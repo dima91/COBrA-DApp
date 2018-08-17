@@ -4,3 +4,4 @@ dapp.express/
 envPopulators/
 prove/
 node_modules
+package-lock.json
