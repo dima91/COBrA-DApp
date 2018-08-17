@@ -1,0 +1,47 @@
+html, body {height: 100%}
+
+.inactive {
+	display: none;
+}
+
+
+.inline {
+	display: inline;
+}
+
+
+#modalHeader {
+	margin-top: 1em;
+}
+
+
+#divUserInfo {
+	margin-top: 1em;
+}
+
+
+#notificationIcon, #headerCloseButton {
+	font-size: 1em;
+	padding: 0.2857143em 1.42857143em;
+}
+
+
+.item.material-icons:hover {
+	cursor: pointer
+}
+
+
+
+
+/* ****************** */
+/* ***** DIALOG ***** */
+
+
+
+/* ****************** */
+/* ***** HEADER ***** */
+
+
+
+/* **************** */
+/* ***** MAIN ***** */

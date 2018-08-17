@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset = "UTF-8">
+		<title>COBrA Dapp</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<link rel="stylesheet" href="style.css">
+
+		<!-- jQuery library -->
+		<script>window.$ = window.jQuery = require('./node_modules/jquery/dist/jquery.js');</script>
+
+		<!-- CSS files -->
+		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.2/dist/semantic.css" /> 
+		<script defer src="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.2/dist/semantic.js"></script>
+	</head>
+   
+
+
+	<body id="body" class='ui page dimmable'>
+
+		<!--********-->
+		<!-- LOADER -->
+		<div class="ui page dimmer" id='loaderDiv'>
+			<div class="ui text loader">
+				Fetching data...
+			</div>
+		</div>
+	
+
+
+
+		<!--****         ****-->
+		<!--    LOGIN DIV    -->
+		<div class="ui modal" id="loginModal">
+			<div class='ui text container'>
+				<h2 class="ui header centered" id='modalHeader'>
+					Insert your username (or chose one to register to COBrA) and select your adrress
+				</h2>
+			</div>
+
+			<div class="ui segment">
+				<div class="ui input" id='modal_uiInput'>
+					<input placeholder="Username..." type="text" id ='modal_usernameInput'>
+				</div>
+
+				<div class="ui inverted divider"></div>
+				
+				<div class="ui fluid dropdown" id='modal_dropdown'>
+					<div class="text">Addresses...</div>
+					<i class="dropdown icon"></i>
+					<div class="menu" id='dropdownElements'>
+					</div>
+				</div>
+
+				<div class="ui inverted divider"></div>
+
+				<div class="ui grid">
+					<div class='four wide column'><div id="modal_submitButton" type="button" class="ui button">Submit</div></div>
+					<div class='four wide column'><div id="modal_closeButton" type="button" class="ui button">Close</div></div>
+				</div>
+			</div>
+		</div>
+
+
+
+
+		<!--**********************-->
+		<!--     MAIN CONTent     -->
+		<div id ='mainDiv' class='ui fluid container'>
+
+			<!--*******************-->
+			<!--     USER INFO     -->
+			<div id='divUserInfo'>
+				<!-- standard user -->
+				<div id='standard' class='ui grid center aligned'>
+					<div class='one wide column'>
+						<img class="ui mini image" src="cobra.png" alt="COBrA">
+					</div>
+					<div class='one wide column'></div>
+					<div class='four wide column inline'>
+						<h3 class='inline hidden'>Username: </h3>
+						<p id='usernameContainer' class='inline'></p>
+					</div>
+					<div class0'two wide column'></div>
+					<div class='five wide column inline'>
+						<h3 class='inline'>Balance: </h3>
+						<p id='balanceContainer' class='inline'></p>
+					</div>
+					<div class='one wide column'></div>
+					<div class='two wide column'>
+						<!-- premium user -->
+						<div id='premium' class=''>
+							Premium user!
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+
+			
+
+
+
+			<!--****************-->
+			<!--     HEADER     -->
+			<header id="header" class="ui tabular menu">
+					<a id="authorRoleBtn" class="item">Author</a>
+					<a id="customerRoleBtn" class="item">Customer</a>
+					<!-- to align navigation to the right -->
+					<div class="right menu">
+						<div class="ui dropdown item" id='actionsDropdown' onclick="$('#actionsDropdown').dropdown('restore default value')">
+							Perform a query
+							<i class="dropdown icon"></i>
+							<div class="menu">
+								<div class="item">Get some statistics</div>
+								<div class="item">Get contents list</div>
+								<div class="item">Get newest contents list</div>
+								<div class="item">Get latest content by author</div>
+								<div class="item">Get latest content by genre</div>
+								<div class="item">Get most popular content by author</div>
+								<div class="item">Get most popular content by genre</div>
+								<div class='item'>Get most rated content</div>
+								<div class='item'>Get most rated content by genre</div>
+								<div class='item'>Get most rated content by author</div>
+							</div>
+						</div>
+
+						<div class='ui dropdown item' id='notificationsDropdown'>
+							<div>
+								<i class="bell icon outline" id="notificationsIcon"></i>
+								<div class="floating ui red circular mini label hidden" id='notificationsNumber'></div>
+							</div>
+							<div class="menu" id='noticationsMenu'>
+								<!--<div class="item">N_0</div>
+								<div class="item">N_1</div>
+								<div class="item">N_2</div>
+								<div class="item">N_3</div>
+								<div class="item">N_4</div>
+								<div class="item">N_5</div>
+								<div class="item">...</div>
+								<div class='item'>N_n</div>-->
+							</div>
+						</div>
+
+						<div class="item" id="headerCloseButton"> <i class="red close link icon"></i> </div>
+					</div>
+				</header>
+
+
+			<!--*************************-->
+			<!--     CHILD CONTAINER     -->
+			<div id ="childContainer" class="inactive ui content">
+
+				<!-- AUTHOR VIEW -->
+				<div id='autorView' class="ui segment inactive">
+					<div class='ui text'>authorView</div>
+				</div>
+
+
+
+				<!-- CUSTOMER VIEW -->
+				<div id='customerView' class='ui segment inactive'>
+					customerView
+				</div>
+			</div>
+		</div>
+	</body>
+
+   <!-- My scripts -->
+   <script type="text/javascript" src="./render.js"></script>
+</html>

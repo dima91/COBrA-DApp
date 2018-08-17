@@ -1,0 +1,22 @@
+{
+	"name": "dapp",
+	"version": "1.0.0",
+	"description": "Dapp for COBrA project",
+	"main": "main.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "electron .",
+		"rebuild": "electron-rebuild -f -w web3 solc"
+	},
+	"author": "Luca Di Mauro",
+	"license": "ISC",
+	"dependencies": {
+		"jquery": "^3.3.1",
+		"solc": "^0.4.24",
+		"web3": "^1.0.0-beta.34"
+	},
+	"devDependencies": {
+		"electron": "^2.0.3",
+		"electron-rebuild": "^1.7.3"
+	}
+}
