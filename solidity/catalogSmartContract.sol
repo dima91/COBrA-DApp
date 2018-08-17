@@ -172,6 +172,17 @@ contract CatalogSmartContract is Ownable {
     function isPremiumValid (bytes32 _username, uint _currentBlockNumber) userExistsM(_username) private view returns (bool) {
         return (usersMapping[_username].expirationTime > _currentBlockNumber);
     }
+
+	// Return true if at least one feedback is given, false otherwise
+	function atLeastOneFeedback (uint[3] feedsCount) private pure returns (bool) {
+		uint i	= 0;
+		for (i=0; i<3; i++) {
+			if (feedsCount[i] != 0)
+				return true;
+		}
+
+		return false;
+	}
     
     // Return the average value of feedbacks, given as parameter
     function feedbacksAverage (uint[3] feeds, uint[3] feedsCount) private pure returns (uint) {
@@ -203,16 +214,17 @@ contract CatalogSmartContract is Ownable {
         uint inspectedElements  = 0;
         
         for (i=0; i<contentsCount; i++) {
-            BaseContentManagementContract _content  = BaseContentManagementContract (contentsMapping[contentsArray[i]].contractAddress);
+            BaseContentManagementContract content  = BaseContentManagementContract (contentsMapping[contentsArray[i]].contractAddress);
             bytes32 currentAuthor                   = contentsMapping[contentsArray[i]].author;
             
-            if (_filterByGenre && _content.getType() != _type)
+            if (_filterByGenre && content.getType() != _type)
                 continue;
             if (_filterByAuthor && currentAuthor != _author)
                 continue;
-                
-            uint[3] memory feeds        = (BaseContentManagementContract(contentsMapping[contentsArray[i]].contractAddress)).getFeedbacksAverages();
-            uint[3] memory feedsCount   = (BaseContentManagementContract(contentsMapping[contentsArray[i]].contractAddress)).getFeedbacksCount();
+            
+            uint[3] memory feeds        = content.getFeedbacksAverages();
+            uint[3] memory feedsCount   = content.getFeedbacksCount();
+
             if (_category == 0) {
                 // Calculating average and compare to temporary most rated
                 // FIXME Add check on feedsCount > 0
@@ -238,6 +250,17 @@ contract CatalogSmartContract is Ownable {
         
         return contentsArray[mostRatedIdx];
     }
+
+	// This function send to author reward for the content
+	function sendReward (BaseContentManagementContract _remoteContract, bytes32 _contentTitle) private {
+		uint[3] memory feeds        = _remoteContract.getFeedbacksAverages();
+        uint[3] memory feedsCount   = _remoteContract.getFeedbacksCount();
+		address authorAddress		= usersMapping[contentsMapping[_contentTitle].author].userAddress;
+			
+		uint avg = feedbacksAverage (feeds, feedsCount);
+		
+		authorAddress.transfer ((contentsMapping[_contentTitle].contentPrice * avg) / 5);
+	}
     
     
     
@@ -303,14 +326,13 @@ contract CatalogSmartContract is Ownable {
     // Function to notify new view from another content manager
     // FIXME Update payment to author
     // FIXME Check correspondance between msg.sender and saved contentAddress
-    function notifyNewView (bytes32 _contentTitle, bytes32 _username) alreadyPublishedM (_contentTitle) userExistsM (_username) userAllowed (_username, _contentTitle) public {
-        bytes32 author= contentsMapping[_contentTitle].author;
-        uint count= BaseContentManagementContract (msg.sender).getViewsCount ();
-        //feedbacksAverage
+    function notifyNewView (bytes32 _contentTitle, bytes32 _username) alreadyPublishedM (_contentTitle)
+	userExistsM (_username) userAllowed (_username, _contentTitle) public {
+		BaseContentManagementContract remoteContract	= BaseContentManagementContract (msg.sender);
+		uint count										= remoteContract.getViewsCount ();
         
-        if ((count % MAX_VIEWS_LIMIT) == 0) {
-            address rcvAddr= usersMapping[author].userAddress;
-            rcvAddr.transfer (MAX_VIEWS_LIMIT * PAYOUT_FOR_AUTHOR);
+        if ((count % MAX_VIEWS_LIMIT) == 0 && count != 0) {
+			sendReward (remoteContract, _contentTitle);
         }
     }
     
@@ -393,9 +415,10 @@ contract CatalogSmartContract is Ownable {
         
         while (i != 0 && !found ) {
             i--;
-            if ((BaseContentManagementContract(contentsMapping[contentsArray[i]].contractAddress)).getType() == _ct) {
+			BaseContentManagementContract cont= BaseContentManagementContract(contentsMapping[contentsArray[i]].contractAddress);
+            if (cont.getType() == _ct) {
                 found = true;
-                reqStr= (BaseContentManagementContract(contentsMapping[contentsArray[i]].contractAddress)).getTitle();
+                reqStr= cont.getTitle();
             }
         }
         
