@@ -1,34 +1,25 @@
-// FIXME Integrate with truffle compilation!!!
-
 
 const fs= require('fs')
 const Web3= require ("web3");
 
-var contarcts= [];  // {'code': ..., 'compiled':..., 'byteCode':..., 'abi':..., 'contract':..., 'instance':...}
-var addresses= [];
-var catalogAddress;
-var casinoContract;
+const folderPrefix	= '../solidity/build/contracts/'
+const baseContentContractPath	= folderPrefix + 'BaseContentManagementContract.json'
+const catalogSmartContractPath	= folderPrefix + 'CatalogSmartContract.json'
+const documentContractPath		= folderPrefix + 'DocumentManagementContract.json'
+const photoContractPath			= folderPrefix + 'PhotoManagementContract.json'
+const videoContractPath			= folderPrefix + 'VideoManagementContract.json'
 
+let web3;
 
+let contarcts= [];  // {'code': ..., 'compiled':..., 'byteCode':..., 'abi':..., 'contract':..., 'instance':...}
+let addresses= [];
+let catalogAddress;
+let casinoContract;
 
-				// (contract.sol, Casino)
-let compileContract = (path, name) => {
-	var cCode =		fs.readFileSync (path).toString();
-	var compCode = 	solc.compile (cCode, 1);
-	var bCode = 	compCode.contracts[':'+name].bytecode;
-	var abi = 		JSON.parse (compCode.contracts[':'+name].interface);
-	var contract = 	new web3.eth.Contract (abi);
-	var deployed = 	contract.deploy ({ data : bCode });
-
-	return {code:cCode, compiled:compCode, byteCode:bCode, abi:abi, contract:contract, deployed:deployed, address:""};
+let readContract = (contractPath) => {
+	content= fs.readFileSync (contractPath);
+	return JSON.parse(content);
 }
-
-
-
-let publishContents = () => {
-
-}
-
 
 
 console.log ("Hello client!");
@@ -41,10 +32,32 @@ if (typeof web3 !== 'undefined') {
 	web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 }
 
+
+
+
 web3.eth.getAccounts (function (err, res) {
 	addresses= res;
 }).then ( () => {
-	casinoContract= compileContract ('../cobra/contracts.sol', 'CatalogSmartContract')
+	let catalogAbi	= (readContract (catalogSmartContractPath))['abi'];
+	var catalogContract	= new web3.eth.Contract (catalogAbi, '0xa1d83ed7e589892afbac6d9b772081ef81c0d259',{
+													from : addresses[0]
+												});
+	/*catalogContract.methods.getContentList().send ()
+		.then ((result) => {console.log ('Result of query'); console.log (result)});*/
+	catalogContract.methods.registerMe('0xab').send ({from : addresses[0], gas:300000}, (err, res) => {
+													console.log (err);
+													console.log (res);
+												})
+
+	setTimeout (() => {
+		catalogContract.methods.isPremium('0xab').call ({from : addresses[0]}).then ((res) => {
+			console.log (res);
+	})}, 3000)
+
+
+
+
+/*	casinoContract= compileContract ('../cobra/contracts.sol', 'CatalogSmartContract')
 	casinoContract['deployed'].send ({
 		from: addresses[0],
 		gas: 3000000,
@@ -59,5 +72,5 @@ web3.eth.getAccounts (function (err, res) {
 	.then(function(newContractInstance){
 		console.log("New contract address: " + newContractInstance.options.address) // instance with the new contract address
 		casinoContract['contract'].options.address= newContractInstance.options.address;
-	});
+	});*/
 })
