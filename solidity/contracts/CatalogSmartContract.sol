@@ -1,8 +1,8 @@
 pragma solidity ^0.4.24;
 
-import "./sharedTypes.sol";
-import "./ownable.sol";
-import "./baseContentManagementContract.sol";
+import "./SharedTypes.sol";
+import "./Ownable.sol";
+import "./BaseContentManagementContract.sol";
 
 
 contract CatalogSmartContract is Ownable {
