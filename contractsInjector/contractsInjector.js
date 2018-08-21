@@ -47,7 +47,7 @@ web3.eth.getAccounts (function (err, res) {
 
 
 
-	/****** Get content list */
+	/****** Get content list
 	catalogContract.methods.getContentList()
 						   .call ({from : addresses[0], gas:300000}, (err, res) => {
 								console.log (err);
@@ -98,6 +98,18 @@ web3.eth.getAccounts (function (err, res) {
 											})
 	//*/
 
+
+
+	/****** Check existance of user
+	catalogContract.methods.userExists ('0x6c756361')
+							.call ({from : addresses[0], gas:300000}, (err, res) => {
+								console.log (err);
+								console.log (res);
+							}).then (() => {
+								console.log ("Resolved");
+							});
+	//*/
+
 	
 
 	/****** Buy premium account
@@ -109,17 +121,11 @@ web3.eth.getAccounts (function (err, res) {
 
 
 	/****** Check whether an account is premium
-	catalogContract.methods.isPremium('0xab').call ({from : addresses[0]}).then ((res) => {
+	catalogContract.methods.isPremium('0x6c756361').call ({from : addresses[0]}).then ((res) => {
 		console.log (res);
 	})
 	//*/
-});
-
-
-
-setTimeout(() => {
-	console.log (web3.utils.toWei ("44000", "szabo"))
-}, 3000);
+})
 
 
 

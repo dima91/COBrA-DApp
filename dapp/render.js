@@ -3,10 +3,10 @@ const ipcr= ipcRenderer;
 
 var username;
 var address;
-var ADDRESSES= []
-var notifications= []
+var ADDRESSES		= []
+var notifications	= []
 
-const ___TEST___= false;
+const ___TEST___	= false;
 
 
 
@@ -24,8 +24,8 @@ const hideLoader= () => {
 
 const newNotification= (ni) => {
 	notifications.push (ni)
-	$('#notificationsNumber').html (notifications.length)
-	$('#notificationsNumber').removeClass ('hidden')
+	/*$('#notificationsNumber').html (notifications.length)
+	$('#notificationsNumber').removeClass ('hidden')*/
 	$('#notificationsIcon').removeClass ('outline')
 	$('#notificationsIcon').addClass ('blue')
 	
@@ -41,8 +41,8 @@ const readNotification= (ith) => {
 
 
 
-// ====================
-// =====  EVENTS  =====
+// ============================
+// ===== ELECTRON EVENTS  =====
 
 // Event handler for incoming addresses
 ipcr.on ('addresses', (event, arg) => {
@@ -72,14 +72,21 @@ ipcr.on ('newBalance', (event, arg) => {
 // Event handler for incoming user information
 ipcr.on ('userInfo', (event, arg) => {
 	jsonP= JSON.parse (arg);
-	console.log ('Incoming infos:')
-	console.log (jsonP);
 
-	$('#childContainer').removeClass ('inactive')
-	hideLoader ()
+	if (jsonP['status'] == 'error') {
+		// TODO Handle this error
+	}
+	else {
+		$('#childContainer').removeClass ('inactive')
+		hideLoader ()
 
-	$('#usernameContainer').html (username);
-	$('#balanceContainer').html (jsonP['balance'] + " (gigaWei)");
+		$('#usernameContainer').html (username);
+		$('#balanceContainer').html (jsonP['balance'] + " (ether)");
+		if (jsonP['isPremium'] == true)
+			$('#premium').removeClass ('inactive');
+		else
+			$('#premium').addClass ('inactive');
+	}
 })
 
 
@@ -153,7 +160,6 @@ $('#modal_submitButton').click ((evt) => {
 		if (address == "Addresses..." || address == "" || address == undefined) {
 			$('#modal_dropdown').addClass('error')
 		}
-		
 	}
 })
 
@@ -162,9 +168,9 @@ $('#modal_submitButton').click ((evt) => {
 // ********************
 // *****  Header  *****
 
-$("#headerCloseButton").click ((evt) => {
+/*$("#headerCloseButton").click ((evt) => {
 	ipcRenderer.send('quitDapp', {});
-})
+})*/
 
 
 
@@ -184,6 +190,7 @@ $("#customerRoleBtn").click ((evt) => {
 // Getting addresses
 window.onload = () => {
 	ipcr.send('getAddresses', {})
+
 	$('#loginModal').modal ('show')
 	$('.ui.dropdown').dropdown();
 
@@ -203,7 +210,7 @@ window.onload = () => {
 		// Timeout to create new notification
 		setTimeout(() => {
 			newNotification ({name: "testNotification"})
-		}, 10000)
+		}, 20000)
 	}
 }
 

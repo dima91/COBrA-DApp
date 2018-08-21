@@ -1,16 +1,38 @@
 const {app, BrowserWindow, ipcMain} = require('electron');
-const path= require ('path')
-const Web3= require ("web3");
+const path	= require ('path');
+const Web3	= require ("web3");
+const fs	= require('fs');
+
+
+// Send something -->      mainWindow.webContents.send('some-message', {})
+
+const folderPrefix	= '../solidity/build/contracts/'
+const baseContentContractPath	= folderPrefix + 'BaseContentManagementContract.json'
+const catalogSmartContractPath	= folderPrefix + 'CatalogSmartContract.json'
+const documentContractPath		= folderPrefix + 'DocumentManagementContract.json'
+const photoContractPath			= folderPrefix + 'PhotoManagementContract.json'
+const videoContractPath			= folderPrefix + 'VideoManagementContract.json'
 
 
 var web3;
-const ipcM= ipcMain;
+const ipcM	= ipcMain;
 
-let window;
+var mainWindow;
 
-let addresses= [];
-let localAddress;
-let endpoint;
+
+var contracts	= {};
+var addresses	= [];
+
+var userBalance;
+var userAddress;
+var addressIndex;
+var hexUser;
+var stringUser;
+
+var catalogContract;
+var catalogInstance;
+var catalogAddress;
+var endpoint;
 
 
 const createWindow= () => {
@@ -18,19 +40,19 @@ const createWindow= () => {
 		console.log ("No address available: VERY DANGEROUS!\nEXIT")
 		process.exit ();
 	}
-	window = new BrowserWindow({
+	mainWindow = new BrowserWindow({
 		icon: path.join(__dirname, 'cobra.png'),
-		show:false
+		show:false,
 	})
 	
-	window.loadURL(`file://${__dirname}/index.html`)
+	mainWindow.loadURL(`file://${__dirname}/index.html`)
 
-	window.once ('ready-to-show', () => {
-		window.maximize ();
+	mainWindow.once ('ready-to-show', () => {
+		mainWindow.maximize ();
 	})
 
-	window.on ('closed', () => {
-		window = null
+	mainWindow.on ('closed', () => {
+		mainWindow = undefined
 	})
 }
 
@@ -44,29 +66,48 @@ const loadAddresses= () => {
 
 
 
-// Parsing comman line arguments
-if (process.argv.length !=3) {
-	endpoint= "http://localhost:8545";
+
+const readContract	= (contractPath) => {
+	content= fs.readFileSync (contractPath);
+	return JSON.parse(content);
 }
-else {
-	endpoint= process.argv[2];
+
+
+
+
+const getOtherInfo	= () => {
+	var tmpPreium;
+	console.log ('1 ' + userAddress);
+	web3.eth.getBalance (userAddress, (err, res) => {
+		console.log ('2');
+		// Recived balance in 'wei' --> converting it into 'ether'
+		userBalance	= web3.utils.fromWei (res);
+		console.log ('3');
+	}).then (() => {
+		console.log ('4');
+		catalogInstance
+		.methods
+		.isPremium (hexUser).call ({from:userAddress, gas:300000}, (err, res) => {
+										tmpPreium	= res;
+									}).then (() => {
+										console.log ('5');
+										data	= {
+											'balance'	: userBalance,
+											'isPremium'	: tmpPreium,
+											'status'	: 'success'
+										}
+										mainWindow.webContents.send('userInfo', JSON.stringify(data))
+									})
+	})
 }
-web3 = new Web3(new Web3.providers.HttpProvider(endpoint));
-
-
-app.on('ready', loadAddresses)
 
 
 
 
 
 
-
-
-
-
-// ====================
-// =====  EVENTS  =====
+// =============================
+// =====  ELECTRON EVENTS  =====
 
 
 // Event handler for quitDapp requests
@@ -81,12 +122,84 @@ ipcMain.on ('getAddresses', (event, arg) => {
 })
 
 
- // Event handler for 'userInfo' message
+/* Event handler for 'userInfo' request
+	If user exists, checks corrispondance with address
+	If it doesn't exists, try to register it */
 ipcMain.on ('userInfo', (event, arg) => {
-	console.log ('Received request for user informations for  ' + arg['addr']);
-	web3.eth.getBalance (arg['addr'], (err, res) => {
-		// Recived balance in 'wei' --> convert it into 'gigaWei'!
-		var balance = (new Number(res))/(parseInt(1000000000, 10))
-		event.sender.send ('userInfo', JSON.stringify({'balance':balance}))
-	})
+	console.log ('Received request for user  ' + arg['user'] + '  informations for  ' + arg['addr']);
+
+	stringUser		= arg['user'];
+	hexUser			= web3.utils.stringToHex (arg['user']);
+	userAddress			= arg['addr'];
+	addressIndex	= addresses.indexOf (arg['addr']);
+	catalogContract	= (readContract (catalogSmartContractPath));
+	catalogInstance	= new web3.eth.Contract (catalogContract.abi, catalogAddress);
+	
+	var userExists	= false;
+	var tmpAddress;
+
+	console.log (hexUser)
+
+	catalogInstance
+	.methods
+	.userExists (hexUser).call ({from:userAddress, gas:300000}, (err, res) => {
+									// FIXME Handle errors
+									userExists	= res;
+								}).then (() => {
+									console.log ('B ' +userExists);
+									if (userExists) {
+										console.log ('E');
+										catalogInstance
+										.methods
+										.getUserAddress (hexUser).call ({from:userAddress, gas:300000}, (err, res) => {
+											console.log ('C');
+											tmpAddress	= res;
+										}).then (() => {
+											console.log ('D');
+											if (tmpAddress == userAddress) {
+												console.log ("Good news. Getting balance and other info");
+												getOtherInfo ()
+											}
+											else
+												console.log ("It is an error!");
+												throw "Error!"
+										})
+									}
+									else {
+										console.log (userAddress);
+										catalogInstance
+										.methods.registerMe (hexUser).send ({from:userAddress, gas:300000}, (err, res) => {
+											console.log ("err: " + err)
+											console.log ("res: "+ res)
+											getOtherInfo ()
+										});
+									}
+								})
 })
+
+
+
+
+
+
+
+
+
+
+
+
+// FIXME !!!!!!  Parsing comman line arguments
+/*if (process.argv.length !=3) {
+	endpoint= "http://localhost:8545";
+}
+else {
+	endpoint= process.argv[2];
+}*/
+endpoint		= "http://localhost:8545";
+web3			= new Web3(new Web3.providers.HttpProvider(endpoint));
+catalogAddress	= process.argv[2]
+console.log ("Cat addr:  " + catalogAddress)
+
+
+
+app.on('ready', loadAddresses)

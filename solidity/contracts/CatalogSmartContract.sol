@@ -127,11 +127,6 @@ contract CatalogSmartContract is Ownable {
     // ************************************************************************************************************** //
     // Helper private functions
     
-    // Function to check if a user exists or not in usersMapping
-    function userExists (bytes32 _username) private view returns (bool){
-		return (usersMapping[_username].exists == true);
-    }
-
     // Function which returns wether a content is already published on the platform
     function alreadyPublished (bytes32 _conTitle) private view returns (bool) {
         return (contentsMapping[_conTitle].exists == true);
@@ -174,15 +169,15 @@ contract CatalogSmartContract is Ownable {
     }
 
 	// Return true if at least one feedback is given, false otherwise
-	function atLeastOneFeedback (uint[3] feedsCount) private pure returns (bool) {
-		uint i	= 0;
-		for (i=0; i<3; i++) {
-			if (feedsCount[i] != 0)
+    function atLeastOneFeedback (uint[3] feedsCount) private pure returns (bool) {
+        uint i	= 0;
+        for (i=0; i<3; i++) {
+            if (feedsCount[i] != 0)
 				return true;
-		}
+        }
 
-		return false;
-	}
+        return false;
+    }
     
     // Return the average value of feedbacks, given as parameter
     function feedbacksAverage (uint[3] feeds, uint[3] feedsCount) private pure returns (uint) {
@@ -252,15 +247,15 @@ contract CatalogSmartContract is Ownable {
     }
 
 	// This function send to author reward for the content
-	function sendReward (BaseContentManagementContract _remoteContract, bytes32 _contentTitle) private {
-		uint[3] memory feeds        = _remoteContract.getFeedbacksAverages();
+    function sendReward (BaseContentManagementContract _remoteContract, bytes32 _contentTitle) private {
+        uint[3] memory feeds        = _remoteContract.getFeedbacksAverages();
         uint[3] memory feedsCount   = _remoteContract.getFeedbacksCount();
-		address authorAddress		= usersMapping[contentsMapping[_contentTitle].author].userAddress;
+        address authorAddress		= usersMapping[contentsMapping[_contentTitle].author].userAddress;
 			
-		uint avg = feedbacksAverage (feeds, feedsCount);
+        uint avg = feedbacksAverage (feeds, feedsCount);
 		
-		authorAddress.transfer ((contentsMapping[_contentTitle].contentPrice * avg) / 5);
-	}
+        authorAddress.transfer ((contentsMapping[_contentTitle].contentPrice * avg) / 5);
+    }
     
     
     
@@ -328,11 +323,11 @@ contract CatalogSmartContract is Ownable {
     // FIXME Check correspondance between msg.sender and saved contentAddress
     function notifyNewView (bytes32 _contentTitle, bytes32 _username) alreadyPublishedM (_contentTitle)
 	userExistsM (_username) userAllowed (_username, _contentTitle) public {
-		BaseContentManagementContract remoteContract	= BaseContentManagementContract (msg.sender);
-		uint count										= remoteContract.getViewsCount ();
+        BaseContentManagementContract remoteContract	= BaseContentManagementContract (msg.sender);
+        uint count										= remoteContract.getViewsCount ();
         
         if ((count % MAX_VIEWS_LIMIT) == 0 && count != 0) {
-			sendReward (remoteContract, _contentTitle);
+            sendReward (remoteContract, _contentTitle);
         }
     }
     
@@ -340,6 +335,18 @@ contract CatalogSmartContract is Ownable {
     // Function to get a content's address
     function getAddressOf (bytes32 _contentTitle) alreadyPublishedM (_contentTitle) public view returns (address) {
         return contentsMapping[_contentTitle].contractAddress;
+    }
+
+
+	// Function to obtain address of user _username
+    function getUserAddress (bytes32 _username) userExistsM (_username) public view returns (address) {
+        return usersMapping[_username].userAddress;
+    }
+
+
+	// Function to check if a user exists or not in usersMapping
+    function userExists (bytes32 _username) public view returns (bool){
+        return (usersMapping[_username].exists == true);
     }
     
     
@@ -379,7 +386,7 @@ contract CatalogSmartContract is Ownable {
     
     
     // Returns the list of x newest contents
-	function getNewContentList (uint _n) public view returns (bytes32[]) {
+    function getNewContentList (uint _n) public view returns (bytes32[]) {
         uint count=0;
         uint i=0;
         uint j=0;
@@ -415,7 +422,7 @@ contract CatalogSmartContract is Ownable {
         
         while (i != 0 && !found ) {
             i--;
-			BaseContentManagementContract cont= BaseContentManagementContract(contentsMapping[contentsArray[i]].contractAddress);
+            BaseContentManagementContract cont= BaseContentManagementContract(contentsMapping[contentsArray[i]].contractAddress);
             if (cont.getType() == _ct) {
                 found = true;
                 reqStr= cont.getTitle();
@@ -524,9 +531,9 @@ contract CatalogSmartContract is Ownable {
     
     /* Returns the content with highest rating for feedback category _category
      * (or highest average of all ratings it _category is not specified) with author _author */
-	function getMostRatedByAuthor (bytes32 _author, uint8 _category) public view returns (bytes32) {
-         return genericGetMostRated (true, _author, false, SharedTypes.contentType.song, _category);
-     }
+    function getMostRatedByAuthor (bytes32 _author, uint8 _category) public view returns (bytes32) {
+        return genericGetMostRated (true, _author, false, SharedTypes.contentType.song, _category);
+    }
     
     
     // ************************************************************************************************************** //
@@ -576,7 +583,7 @@ contract CatalogSmartContract is Ownable {
         usersMapping[_receivingUser].expirationTime= block.number + PREMIUM_ACCOUNT_DURATION;
         
         emit GrantedPremium (_receivingUser,  usersMapping[_receivingUser].userAddress);
-	}
+    }
     
     
     
