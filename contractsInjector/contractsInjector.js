@@ -11,15 +11,19 @@ const videoContractPath			= folderPrefix + 'VideoManagementContract.json'
 
 let web3;
 
-let contarcts= [];  // {'code': ..., 'compiled':..., 'byteCode':..., 'abi':..., 'contract':..., 'instance':...}
 let addresses= [];
-let catalogAddress;
-let casinoContract;
+let catalogAddress	= process.argv[2];
+let tmpInstance		= process.argv[3];
 
-let readContract = (contractPath) => {
+
+let readContract	= (contractPath) => {
 	content= fs.readFileSync (contractPath);
 	return JSON.parse(content);
 }
+
+
+
+
 
 
 console.log ("Hello client!");
@@ -38,21 +42,84 @@ if (typeof web3 !== 'undefined') {
 web3.eth.getAccounts (function (err, res) {
 	addresses= res;
 }).then ( () => {
-	let catalogAbi	= (readContract (catalogSmartContractPath))['abi'];
-	var catalogContract	= new web3.eth.Contract (catalogAbi, '0xa1d83ed7e589892afbac6d9b772081ef81c0d259',{
-													from : addresses[0]
-												});
-	/*catalogContract.methods.getContentList().send ()
-		.then ((result) => {console.log ('Result of query'); console.log (result)});*/
-	catalogContract.methods.registerMe('0xab').send ({from : addresses[0], gas:300000}, (err, res) => {
-													console.log (err);
-													console.log (res);
-												})
+	let catalogAbi	= (readContract (catalogSmartContractPath)).abi;
+	var catalogContract	= new web3.eth.Contract (catalogAbi, catalogAddress);
 
-	setTimeout (() => {
-		catalogContract.methods.isPremium('0xab').call ({from : addresses[0]}).then ((res) => {
-			console.log (res);
-	})}, 3000)
+
+
+	/****** Get content list */
+	catalogContract.methods.getContentList()
+						   .call ({from : addresses[0], gas:300000}, (err, res) => {
+								console.log (err);
+								console.log (res);
+							});
+	//*/
+
+
+
+	/****** Create new content instance
+	var rContract		= readContract (documentContractPath);
+	var documentAbi		= rContract.abi;
+	var documentContract	= new web3.eth.Contract (documentAbi)
+	var contractData		= rContract.bytecode;
+	
+	documentContract
+			.deploy ({data:contractData, arguments:['0xab', catalogAddress]})
+			.send ({from : addresses[0], gas:10000000});
+	//*/
+
+
+
+	/****** Publish new content on catalog
+	catalogContract.methods.publishContent ('0xaa', '0xab', web3.utils.toWei ("6300", "szabo"), tmpInstance)
+							.send ({from : addresses[0], gas:300000}, (err, res) => {
+								console.log (err);
+								console.log (res);
+							});
+
+	//*/
+	
+
+	
+	/****** Get content list
+	catalogContract.methods.getAddressOf ("0xab")
+						   .call ({from : addresses[0], gas:300000}, (err, res) => {
+								console.log (err);
+								console.log (res);
+							});
+	//*/
+
+
+	
+	/****** Register an user
+	catalogContract.methods.registerMe('0xab').send ({from : addresses[0], gas:300000}, (err, res) => {
+												console.log (err);
+												console.log (res);
+											})
+	//*/
+
+	
+
+	/****** Buy premium account
+	catalogContract.methods.buyPremium ()
+	.send ({from: addresses[0], value:web3.utils.toWei ("44000", "szabo")})
+	.then (() => {console.log ("Premium buyied")})
+	//*/
+
+
+
+	/****** Check whether an account is premium
+	catalogContract.methods.isPremium('0xab').call ({from : addresses[0]}).then ((res) => {
+		console.log (res);
+	})
+	//*/
+});
+
+
+
+setTimeout(() => {
+	console.log (web3.utils.toWei ("44000", "szabo"))
+}, 3000);
 
 
 
@@ -73,4 +140,3 @@ web3.eth.getAccounts (function (err, res) {
 		console.log("New contract address: " + newContractInstance.options.address) // instance with the new contract address
 		casinoContract['contract'].options.address= newContractInstance.options.address;
 	});*/
-})
