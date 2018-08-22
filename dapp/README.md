@@ -1,3 +1,14 @@
+# Useful commands
+
+* **/solidity -> rm build/contracts/*.json && truffle compile**: compile contracts with truffle
+* **/ -> redis-cli SET catAddr <address>**: set redis-server's 'catAddr' key to address of catalog
+* **/contractsInjectors -> nodejs createCatalog.js**: create catalog instance
+* **/ --> ganache-cli -l 10000000000000000 -g 2000 -e 1000**: starts ethereum test net
+* **/ --> npm start --prefix dapp/ $(redis-cli GET catAddr)**: starts application
+
+
+
+
 # Topic data model
 
 ## main -> render

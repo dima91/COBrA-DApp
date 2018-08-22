@@ -199,7 +199,7 @@ window.onload = () => {
 		// Timeout to automatically access with first address of array
 		setTimeout(() => {
 			console.log ('Helo user: ' + ___TEST___)
-			address= ADDRESSES[0]
+			address= ADDRESSES[9]
 			username= 'luca'
 			payload= {'user': username, 'addr': address};
 			$('#loginModal').modal ('hide')

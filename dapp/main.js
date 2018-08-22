@@ -77,20 +77,15 @@ const readContract	= (contractPath) => {
 
 const getOtherInfo	= () => {
 	var tmpPreium;
-	console.log ('1 ' + userAddress);
 	web3.eth.getBalance (userAddress, (err, res) => {
-		console.log ('2');
 		// Recived balance in 'wei' --> converting it into 'ether'
 		userBalance	= web3.utils.fromWei (res);
-		console.log ('3');
 	}).then (() => {
-		console.log ('4');
 		catalogInstance
 		.methods
 		.isPremium (hexUser).call ({from:userAddress, gas:300000}, (err, res) => {
 										tmpPreium	= res;
 									}).then (() => {
-										console.log ('5');
 										data	= {
 											'balance'	: userBalance,
 											'isPremium'	: tmpPreium,
@@ -126,7 +121,7 @@ ipcMain.on ('getAddresses', (event, arg) => {
 	If user exists, checks corrispondance with address
 	If it doesn't exists, try to register it */
 ipcMain.on ('userInfo', (event, arg) => {
-	console.log ('Received request for user  ' + arg['user'] + '  informations for  ' + arg['addr']);
+	console.log ('Received request for\n\tuser:  ' + arg['user'] + '\n\taddress:  ' + arg['addr']);
 
 	stringUser		= arg['user'];
 	hexUser			= web3.utils.stringToHex (arg['user']);
@@ -138,7 +133,7 @@ ipcMain.on ('userInfo', (event, arg) => {
 	var userExists	= false;
 	var tmpAddress;
 
-	console.log (hexUser)
+	console.log ('Hex user:  ' + hexUser + '\taddress index: ' + addressIndex);
 
 	catalogInstance
 	.methods
@@ -146,31 +141,35 @@ ipcMain.on ('userInfo', (event, arg) => {
 									// FIXME Handle errors
 									userExists	= res;
 								}).then (() => {
-									console.log ('B ' +userExists);
 									if (userExists) {
-										console.log ('E');
+										console.log ('User exists! Checking corrispondance with address..');
 										catalogInstance
 										.methods
 										.getUserAddress (hexUser).call ({from:userAddress, gas:300000}, (err, res) => {
-											console.log ('C');
+											if (err) {
+												// TODO Handle errors!
+												throw "Cannot get user address!"
+											}
 											tmpAddress	= res;
 										}).then (() => {
-											console.log ('D');
 											if (tmpAddress == userAddress) {
 												console.log ("Good news. Getting balance and other info");
 												getOtherInfo ()
 											}
 											else
-												console.log ("It is an error!");
+												console.log ("Received address form catalog differs from chosen address: it is an error!");
 												throw "Error!"
 										})
 									}
 									else {
-										console.log (userAddress);
 										catalogInstance
 										.methods.registerMe (hexUser).send ({from:userAddress, gas:300000}, (err, res) => {
-											console.log ("err: " + err)
-											console.log ("res: "+ res)
+											if (err) {
+												// TODO Handle errors!
+												console.log ("It is an error!");
+												throw "Error!"
+											}
+										}).then (() => {
 											getOtherInfo ()
 										});
 									}
@@ -198,7 +197,7 @@ else {
 endpoint		= "http://localhost:8545";
 web3			= new Web3(new Web3.providers.HttpProvider(endpoint));
 catalogAddress	= process.argv[2]
-console.log ("Cat addr:  " + catalogAddress)
+console.log ("Catalog address:  " + catalogAddress)
 
 
 

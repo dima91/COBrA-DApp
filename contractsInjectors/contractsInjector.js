@@ -11,14 +11,38 @@ const videoContractPath			= folderPrefix + 'VideoManagementContract.json'
 
 let web3;
 
+if (process.argv.length < 3)
+	throw "Invalid arguments"
+
 let addresses= [];
 let catalogAddress	= process.argv[2];
 let tmpInstance		= process.argv[3];
+
+var lucaHex	= '0x6c756361';
+
+let CREATE_CATALOG = true;
 
 
 let readContract	= (contractPath) => {
 	content= fs.readFileSync (contractPath);
 	return JSON.parse(content);
+}
+
+
+
+var createNewCatalog	= () => {
+	let rContract		= readContract (catalogSmartContractPath);
+	let catalogAbi		= rContract.abi;
+	let catalogContract	= new web3.eth.Contract (catalogAbi);
+	let contractData		= rContract.bytecode;
+	
+	catalogContract
+			.deploy ({data:contractData})
+			.send ({from : addresses[0], gas:10000000}, (err, res) => {
+				console.log (err);
+				console.log (res);
+			})
+			.then (() => { process.exit (); });
 }
 
 
@@ -42,12 +66,12 @@ if (typeof web3 !== 'undefined') {
 web3.eth.getAccounts (function (err, res) {
 	addresses= res;
 }).then ( () => {
+
 	let catalogAbi	= (readContract (catalogSmartContractPath)).abi;
 	var catalogContract	= new web3.eth.Contract (catalogAbi, catalogAddress);
 
 
-
-	/****** Get content list
+	/****** Get content list */
 	catalogContract.methods.getContentList()
 						   .call ({from : addresses[0], gas:300000}, (err, res) => {
 								console.log (err);
@@ -91,7 +115,7 @@ web3.eth.getAccounts (function (err, res) {
 
 
 	
-	/****** Register an user
+	/****** Register an user 
 	catalogContract.methods.registerMe('0xab').send ({from : addresses[0], gas:300000}, (err, res) => {
 												console.log (err);
 												console.log (res);
@@ -114,7 +138,7 @@ web3.eth.getAccounts (function (err, res) {
 
 	/****** Buy premium account
 	catalogContract.methods.buyPremium ()
-	.send ({from: addresses[0], value:web3.utils.toWei ("44000", "szabo")})
+	.send ({from: addresses[9], value:web3.utils.toWei ("44000", "szabo")})
 	.then (() => {console.log ("Premium buyied")})
 	//*/
 
