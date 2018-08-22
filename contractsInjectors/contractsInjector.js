@@ -1,6 +1,6 @@
 
-const fs= require('fs')
-const Web3= require ("web3");
+const fs	= require('fs')
+const Web3	= require ("web3");
 
 const folderPrefix	= '../solidity/build/contracts/'
 const baseContentContractPath	= folderPrefix + 'BaseContentManagementContract.json'
@@ -14,7 +14,7 @@ let web3;
 if (process.argv.length < 3)
 	throw "Invalid arguments"
 
-let addresses= [];
+let addresses	= [];
 let catalogAddress	= process.argv[2];
 let tmpInstance		= process.argv[3];
 

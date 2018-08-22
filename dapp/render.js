@@ -6,7 +6,7 @@ var address;
 var ADDRESSES		= []
 var notifications	= []
 
-const ___TEST___	= false;
+const ___TEST___	= true;
 
 
 
@@ -27,7 +27,7 @@ const newNotification= (ni) => {
 	/*$('#notificationsNumber').html (notifications.length)
 	$('#notificationsNumber').removeClass ('hidden')*/
 	$('#notificationsIcon').removeClass ('outline')
-	$('#notificationsIcon').addClass ('blue')
+	$('#notificationsIcon').addClass ('red')
 	
 	// Adding new element to html!
 	$('#noticationsMenu').append('<div class="item">' + ni.name + '</div>');
@@ -182,6 +182,25 @@ $("#authorRoleBtn").click ((evt) => {
 
 $("#customerRoleBtn").click ((evt) => {
 	showCustomerView ();
+})
+
+
+
+
+// ==================================
+// ====  Create content segment  ====
+$('#create-content-button').click ((evt) => {
+	let type	= $('#contentDropdown').dropdown('get value');
+	let title	= $('#contentTitleInput').val ()
+	let price	= $('#contentPriceInput').val ()
+
+	console.log (type + '  ' + title + '  ' + price)
+
+	$('#contentDropdown').dropdown('restore defaults');
+	$('#contentTitleInput').val ('')
+	$('#contentPriceInput').val ('')
+
+
 })
 
 
