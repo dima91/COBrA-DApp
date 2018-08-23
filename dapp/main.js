@@ -9,6 +9,7 @@ const fs	= require('fs');
 const folderPrefix	= '../solidity/build/contracts/'
 const baseContentContractPath	= folderPrefix + 'BaseContentManagementContract.json'
 const catalogSmartContractPath	= folderPrefix + 'CatalogSmartContract.json'
+const songContractPath			= folderPrefix + 'SongManagementContract.json'
 const documentContractPath		= folderPrefix + 'DocumentManagementContract.json'
 const photoContractPath			= folderPrefix + 'PhotoManagementContract.json'
 const videoContractPath			= folderPrefix + 'VideoManagementContract.json'
@@ -20,8 +21,9 @@ const ipcM	= ipcMain;
 var mainWindow;
 
 
-var contracts	= {};
-var addresses	= [];
+var deployedContracts	= [];		// Array of deployed contracts to create contents
+var contracts			= {};		// ?!?!?!
+var addresses			= [];		// List of available addresses
 
 var userBalance;
 var userAddress;
@@ -67,14 +69,6 @@ const loadAddresses= () => {
 
 
 
-const readContract	= (contractPath) => {
-	content= fs.readFileSync (contractPath);
-	return JSON.parse(content);
-}
-
-
-
-
 const getOtherInfo	= () => {
 	var tmpPreium;
 	web3.eth.getBalance (userAddress, (err, res) => {
@@ -98,12 +92,18 @@ const getOtherInfo	= () => {
 
 
 
+const readContract	= (contractPath) => {
+	content= fs.readFileSync (contractPath);
+	return JSON.parse(content);
+}
+
+
+
 
 
 
 // =============================
 // =====  ELECTRON EVENTS  =====
-
 
 // Event handler for quitDapp requests
 ipcMain.on ('quitDapp', (event, arg) => {
@@ -111,10 +111,14 @@ ipcMain.on ('quitDapp', (event, arg) => {
 })
 
 
+
+
 // Event handler for 'getAddresses' request
 ipcMain.on ('getAddresses', (event, arg) => {
 	event.sender.send ('addresses', JSON.stringify(addresses));
 })
+
+
 
 
 /* Event handler for 'userInfo' request
@@ -179,6 +183,75 @@ ipcMain.on ('userInfo', (event, arg) => {
 
 
 
+// await sleep trick
+function sleep(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms));
+  }
+  
+// We need to wait until any miner has included the transaction
+// in a block to get the address of the contract
+async function waitBlock() {
+while (true) {
+	let receipt = web3.eth.getTransactionReceipt(transferfunds.transactionHash);
+	if (receipt && receipt.contractAddress) {
+	console.log("Your contract has been deployed at "+ receipt.contractAddress);
+	console.log("Note that it might take 30 - 90 sceonds for the block to propagate befor it's visible in etherscan.io");
+	break;
+	}
+	console.log("Waiting a mined block to include your contract... currently in block " + web3.eth.blockNumber);
+	await sleep(4000);
+}
+return;
+}
+  
+
+
+
+
+// Event to request content of deployed contracts
+ipcMain.on ('create-content', (event, data) => {
+	console.log ('Creating content:  '+ data.type +'   '+ data.title +'   '+ data['price'])
+
+
+	abi			= deployedContracts[data.type].abi;
+	bytecode	= deployedContracts[data.type].bytecode;
+	contract	= new web3.eth.Contract (abi);
+
+	contract
+	.deploy	({data: bytecode, arguments: [web3.utils.stringToHex(data.title), catalogAddress]})
+	.send	({from: userAddress, gas: 10000000000000}, (err, res) => {
+		console.log (err)
+		console.log(res)
+	})			// FIXME
+	.on('error', function(error){})
+	.on('transactionHash', function(transactionHash){})
+	.on('receipt', function(receipt){
+	   console.log("Contract address: " + receipt.contractAddress) // contains the new contract address
+	})
+	.on('confirmation', function(confirmationNumber, receipt){})
+	.then ((newContractnstance) => {
+		// Success! --> publishing to the catalog
+		console.log ('Deployed!');
+		console.log (newContractnstance);
+		/*catalogInstance
+		.methods
+		.publshContent (hexUser, data.title, web3.utils.toWei ("6300", "milliether", "0x00" /*contract addres!))
+		.send ({from : userAddress, gas:30000000}, (err, res) => {
+			console.log (err);
+			console.log (res);
+		}).then (() => {
+			console.log ("Published on catalog!")
+		});*/
+
+		getOtherInfo ();
+	});
+})
+
+
+
+
+
+
 
 
 
@@ -201,4 +274,11 @@ console.log ("Catalog address:  " + catalogAddress)
 
 
 
-app.on('ready', loadAddresses)
+app.on('ready', () => {
+	loadAddresses ();
+
+	deployedContracts[0]	= readContract (songContractPath);
+	deployedContracts[1]	= readContract (videoContractPath);
+	deployedContracts[2]	= readContract (photoContractPath);
+	deployedContracts[3]	= readContract (documentContractPath);
+})

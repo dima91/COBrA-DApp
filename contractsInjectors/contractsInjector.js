@@ -5,6 +5,7 @@ const Web3	= require ("web3");
 const folderPrefix	= '../solidity/build/contracts/'
 const baseContentContractPath	= folderPrefix + 'BaseContentManagementContract.json'
 const catalogSmartContractPath	= folderPrefix + 'CatalogSmartContract.json'
+const songContractPath			= folderPrefix + 'SongManagementContract.json'
 const documentContractPath		= folderPrefix + 'DocumentManagementContract.json'
 const photoContractPath			= folderPrefix + 'PhotoManagementContract.json'
 const videoContractPath			= folderPrefix + 'VideoManagementContract.json'

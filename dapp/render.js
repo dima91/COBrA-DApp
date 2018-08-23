@@ -3,40 +3,11 @@ const ipcr= ipcRenderer;
 
 var username;
 var address;
-var ADDRESSES		= []
-var notifications	= []
+var ADDRESSES			= []
+var notifications		= []
+
 
 const ___TEST___	= true;
-
-
-
-
-// ==============================
-// =====  HELPER FUNCTIONS  =====
-
-const showLoader= () => {
-	$('#loaderDiv').addClass ('active')
-}
-
-const hideLoader= () => {
-	$('#loaderDiv').removeClass ('active')
-}
-
-const newNotification= (ni) => {
-	notifications.push (ni)
-	/*$('#notificationsNumber').html (notifications.length)
-	$('#notificationsNumber').removeClass ('hidden')*/
-	$('#notificationsIcon').removeClass ('outline')
-	$('#notificationsIcon').addClass ('red')
-	
-	// Adding new element to html!
-	$('#noticationsMenu').append('<div class="item">' + ni.name + '</div>');
-}
-
-const readNotification= (ith) => {
-	// TODO Deelte element from html. If (notifications.length == 0) then remove 'notificationsNumber' element.
-	// TODO remove class 'blue' from 'notificationsIcon' and insert 'outline'
-}
 
 
 
@@ -78,7 +49,7 @@ ipcr.on ('userInfo', (event, arg) => {
 	}
 	else {
 		$('#childContainer').removeClass ('inactive')
-		hideLoader ()
+		hideLoader ();
 
 		$('#usernameContainer').html (username);
 		$('#balanceContainer').html (jsonP['balance'] + " (ether)");
@@ -99,6 +70,42 @@ ipcr.on ('userInfo', (event, arg) => {
 // ==============================
 // =====  HELPER FUNCTIONS  =====
 
+const showLoader= () => {
+	$('#loaderDiv').addClass ('active')
+}
+
+
+
+
+const hideLoader= () => {
+	$('#loaderDiv').removeClass ('active')
+}
+
+
+
+
+const newNotification= (ni) => {
+	notifications.push (ni)
+	/*$('#notificationsNumber').html (notifications.length)
+	$('#notificationsNumber').removeClass ('hidden')*/
+	$('#notificationsIcon').removeClass ('outline')
+	$('#notificationsIcon').addClass ('red')
+	
+	// Adding new element to html!
+	$('#noticationsMenu').append('<div class="item">' + ni.name + '</div>');
+}
+
+
+
+
+const readNotification= (ith) => {
+	// TODO Deelte element from html. If (notifications.length == 0) then remove 'notificationsNumber' element.
+	// TODO remove class 'blue' from 'notificationsIcon' and insert 'outline'
+}
+
+
+
+
 let showAuthorView = () => {
 	$("#authorRoleBtn").addClass ("active");
 	$('#autorView').removeClass ('inactive');
@@ -108,12 +115,35 @@ let showAuthorView = () => {
 }
 
 
+
+
 let showCustomerView = () => {
 	$("#authorRoleBtn").removeClass ('active');
 	$('#autorView').addClass ('inactive')
 
 	$("#customerRoleBtn").addClass ('active');
 	$('#customerView').removeClass ('inactive');
+}
+
+
+
+
+let typeString2Type	= (typeStr) => {
+	console.log ('Incoming: ' + typeStr)
+	if (typeStr == 'song content')
+		return 0;
+	if (typeStr == 'video content')
+		return 1;
+	if (typeStr == 'photo content')
+		return 2;
+	if (typeStr == 'document content')
+		return 3;
+}
+
+
+
+let createContent	= (type, title, price) => {
+	ipcr.send ('create-content', {type: type, title:title, price:price});
 }
 
 
@@ -187,18 +217,42 @@ $("#customerRoleBtn").click ((evt) => {
 
 
 
+
+
+
+
 // ==================================
 // ====  Create content segment  ====
 $('#create-content-button').click ((evt) => {
+	var error	= false;
 	let type	= $('#contentDropdown').dropdown('get value');
 	let title	= $('#contentTitleInput').val ()
 	let price	= $('#contentPriceInput').val ()
 
+	let checkAndError	= (val, id) => {
+		if (val == undefined || val == '') {
+			$('#'+id).addClass ('error');
+			return true;
+		}
+		$('#'+id).removeClass ('error');
+	}
+
 	console.log (type + '  ' + title + '  ' + price)
+
+	error	= error || checkAndError (type, 'contentDropdown');
+	error	= error || checkAndError (title, 'conTitleInpContainer');	// FIXME
+	error	= error || checkAndError (price, 'priceInpContainer');		// FIXME
+
+	if (error) {
+		console.log ('Error!')
+		return ;
+	}
 
 	$('#contentDropdown').dropdown('restore defaults');
 	$('#contentTitleInput').val ('')
 	$('#contentPriceInput').val ('')
+
+	createContent (typeString2Type(type), title, price);
 
 
 })

@@ -172,6 +172,11 @@
 
 						<div class='six wide column'>
 							<div class="ui clearing form segment">
+								<!-- FIXME -->
+								<div class="ui active dimmer">
+									<div class="ui loader"></div>
+								</div>
+
 								<div class='ui medium header'>
 									Publish new content to catalog
 								</div>
@@ -179,7 +184,7 @@
 								<div class='ui hidden divider'></div>
 								<div class='ui hidden divider'></div>
 
-								<div class="field">
+								<div class="required field">
 									<label>Content type</label>
 									<div class="ui selection dropdown" id='contentDropdown'>
 										<div class="default text">Select</div>
@@ -197,13 +202,13 @@
 								
 								<div class="required field">
 									<label>Title</label>
-									<div class="ui input">
+									<div class="ui input" id='conTitleInpContainer'>
 										<input placeholder='title' type='text' id='contentTitleInput'>
 									</div>
 								</div>
 								<div class="required field">
 									<label>Price</label>
-									<div class="ui input">
+									<div class="ui input" id='priceInpContainer'>
 										<input placeholder="(milliether)" type="number" step="0.1" id='contentPriceInput'>
 									</div>
 								</div>
