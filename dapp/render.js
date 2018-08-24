@@ -29,7 +29,7 @@ ipcr.on ('addresses', (event, arg) => {
 		idx++;
 	});
 
-	showAuthorView ();
+	showCustomerView ();
 })
 
 
@@ -169,16 +169,16 @@ const createContent	= (type, title, price) => {
 
 
 
-const type2iconName	= (type) => {
+const type2iconTag	= (type) => {
 	switch (type) {
 	case 0:
-		return "music";
+		return '<i class="large music icon"></i>';
 	case 1:
-		return 'video';
+		return '<i class="large video icon"></i>';
 	case 2:
-		return 'image';
+		return '<i class="large material-icons">image</i>';
 	case 3:
-		return 'clipboard';
+		return '<i class="large clipboard icon"></i>';
 	}
 }
 
@@ -186,10 +186,10 @@ const type2iconName	= (type) => {
 
 
 const newContentItem	= (address, type, title) => {
-	typeIcon	= type2iconName (type);
+	typeIcon	= type2iconTag (type);
 
 	toRet	= 	"<div class='item'>";
-	toRet	+= 		"<i class='large "+ typeIcon +" icon'></i>";
+	toRet	+= 		typeIcon;
 	toRet	+=		"<div class='content'>";
 	toRet	+=			"<div class='header'>"+ title +"</div>";
 	toRet	+=			"<div class='description'>Address: "+ address +"</div>";
@@ -334,7 +334,7 @@ window.onload = () => {
 			$('#loginModal').modal ('hide')
 			showLoader ('loaderDiv')
 			ipcr.send ('userInfo', payload);
-		}, 1000);
+		}, 100);
 
 		// Timeout to create new notification
 		setTimeout(() => {
