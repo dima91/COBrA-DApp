@@ -18,6 +18,14 @@ let tmpInstance		= process.argv[3];
 var lucaHex	= '0x6c756361';
 
 
+var redis	= require("redis"),
+	client	= redis.createClient();
+	client.on("error", function (err) {
+		console.log("Error " + err);
+		process.exit ();
+	});
+
+
 let readContract	= (contractPath) => {
 	content= fs.readFileSync (contractPath);
 	return JSON.parse(content);
@@ -42,10 +50,28 @@ web3.eth.getAccounts (function (err, res) {
 	let catalogContract	= new web3.eth.Contract (catalogAbi);
 	let contractData		= rContract.bytecode;
 	
+
+
 	catalogContract
 	.deploy ({data:contractData})
 	.send ({from : addresses[0], gas:10000000}, (err, res) => {
 		console.log (err);
 		console.log (res);
 	})
+	.on('error', (error) => {
+		console.log (error)
+	})
+	.on('transactionHash', (transactionHash) => {
+		console.log ('transaction hash: ' + transactionHash)
+	})
+	.on('receipt', (receipt) => {
+	   console.log("Contract address: " + receipt.contractAddress) // contains the new contract address
+	   client.set("catAddr", receipt.contractAddress, redis.print);
+	})
+	.on('confirmation', (confirmationNumber, receipt) => {
+
+	})
+	.then ((newContractnstance) => {
+		console.log ('Deployed!');
+	});
 })

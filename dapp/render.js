@@ -49,7 +49,7 @@ ipcr.on ('userInfo', (event, arg) => {
 	}
 	else {
 		$('#childContainer').removeClass ('inactive')
-		hideLoader ();
+		hideLoader ('loaderDiv');
 
 		$('#usernameContainer').html (username);
 		$('#balanceContainer').html (jsonP['balance'] + " (ether)");
@@ -63,6 +63,25 @@ ipcr.on ('userInfo', (event, arg) => {
 
 
 
+ipcr.on ('create-content-reply', ((evt, arg) => {
+	// FIXME Handle errors!
+	console.log (arg);
+
+	if (arg.result == 'success') {
+		htmlText	= newContentItem (arg.address, arg.type, arg.title);
+		$('#published-contents-list').append (htmlText);
+	}
+	else {
+		// FIXME Notify this
+		console.log ('Error on publish content!');
+	}
+
+	hideLoader ('create-content-dimmer');
+}));
+
+
+
+
 
 
 
@@ -70,15 +89,15 @@ ipcr.on ('userInfo', (event, arg) => {
 // ==============================
 // =====  HELPER FUNCTIONS  =====
 
-const showLoader= () => {
-	$('#loaderDiv').addClass ('active')
+const showLoader= (loaderId) => {
+	$('#'+loaderId).addClass ('active')
 }
 
 
 
 
-const hideLoader= () => {
-	$('#loaderDiv').removeClass ('active')
+const hideLoader= (loaderId) => {
+	$('#'+loaderId).removeClass ('active')
 }
 
 
@@ -106,7 +125,7 @@ const readNotification= (ith) => {
 
 
 
-let showAuthorView = () => {
+const showAuthorView = () => {
 	$("#authorRoleBtn").addClass ("active");
 	$('#autorView').removeClass ('inactive');
 
@@ -117,7 +136,7 @@ let showAuthorView = () => {
 
 
 
-let showCustomerView = () => {
+const showCustomerView = () => {
 	$("#authorRoleBtn").removeClass ('active');
 	$('#autorView').addClass ('inactive')
 
@@ -128,7 +147,7 @@ let showCustomerView = () => {
 
 
 
-let typeString2Type	= (typeStr) => {
+const typeString2Type	= (typeStr) => {
 	console.log ('Incoming: ' + typeStr)
 	if (typeStr == 'song content')
 		return 0;
@@ -142,8 +161,43 @@ let typeString2Type	= (typeStr) => {
 
 
 
-let createContent	= (type, title, price) => {
-	ipcr.send ('create-content', {type: type, title:title, price:price});
+const createContent	= (type, title, price) => {
+	ipcr.send ('create-content-request', {type: type, title:title, price:price});
+	showLoader ('create-content-dimmer')
+}
+
+
+
+
+const type2iconName	= (type) => {
+	switch (type) {
+	case 0:
+		return "music";
+	case 1:
+		return 'video';
+	case 2:
+		return 'image';
+	case 3:
+		return 'clipboard';
+	}
+}
+
+
+
+
+const newContentItem	= (address, type, title) => {
+	typeIcon	= type2iconName (type);
+
+	toRet	= 	"<div class='item'>";
+	toRet	+= 		"<i class='large "+ typeIcon +" icon'></i>";
+	toRet	+=		"<div class='content'>";
+	toRet	+=			"<div class='header'>"+ title +"</div>";
+	toRet	+=			"<div class='description'>Address: "+ address +"</div>";
+	toRet	+=		"</div></div>";
+
+	console.log (toRet);
+
+	return toRet;
 }
 
 
@@ -155,9 +209,7 @@ let createContent	= (type, title, price) => {
 
 
 
-// Ignoring escape key!
-$("#body").keyup ((evt) => {
-});
+
 
 
 
@@ -180,7 +232,7 @@ $('#modal_submitButton').click ((evt) => {
 	if (username != undefined && username.length != 0 && address != "Addresses..." && address != "") {
 		payload= {'user': username, 'addr': address};
 		$('#loginModal').modal ('hide')
-		showLoader ()
+		showLoader ('loaderDiv')
 		ipcr.send ('userInfo', payload);
 	}
 	else {
@@ -260,6 +312,10 @@ $('#create-content-button').click ((evt) => {
 
 
 
+// Ignoring escape key!
+$("#body").keyup ((evt) => {
+});
+
 // Getting addresses
 window.onload = () => {
 	ipcr.send('getAddresses', {})
@@ -276,7 +332,7 @@ window.onload = () => {
 			username= 'luca'
 			payload= {'user': username, 'addr': address};
 			$('#loginModal').modal ('hide')
-			showLoader ()
+			showLoader ('loaderDiv')
 			ipcr.send ('userInfo', payload);
 		}, 1000);
 

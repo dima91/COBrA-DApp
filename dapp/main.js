@@ -36,6 +36,9 @@ var catalogInstance;
 var catalogAddress;
 var endpoint;
 
+var errorOnLastCreation;
+var lastCreatedContentAddress;
+
 
 const createWindow= () => {
 	if (addresses.length == 0) {
@@ -179,71 +182,64 @@ ipcMain.on ('userInfo', (event, arg) => {
 									}
 								})
 })
-
-
-
-
-// await sleep trick
-function sleep(ms) {
-	return new Promise(resolve => setTimeout(resolve, ms));
-  }
-  
-// We need to wait until any miner has included the transaction
-// in a block to get the address of the contract
-async function waitBlock() {
-while (true) {
-	let receipt = web3.eth.getTransactionReceipt(transferfunds.transactionHash);
-	if (receipt && receipt.contractAddress) {
-	console.log("Your contract has been deployed at "+ receipt.contractAddress);
-	console.log("Note that it might take 30 - 90 sceonds for the block to propagate befor it's visible in etherscan.io");
-	break;
-	}
-	console.log("Waiting a mined block to include your contract... currently in block " + web3.eth.blockNumber);
-	await sleep(4000);
-}
-return;
-}
   
 
 
 
 
 // Event to request content of deployed contracts
-ipcMain.on ('create-content', (event, data) => {
-	console.log ('Creating content:  '+ data.type +'   '+ data.title +'   '+ data['price'])
+ipcMain.on ('create-content-request', (event, data) => {
+	console.log ('Creating content:  '+ data.type +',   '+ data.title +',   '+ data['price'])
 
 
 	abi			= deployedContracts[data.type].abi;
 	bytecode	= deployedContracts[data.type].bytecode;
 	contract	= new web3.eth.Contract (abi);
 
+	errorOnLastCreation	= false;
+
 	contract
 	.deploy	({data: bytecode, arguments: [web3.utils.stringToHex(data.title), catalogAddress]})
 	.send	({from: userAddress, gas: 10000000000000}, (err, res) => {
-		console.log (err)
-		console.log(res)
+		if (err){
+			errorOnLastCreation	= true;
+			consol.log (err);
+		}
 	})			// FIXME
 	.on('error', function(error){})
 	.on('transactionHash', function(transactionHash){})
-	.on('receipt', function(receipt){
+	.on('receipt', function (receipt){
 	   console.log("Contract address: " + receipt.contractAddress) // contains the new contract address
+	   lastCreatedContentAddress	= receipt.contractAddress;
 	})
 	.on('confirmation', function(confirmationNumber, receipt){})
-	.then ((newContractnstance) => {
+	.then ((newContractInstance) => {
 		// Success! --> publishing to the catalog
 		console.log ('Deployed!');
-		console.log (newContractnstance);
-		/*catalogInstance
+		catalogInstance
 		.methods
-		.publshContent (hexUser, data.title, web3.utils.toWei ("6300", "milliether", "0x00" /*contract addres!))
+		.publishContent (hexUser, web3.utils.stringToHex(data.title),
+							web3.utils.toWei ("6300", "milliether"), lastCreatedContentAddress)
 		.send ({from : userAddress, gas:30000000}, (err, res) => {
-			console.log (err);
-			console.log (res);
+			if (err) {
+				// Error linking content address to catalog! Destoying it! (content contract)
+				// TODO Destroy me!
+				mainWindow.webContents.send ('create-content-reply', {result:'failure'});
+				console.log ('\nError here!\n');
+			}
+			else {
+				mainWindow.webContents.send('create-content-reply', {
+					result: 'success',
+					type: data.type,
+					title: data.title,
+					address: lastCreatedContentAddress
+				});
+			}
+			getOtherInfo ();
+			errorOnLastCreation	= false;
 		}).then (() => {
 			console.log ("Published on catalog!")
-		});*/
-
-		getOtherInfo ();
+		});
 	});
 })
 
