@@ -41,8 +41,9 @@ ipcr.on ('newBalance', (event, arg) => {
 
 
 // Event handler for incoming user information
-ipcr.on ('userInfo', (event, arg) => {
+ipcr.on ('init-info', (event, arg) => {
 	jsonP= JSON.parse (arg);
+	console.log (jsonP);
 
 	if (jsonP['status'] == 'error') {
 		// TODO Handle this error
@@ -58,6 +59,8 @@ ipcr.on ('userInfo', (event, arg) => {
 		else
 			$('#premium').addClass ('inactive');
 	}
+
+	loadPublishedContents (jsonP);
 })
 
 
@@ -70,6 +73,7 @@ ipcr.on ('create-content-reply', ((evt, arg) => {
 	if (arg.result == 'success') {
 		htmlText	= newContentItem (arg.address, arg.type, arg.title);
 		$('#published-contents-list').append (htmlText);
+		$('#delete-'+arg.address).click (deleteItem);
 	}
 	else {
 		// FIXME Notify this
@@ -169,6 +173,14 @@ const createContent	= (type, title, price) => {
 
 
 
+const deleteItem = (evt) => {
+	console.log (evt)
+	// TODO Remove me from UI and send deletion to blockchain!
+}
+
+
+
+
 const type2iconTag	= (type) => {
 	switch (type) {
 	case 0:
@@ -186,18 +198,34 @@ const type2iconTag	= (type) => {
 
 
 const newContentItem	= (address, type, title) => {
-	typeIcon	= type2iconTag (type);
+	typeIcon	= type2iconTag (type);	
 
-	toRet	= 	"<div class='item'>";
-	toRet	+= 		typeIcon;
-	toRet	+=		"<div class='content'>";
-	toRet	+=			"<div class='header'>"+ title +"</div>";
-	toRet	+=			"<div class='description'>Address: "+ address +"</div>";
-	toRet	+=		"</div></div>";
+	toRet	= 	"<div class='item'>"																		+
+					typeIcon																				+
+					"<div class='content'>"																	+
+						"<div class='ui grid'>"																+
+							"<div class='ui fourteen wide column'>"											+
+								"<div class='ui header'>" + title											+
+									"<div class='sub header'>"+ address +"</div>" 							+
+								"</div>"																	+
+							"</div>"																		+
+							"<div class='ui two wide column'>"												+
+								"<a id='delete-"+address+"'><i class='ui little red trash icon'></i></a>"	+
+							"</div>"																		+
+						"</div>"																			+
+					"</div>"																				+
+				"</div>";
 
 	console.log (toRet);
 
 	return toRet;
+}
+
+
+
+
+const loadPublishedContents	= (arg) => {
+	console.log (arg);
 }
 
 
@@ -233,7 +261,7 @@ $('#modal_submitButton').click ((evt) => {
 		payload= {'user': username, 'addr': address};
 		$('#loginModal').modal ('hide')
 		showLoader ('loaderDiv')
-		ipcr.send ('userInfo', payload);
+		ipcr.send ('init-info', payload);
 	}
 	else {
 		if (username == undefined || username.length == 0) {
@@ -333,7 +361,7 @@ window.onload = () => {
 			payload= {'user': username, 'addr': address};
 			$('#loginModal').modal ('hide')
 			showLoader ('loaderDiv')
-			ipcr.send ('userInfo', payload);
+			ipcr.send ('init-info', payload);
 		}, 100);
 
 		// Timeout to create new notification

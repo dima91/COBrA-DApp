@@ -22,7 +22,7 @@ var mainWindow;
 
 
 var deployedContracts	= [];		// Array of deployed contracts to create contents
-var contracts			= {};		// ?!?!?!
+var publishedContents	= [];		// Do I really need this variable?????
 var addresses			= [];		// List of available addresses
 
 var userBalance;
@@ -72,7 +72,17 @@ const loadAddresses= () => {
 
 
 
-const getOtherInfo	= () => {
+const getOtherInfo	= (getContentLst) => {
+
+	const constructPayload = (conList) => {
+		return {
+			'balance'		: userBalance,
+			'isPremium'		: tmpPreium,
+			'status'		: 'success',
+			'contentList'	: conList
+		};
+	};
+
 	var tmpPreium;
 	web3.eth.getBalance (userAddress, (err, res) => {
 		// Recived balance in 'wei' --> converting it into 'ether'
@@ -80,18 +90,31 @@ const getOtherInfo	= () => {
 	}).then (() => {
 		catalogInstance
 		.methods
-		.isPremium (hexUser).call ({from:userAddress, gas:300000}, (err, res) => {
-										tmpPreium	= res;
-									}).then (() => {
-										data	= {
-											'balance'	: userBalance,
-											'isPremium'	: tmpPreium,
-											'status'	: 'success'
-										}
-										mainWindow.webContents.send('userInfo', JSON.stringify(data))
-									})
+		.isPremium (hexUser)
+		.call ({from:userAddress, gas:300000}, (err, res) => {
+					tmpPreium	= res;
+				}).then (() => {
+					if (getContentLst) {
+						catalogInstance
+						.methods
+						.getContentsListByAuthor (hexUser)
+						.call ({from:userAddress, gas:300000}, (err, res) => {
+							// TODO Handle palyoad
+							console.log (res);
+						}).then (() => {
+							console.log ("Send also contentsList!")
+							data= constructPayload ([]);
+							mainWindow.webContents.send('init-info', JSON.stringify(data));
+						})
+					}
+					else {
+						data= constructPayload ([]);
+							mainWindow.webContents.send('init-info', JSON.stringify(data));
+					}
+				})
 	})
 }
+
 
 
 
@@ -124,10 +147,10 @@ ipcMain.on ('getAddresses', (event, arg) => {
 
 
 
-/* Event handler for 'userInfo' request
+/* Event handler for 'init-info' request
 	If user exists, checks corrispondance with address
 	If it doesn't exists, try to register it */
-ipcMain.on ('userInfo', (event, arg) => {
+ipcMain.on ('init-info', (event, arg) => {
 	console.log ('Received request for\n\tuser:  ' + arg['user'] + '\n\taddress:  ' + arg['addr']);
 
 	stringUser		= arg['user'];
@@ -145,7 +168,7 @@ ipcMain.on ('userInfo', (event, arg) => {
 	catalogInstance
 	.methods
 	.userExists (hexUser).call ({from:userAddress, gas:300000}, (err, res) => {
-									// FIXME Handle errors
+									// TODO Handle errors
 									userExists	= res;
 								}).then (() => {
 									if (userExists) {
@@ -161,7 +184,7 @@ ipcMain.on ('userInfo', (event, arg) => {
 										}).then (() => {
 											if (tmpAddress == userAddress) {
 												console.log ("Good news. Getting balance and other info");
-												getOtherInfo ()
+												getOtherInfo (true)
 											}
 											else
 												console.log ("Received address form catalog differs from chosen address: it is an error!");
@@ -177,7 +200,7 @@ ipcMain.on ('userInfo', (event, arg) => {
 												throw "Error!"
 											}
 										}).then (() => {
-											getOtherInfo ()
+											getOtherInfo (false)
 										});
 									}
 								})
@@ -205,7 +228,7 @@ ipcMain.on ('create-content-request', (event, data) => {
 			errorOnLastCreation	= true;
 			consol.log (err);
 		}
-	})			// FIXME
+	}) // TODO Handle errors
 	.on('error', function(error){})
 	.on('transactionHash', function(transactionHash){})
 	.on('receipt', function (receipt){
@@ -235,7 +258,7 @@ ipcMain.on ('create-content-request', (event, data) => {
 					address: lastCreatedContentAddress
 				});
 			}
-			getOtherInfo ();
+			getOtherInfo (false);
 			errorOnLastCreation	= false;
 		}).then (() => {
 			console.log ("Published on catalog!")

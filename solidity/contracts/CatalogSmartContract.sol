@@ -6,6 +6,12 @@ import "./BaseContentManagementContract.sol";
 
 
 contract CatalogSmartContract is Ownable {
+
+	// Struct which is returned in 'getContentsListByAuthor' function
+    struct TitleAndAddress {
+        bytes32 title;
+        address contractAddress;
+    }
     
     // Event list
     event NewUser (bytes32 username, address userAddress);
@@ -43,7 +49,7 @@ contract CatalogSmartContract is Ownable {
     
     // Mapping which contains an ExtendedContent struct for each content published on the platform (identified by a string)
     mapping (bytes32 => SharedTypes.ExtendedContent) contentsMapping;
-    // Array containing addresses of contents published on the system (for loop functions)
+    // Array containing titles of contents published on the system (for loop functions)
     bytes32[] contentsArray;
     // Number of contents (also index of next content in the array)
     uint contentsCount;
@@ -348,6 +354,32 @@ contract CatalogSmartContract is Ownable {
     function userExists (bytes32 _username) public view returns (bool){
         return (usersMapping[_username].exists == true);
     }
+
+
+	// Returns list of contents published by an author
+    function getContentsListByAuthor (bytes32 _author) userExistsM (_author) public view returns (bytes32[], address[]) {
+        bytes32[] memory titles		= new bytes32[] (contentsCount);
+        address[] memory addresses	= new address[] (contentsCount);
+        uint i	= 0;
+        uint j	= 0;
+        
+        if (contentsCount == 0) {
+            return (titles, addresses);
+        }
+
+        for (i=0; i<contentsCount; i++) {
+            bytes32 title	= contentsArray[i];
+            if (contentsMapping[title].author == _author) {
+                titles[j]		= title;
+                addresses[j]	= contentsMapping[title].contractAddress;
+				j++;
+			}
+        }
+        
+        return (titles, addresses);
+    }
+    
+    
     
     
     
@@ -538,8 +570,8 @@ contract CatalogSmartContract is Ownable {
     
     // ************************************************************************************************************** //
     // ************************************************************************************************************** //
-    
-    // Pays for access to content x (NOT ACCESS TO CONTENT!)
+
+	// Pays for access to content x (NOT ACCESS TO CONTENT!)
     function getContent (bytes32 _contentTitle) userExistsM(addr2User[msg.sender]) alreadyPublishedM (_contentTitle)
                                                 equalTo (msg.value, contentsMapping[_contentTitle].contentPrice) public payable {
         // ******* --> Check preconditions (enough value..) + handle payments <-- *******
