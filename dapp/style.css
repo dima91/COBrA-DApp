@@ -8,8 +8,7 @@ html, body {
 #buy-gift-content-segment,
 #your-contents-segment,
 #available-contents-segment,
-#buy-gift-premium-segment,
-#info-segment {
+#buy-gift-premium-segment {
 	background: #FFEFBA;  /* fallback for old browsers */
 	background: -webkit-linear-gradient(to right, #FFFFFF, #FFEFBA);  /* Chrome 10-25, Safari 5.1-6 */
 	background: linear-gradient(to right, #FFFFFF, #FFEFBA); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
@@ -22,6 +21,11 @@ html, body {
 
 .inline {
 	display: inline;
+}
+
+
+#loaderDiv {
+	z-index : 1;
 }
 
 

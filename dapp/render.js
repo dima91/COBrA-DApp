@@ -7,7 +7,7 @@ var ADDRESSES = []
 var notifications = []
 
 
-const ___TEST___ = true;
+const ___TEST___ = false;
 
 
 
@@ -113,10 +113,27 @@ ipcr.on ('contents-list-reply', ((evt, arg) => {
 	$('#available-contents-list').empty ();
 	arg.list.forEach ((el) => {
 		$('#available-contents-list').append (newAvailableContent (el, i));
-		$('#more-info-'+i).click ((evt) => {showMoreInfoModal ($('#'+evt.target.id).prev())});
+		$('#more-info-'+i).click ((evt) => {getMoreInfo ($('#'+evt.target.id).prev())});
 		i++;
 	})
 }));
+
+
+
+
+ipcr.on ('more-info-reply', ((evt, arg) => {
+	// TODO Insert values of content into modal div    -->  arg.text()  --> titolo in alfanumerico
+
+	$('#info-title').text (arg.title);
+	$('#info-author').text (arg.author);
+	$('#info-price').text (arg.price);
+	$('#info-rating').text (arg.rating)
+
+
+	hideLoader ('loaderDiv');
+	$('#more-info-modal').modal('show');
+	console.log (arg);
+}))
 
 
 
@@ -276,9 +293,15 @@ const newAvailableContent	= (title, idx) => {
 
 
 
-const showMoreInfoModal	= (arg) => {
-	// TODO Insert values of content into modal div    -->  arg.text()  --> titolo in alfanumerico
-	$('#more-info-modal').modal('show');
+const getMoreInfo	= (arg) => {
+	showLoader('loaderDiv');
+
+	$('#info-title').text (arg.title);
+	$('#info-author').text (arg.author);
+	$('#info-price').text (arg.price);
+	$('#info-rating').text (arg.rating)
+
+	ipcr.send ('more-info-request', {title: arg.text()})
 }
 
 
@@ -493,7 +516,7 @@ window.onload = () => {
 		// Timeout to create new notification
 		setTimeout(() => {
 			newNotification({ name: "testNotification" })
-		}, 20000)
+		}, 10000);
 	}
 }
 

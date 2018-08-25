@@ -37,9 +37,12 @@ var catalogInstance;
 var catalogAddress;
 var endpoint;
 
+// Global variables used to share data between promises
 var errorOnLastCreation;
 var lastCreatedContentAddress;
 var lastCatalogContentsList;
+var lastInfoObject;
+var priceOfNextContent;
 
 
 
@@ -276,12 +279,13 @@ ipcMain.on ('init-info', (event, arg) => {
 
 // Event to request content of deployed contracts
 ipcMain.on ('create-content-request', (event, data) => {
-	console.log ('Creating content:  '+ data.type +',   '+ data.title +',   '+ data['price'])
+	console.log ('Creating content:  '+ data.type +',   '+ data.title +',   '+ data.price)
 
 
-	abi			= deployedContracts[data.type].abi;
-	bytecode	= deployedContracts[data.type].bytecode;
-	contract	= new web3.eth.Contract (abi);
+	priceOfNextContent	= data.price;
+	abi					= deployedContracts[data.type].abi;
+	bytecode			= deployedContracts[data.type].bytecode;
+	contract			= new web3.eth.Contract (abi);
 
 	errorOnLastCreation	= false;
 
@@ -306,7 +310,7 @@ ipcMain.on ('create-content-request', (event, data) => {
 		catalogInstance
 		.methods
 		.publishContent (hexUser, web3.utils.stringToHex(data.title),
-							web3.utils.toWei ("6300", "milliether"), lastCreatedContentAddress)
+							web3.utils.toWei (priceOfNextContent, "milliether"), lastCreatedContentAddress)
 		.send ({from : userAddress, gas:30000000}, (err, res) => {
 			if (err) {
 				// Error linking content address to catalog! Destoying it! (content contract)
@@ -361,6 +365,30 @@ ipcMain.on ('contents-list-request', ((evt, arg) => {
 		mainWindow.webContents.send ('contents-list-reply', {list: toSend, time: currentTime()});
 	})
 }));
+
+
+
+
+ipcMain.on ('more-info-request', ((evt, arg) => {
+	console.log ('Received more-info-request for '+ arg.title);
+	
+	catalogInstance
+	.methods
+	.getInfoOf (web3.utils.stringToHex (arg.title))
+	.call ({from:userAddress, gas:300000}, (err, res) => {
+		lastInfoObject	= {res: res, title: arg.title};
+	}).then (() => {
+		console.log (lastInfoObject);
+		// TODO Computation of feedback
+		toSend	= {
+			title	: lastInfoObject.title,
+			rating	: 'Unknown',
+			price	: lastInfoObject.res['1'],
+			author	: web3.utils.hexToString (lastInfoObject.res['2'])
+		}
+		mainWindow.webContents.send ('more-info-reply', toSend);
+	});
+}))
 
 
 
