@@ -21,6 +21,7 @@ const ipcM	= ipcMain;
 var mainWindow;
 
 
+var baseContentContract	= {};
 var deployedContracts	= [];		// Array of deployed contracts to create contents
 var publishedContents	= [];		// Do I really need this variable?????
 var addresses			= [];		// List of available addresses
@@ -38,6 +39,24 @@ var endpoint;
 
 var errorOnLastCreation;
 var lastCreatedContentAddress;
+var lastCatalogContentsList;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ==============================
+// ===== HELPFUL FUNCTIONS  =====
 
 
 const createWindow= () => {
@@ -72,6 +91,30 @@ const loadAddresses= () => {
 
 
 
+const buildCompleteContentsList	= (arg) => {
+	titles			= arg['0'];
+	addresses		= arg['1'];
+	types			= arg['2'];
+	contentsList	= [];
+	i				= 0;
+
+	addresses.forEach ((el) => {
+		item	= {
+			title	: web3.utils.hexToString (titles[i]),
+			address	: el,
+			type	: types[i]
+		};
+
+		contentsList.push (item);
+		i++;
+	})
+
+	return contentsList;
+}
+
+
+
+
 const getOtherInfo	= (getContentLst) => {
 
 	const constructPayload = (conList) => {
@@ -79,11 +122,12 @@ const getOtherInfo	= (getContentLst) => {
 			'balance'		: userBalance,
 			'isPremium'		: tmpPreium,
 			'status'		: 'success',
-			'contentList'	: conList
+			'contentsList'	: conList
 		};
 	};
 
 	var tmpPreium;
+	var tmpContents;
 	web3.eth.getBalance (userAddress, (err, res) => {
 		// Recived balance in 'wei' --> converting it into 'ether'
 		userBalance	= web3.utils.fromWei (res);
@@ -99,11 +143,10 @@ const getOtherInfo	= (getContentLst) => {
 						.methods
 						.getContentsListByAuthor (hexUser)
 						.call ({from:userAddress, gas:300000}, (err, res) => {
-							// TODO Handle palyoad
-							console.log (res);
+							tmpContents	= res;
 						}).then (() => {
-							console.log ("Send also contentsList!")
-							data= constructPayload ([]);
+							conList	= buildCompleteContentsList (tmpContents);
+							data	= constructPayload (conList);
 							mainWindow.webContents.send('init-info', JSON.stringify(data));
 						})
 					}
@@ -126,10 +169,32 @@ const readContract	= (contractPath) => {
 
 
 
+const currentTime = () => {
+	var currentdate	= new Date(); 
+	return	"Last Sync: " + currentdate.getDate() + "/"
+			+ (currentdate.getMonth()+1)  + "/" 
+			+ currentdate.getFullYear() + " @ "  
+			+ currentdate.getHours() + ":"  
+			+ currentdate.getMinutes() + ":" 
+			+ currentdate.getSeconds();
+}
 
 
-// =============================
-// =====  ELECTRON EVENTS  =====
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ============================
+// ===== ELECTRON EVENTS  =====
 
 // Event handler for quitDapp requests
 ipcMain.on ('quitDapp', (event, arg) => {
@@ -209,7 +274,6 @@ ipcMain.on ('init-info', (event, arg) => {
 
 
 
-
 // Event to request content of deployed contracts
 ipcMain.on ('create-content-request', (event, data) => {
 	console.log ('Creating content:  '+ data.type +',   '+ data.title +',   '+ data['price'])
@@ -246,9 +310,19 @@ ipcMain.on ('create-content-request', (event, data) => {
 		.send ({from : userAddress, gas:30000000}, (err, res) => {
 			if (err) {
 				// Error linking content address to catalog! Destoying it! (content contract)
-				// TODO Destroy me!
+				abi			= baseContentContract.abi;
+				bytecode	= baseContentContract.bytecode;
+				
+				(new web3.eth.Contract (abi, lastCreatedContentAddress))
+				.methods
+				.killMe()
+				.send ({from: userAddress, gas: 1000000}, (err, res) => {
+					if (err){
+						consol.log (err);
+					}
+				})
+				.then (() => {console.log ('Contract destroyed')});
 				mainWindow.webContents.send ('create-content-reply', {result:'failure'});
-				console.log ('\nError here!\n');
 			}
 			else {
 				mainWindow.webContents.send('create-content-reply', {
@@ -269,6 +343,24 @@ ipcMain.on ('create-content-request', (event, data) => {
 
 
 
+ipcMain.on ('contents-list-request', ((evt, arg) => {
+	console.log ('Received a contents list update request');
+
+	catalogInstance
+	.methods
+	.getContentList ()
+	.call ({from:userAddress, gas:300000}, (err, res) => {
+		console.log (res);
+		lastCatalogContentsList	= res;
+	})
+	.then (() => {
+		toSend	= [];
+		lastCatalogContentsList.forEach ((el) => {
+			toSend.push (web3.utils.hexToString (el))
+		})
+		mainWindow.webContents.send ('contents-list-reply', {list: toSend, time: currentTime()});
+	})
+}));
 
 
 
@@ -278,6 +370,14 @@ ipcMain.on ('create-content-request', (event, data) => {
 
 
 
+
+
+
+
+
+
+// ==================================
+// ===== OTHER ELECTRON EVENTS  =====
 
 // FIXME !!!!!!  Parsing comman line arguments
 /*if (process.argv.length !=3) {
@@ -286,15 +386,20 @@ ipcMain.on ('create-content-request', (event, data) => {
 else {
 	endpoint= process.argv[2];
 }*/
+
+
 endpoint		= "http://localhost:8545";
 web3			= new Web3(new Web3.providers.HttpProvider(endpoint));
-catalogAddress	= process.argv[2]
-console.log ("Catalog address:  " + catalogAddress)
+catalogAddress	= process.argv[2];
+console.log ("Catalog address:  " + catalogAddress);
+
 
 
 
 app.on('ready', () => {
 	loadAddresses ();
+
+	baseContentContract		= readContract (baseContentContractPath);
 
 	deployedContracts[0]	= readContract (songContractPath);
 	deployedContracts[1]	= readContract (videoContractPath);

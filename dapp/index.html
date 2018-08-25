@@ -5,15 +5,15 @@
 		<title>COBrA Dapp</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 
-		<link rel="stylesheet" href="style.css">
-
 		<!-- jQuery library -->
 		<script>window.$ = window.jQuery = require('./node_modules/jquery/dist/jquery.js');</script>
 
-		<!-- CSS files -->
+		<!-- Semantic UI files -->
 		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.2/dist/semantic.css" /> 
 		<script defer src="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.2/dist/semantic.js"></script>
+
+		<link rel="stylesheet" href="style.css">
 	</head>
    
 
@@ -152,8 +152,8 @@
 				</header>
 
 
-			<!--*************************-->
-			<!--     CHILD CONTAINER     -->
+			<!-- ===================== -->
+			<!--    CHILD CONTAINER    -->
 			<div id ="childContainer" class="inactive ui content">
 
 
@@ -163,14 +163,17 @@
 
 
 
-
-				<!-- AUTHOR VIEW -->
+				
+				<!-- ================= -->
+				<!--    AUTHOR VIEW    -->
 				<div id='autorView' class="inactive">
 					<div class='ui grid'>
 						<div class='one wide column'></div>
 
 
 						<div class='six wide column'>
+							<!-- ===================================== -->
+							<!--    SEGMENT TO PUBLISH NEW CONTENTS    -->
 							<div class="ui clearing form segment" id='publish-content-segment'>
 
 								<div class='ui medium header'>
@@ -231,6 +234,8 @@
 
 
 						<div class='seven wide column'>
+							<!-- ==================================== -->
+							<!--    SEGMENT FOR PUBLISHED CONTENTS    -->
 							<div class='ui segment' id='published-contents-segment'>
 								<div class='ui medium header'>
 									Your published contents
@@ -241,57 +246,19 @@
 
 								<!-- List of published contents -->
 								<div class="ui divided items" id='published-contents-list'>
-									
-									<div class="item">
+									<!--<div class="item">
 										<i class="large music icon"></i>
 										<div class="content">
 											<div class='ui grid'>
-												<div class='ui fourteen wide column'>
+												<div class='ui fiveteen wide column'>
 													<div class="ui header">
 														First published content
 														<div class='sub header'>address</div>
 													</div>
 												</div>
-												<div class='ui two wide column'>
-													<a><i class='ui little red trash icon'></i></a>
-												</div>
 											</div>
 										</div>
-									</div>
-
-									<div class="item">
-										<i class="large music icon"></i>
-										<div class="content">
-											<div class='ui grid'>
-												<div class='ui fourteen wide column'>
-													<div class="ui header">
-														Second published content
-														<div class='sub header'>address</div>
-													</div>
-												</div>
-												<div class='ui two wide column'>
-													<a><i class='ui little red trash icon'></i></a>
-												</div>
-											</div>
-										</div>
-									</div>
-
-									<div class="item">
-										<i class="large music icon"></i>
-										<div class="content">
-											<div class='ui grid'>
-												<div class='ui fourteen wide column'>
-													<div class="ui header">
-														Last published content
-														<div class='sub header'>address</div>
-													</div>
-												</div>
-												<div class='ui two wide column'>
-													<a><i class='ui little red trash icon'></i></a>
-												</div>
-											</div>
-										</div>
-									</div>
+									</div>-->
 								</div>
 							</div>
 						</div>
@@ -317,7 +284,9 @@
 
 
 						<div class='six wide column'>
-							<div class="ui clearing form segment" id='buy-gift-content-segment'>
+							<!-- ===================================== -->
+							<!--    SEGMENT FOR BUY OR GIFT CONTENT    -->
+							<!--<div class="ui clearing form segment" id='buy-gift-content-segment'>
 								<div class='ui medium header'>
 										Buy or gift a content
 								</div>
@@ -351,8 +320,39 @@
 							</div>
 
 							<div class='ui hidden divider'></div>
+							<div class='ui hidden divider'></div>-->
+
+							<!-- ============================================= -->
+							<!--    SEGMENT FOR BUY OR GIFT PREMIUM ACCOUNT    -->
+							<div class="ui clearing form segment" id='buy-gift-premium-segment'>
+								<div class='ui medium header'>
+										Buy or gift a premium account
+								</div>
+	
+								<div class='ui hidden divider'></div>
+								<div class='ui hidden divider'></div>
+
+								<button class="ui right floated primary button" id=''>
+									Buy
+								</button>
+
+								<div class="ui action left floated input">
+									<div class='ui primary button' id=''>Gift to</div>
+									<input placeholder="Username" type="text">
+								</div>
+
+								<div class="ui dimmer" id='create-content-dimmer'>
+									<div class="ui text loader">
+										Performing requests...
+									</div>
+								</div>
+							</div>
+
+							<div class='ui hidden divider'></div>
 							<div class='ui hidden divider'></div>
 
+							<!-- ================================ -->
+							<!--    SEGMENT FOR BUYED CONTENTS    -->
 							<div class="ui segment" id='your-contents-segment'>
 								<div class='ui medium header'>
 									Your contents
@@ -364,7 +364,7 @@
 
 								<!-- List of published contents -->
 								<div class="ui divided items" id='your-contents-list'>
-									<div class="item">
+									<!--<div class="item">
 										<i class="large music icon"></i>
 										<div class="ui middle aligned clearing content">
 											<div class="ui left floated header">
@@ -372,18 +372,7 @@
 											</div>
 											<button class='ui right floated green button'>Consume me</button>
 										</div>
-									</div>
-
-									<div class="item">
-										<i class="large material-icons">image</i>
-										<div class="ui middle aligned clearing content">
-											<div class="ui left floated header">
-												(My) beautiful face
-											</div>
-											<button class='ui right floated green button'>Rate me</button>
-										</div>
-										
-									</div>
+									</div>-->
 								</div>
 							</div>
 						</div>
@@ -394,9 +383,13 @@
 
 
 						<div class='seven wide column'>
+							<!-- =========================================== -->
+							<!--    SEGMENT FOR AVAILABLE-TO-BUY CONTENTS    -->
 							<div class="ui segment" id='available-contents-segment'>
-								<div class='ui medium header'>
+								<div class="ui clearing medium header">
+									<button class='ui right floated green button' id='refresh-button'><i class="sync icon"></i></button>
 									Available contents
+									<div class="sub header" id='last-sync'>Last sync:</div>
 								</div>
 
 								<div class='ui hidden divider'></div>
@@ -405,61 +398,79 @@
 
 								<!-- List of available contents -->
 								<div class="ui divided items" id='available-contents-list'>
-									<div class="item">
+									<!--<div class="item">
 										<i class="large music icon"></i>
 										<div class="ui middle aligned clearing content">
 											<div class="ui left floated header">Off-key song</div>
 											<button class='ui right floated orange button'>More info</button>
 										</div>
-									</div>
-
-									<div class="item">
-										<i class="large music icon"></i>
-										<div class="ui middle aligned clearing content">
-											<div class="ui left floated header">
-												This is a very very very very (maybe too much) long title. It causes a new line
-											</div>
-											<button class='ui right floated orange button'>More info</button>
-										</div>
-									</div>
-
-									<div class="item">
-										<i class="large video icon"></i>
-										<div class="ui middle aligned clearing content">
-											<div class="ui leftfloated header">Too short film</div>
-											<button class='ui right floated orange button'>More info</button>
-										</div>
-									</div>
-
-									<div class="item">
-										<i class="large clipboard icon"></i>
-										<div class="ui middle aligned clearing content">
-											<div class="ui left floated header">Boring story</div>
-											<button class='ui right floated orange button'>More info</button>
-										</div>
-									</div>
-
-									<div class="item">
-										<i class="large material-icons">image</i>
-										<div class="ui middle aligned clearing content">
-											<div class="ui left floated header">Very ugly image</div>
-											<button class='ui right floated orange button'>More info</button>
-										</div>
-									</div>
+									</div>-->
 								</div>
+
+
+								<!-- =================== -->
+								<!--   MORE INFO MODAL   -->
+								<div class="ui tiny modal" id="more-info-modal">
+									<div class='ui container'>
+										<div class="ui clearing medium centered header" id='infoModalHeader'>
+											Content info
+										</div>
+									</div>
+
+									<div class="ui hidden divider"></div>
+
+									<div class="ui clearing segment" id='info-segment'>
+										<!-- info -->
+										<div class="ui form">
+											<div class="field">
+												<div class='ui grid'>
+													<div class='ui height wide column'>
+														<label class="ui small header">User Input</label>
+														Field
+		
+														<div class="ui hidden divider"></div>
+		
+														<label class="ui small header">User Input</label>
+														Field
+													</div>
+
+													<div class='ui height wide column'>
+														<label class="ui small header">User Input</label>
+														Field
+		
+														<div class="ui hidden divider"></div>
+		
+														<label class="ui small header">User Input</label>
+														Field
+													</div>
+												</div>
+											</div>
+										</div>
+
+										<div class="ui hidden divider"></div>
+										<div class="ui hidden divider"></div>
+										
+
+										<button class="ui right floated primary button" id=''>
+											Buy
+										</button>
+		
+										<div class="ui action left floated input">
+											<div class='ui primary button' id=''>Gift to</div>
+											<input placeholder="Username" type="text">
+										</div>
+									</div>
+								</div>								
 							</div>
 						</div>
-
-
-						<div class='one wide column'></div>
-					</div>
+					<div class='one wide column'></div>
 				</div>
 			</div>
 		</div>
-	</body>
+	</div>
 
-   <!-- My scripts -->
-   <script type="text/javascript" src="./render.js"></script>
+	<script type="text/javascript" src="./render.js"></script>
+</body>
 </html>
 
 <!--

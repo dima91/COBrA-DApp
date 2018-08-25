@@ -2,6 +2,7 @@ pragma solidity ^0.4.24;
 
 import "./SharedTypes.sol";
 import "./CatalogSmartContract.sol";
+import "./Ownable.sol";
 
 
 contract BaseContentManagementContract {
@@ -15,14 +16,15 @@ contract BaseContentManagementContract {
         AccessType accessType;
         bool toBeConsumed;
         bool exists;
-        bool[3] givenFeedbacks;        // Stores information about given feedback for each category
+        bool[3] givenFeedbacks;			// Stores information about given feedback for each category
     }
     
     /* Variables to store feedbacks from users: each user has a unique position in each array. feedbacksSums stores sum of all given feedbacks
      * and feedbacksCount stores number of given feedbacks for each category (A user may or not rate a content for a category) */
-    uint[3] feedbacksSums;      // contentAppreciation, priceFairness, availabilityTime
-    uint8[3] feedbacksCount;    // Number of feedbacks given for each category
+    uint[3] private feedbacksSums;		// contentAppreciation, priceFairness, availabilityTime
+    uint8[3] private feedbacksCount;	// Number of feedbacks given for each category
 
+    address private owner;                              // Address of author (owner of content)
     address private catalogAddress;                     // Address of catalog to check if determined functions are called only by catalog
     SharedTypes.contentType private typeOfContent;      // Tpe of content which this contract contains
     
@@ -58,9 +60,10 @@ contract BaseContentManagementContract {
     }
     
     modifier isAllowedUser (bytes32 _username, address _senderAddress) {
-        bool exists= allowedUsers[_username].exists;
-        bool correspondAddress= allowedUsers[_username].userAddress == _senderAddress;
-        require (exists && correspondAddress);
+        bool exists				= allowedUsers[_username].exists;
+        bool correspondAddress	= (allowedUsers[_username].userAddress == _senderAddress);
+        
+		require (exists && correspondAddress);
         _;
     }
     
@@ -113,6 +116,12 @@ contract BaseContentManagementContract {
     
     // *****                  ***** //
     // ***** Public functions ***** //
+    
+    // Function which kills current contract. It is callable only from contract's owner
+    // FIXME
+    function killMe () public {
+        selfdestruct (owner);
+    }
     
     // Function used by catalog to check that has the same address of catalogAddress local variable
     function getCatalogAddress () public view returns (address) {

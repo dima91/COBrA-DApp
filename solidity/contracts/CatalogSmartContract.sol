@@ -277,6 +277,7 @@ contract CatalogSmartContract is Ownable {
         uint i=0;
         uint sumViews= 0;
         for (i=0; i<usersCount; i++) {
+            // FIXME
             BaseContentManagementContract remoteContract= BaseContentManagementContract (usersMapping[usersArray[i]].userAddress);
             uint count= remoteContract.getViewsCount();
             
@@ -357,14 +358,15 @@ contract CatalogSmartContract is Ownable {
 
 
 	// Returns list of contents published by an author
-    function getContentsListByAuthor (bytes32 _author) userExistsM (_author) public view returns (bytes32[], address[]) {
-        bytes32[] memory titles		= new bytes32[] (contentsCount);
-        address[] memory addresses	= new address[] (contentsCount);
+    function getContentsListByAuthor (bytes32 _author) userExistsM (_author) public view returns (bytes32[], address[], SharedTypes.contentType[]) {
+        bytes32[] memory titles					= new bytes32[] (contentsCount);
+        address[] memory addresses				= new address[] (contentsCount);
+        SharedTypes.contentType[] memory types	= new SharedTypes.contentType[] (contentsCount);
         uint i	= 0;
         uint j	= 0;
         
         if (contentsCount == 0) {
-            return (titles, addresses);
+            return (titles, addresses, types);
         }
 
         for (i=0; i<contentsCount; i++) {
@@ -372,11 +374,12 @@ contract CatalogSmartContract is Ownable {
             if (contentsMapping[title].author == _author) {
                 titles[j]		= title;
                 addresses[j]	= contentsMapping[title].contractAddress;
-				j++;
+                types[j]		= (BaseContentManagementContract (contentsMapping[title].contractAddress)).getType();
+                j++;
 			}
         }
         
-        return (titles, addresses);
+        return (titles, addresses, types);
     }
     
     
