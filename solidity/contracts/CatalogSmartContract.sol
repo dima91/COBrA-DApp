@@ -390,6 +390,12 @@ contract CatalogSmartContract is Ownable {
 		
 		return (remoteContent.getFeedbacksAverages(), localContent.contentPrice, localContent.author);
     }
+
+
+	// Function to retreive price of certain content
+	function getPriceOf (bytes32 _title) alreadyPublishedM (_title) public view returns (uint) {
+		return contentsMapping[_title].contentPrice;
+	}
     
     
     

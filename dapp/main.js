@@ -37,12 +37,15 @@ var catalogInstance;
 var catalogAddress;
 var endpoint;
 
+var contentsPriceCache	= {};		// Cotains price informations (which doesn't change) about some contents
+
 // Global variables used to share data between promises
 var errorOnLastCreation;
 var lastCreatedContentAddress;
 var lastCatalogContentsList;
 var lastInfoObject;
 var priceOfNextContent;
+var tmpPriceInfoTitle;
 
 
 
@@ -185,6 +188,48 @@ const currentTime = () => {
 
 
 
+const setupEventsCallbacks = () => {
+
+	// event ContentPublished (bytes32 username, bytes32 contentTitle, address contentAddress);
+
+
+	console.log (catalogInstance.events.GrantedAccess);
+	// event GrantedAccess (bytes32 username, address userAddress, bytes32 contentTitle, address contentAddress);
+	catalogInstance.events.GrantedAccess({}, (err, evt) => {
+		console.log ("Granted access for a content! Calling callback..");
+		grantedAccessCallback (err, evt);
+	});
+
+	// event GrantedPremium (bytes32 username, address userAddress);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// =====================================
+// ===== CATALOG EVENTS CALLBACKS  =====
+
+//     event GrantedAccess (bytes32 username, address userAddress, bytes32 contentTitle, address contentAddress);
+// Listener for event 'granted access'
+const grantedAccessCallback = (err, evt) => {
+	console.log (err);
+	console.log (evt);
+}
+
+
+
+
 
 
 
@@ -227,6 +272,7 @@ ipcMain.on ('init-info', (event, arg) => {
 	addressIndex	= addresses.indexOf (arg['addr']);
 	catalogContract	= (readContract (catalogSmartContractPath));
 	catalogInstance	= new web3.eth.Contract (catalogContract.abi, catalogAddress);
+	setupEventsCallbacks ();
 	
 	var userExists	= false;
 	var tmpAddress;
@@ -246,17 +292,19 @@ ipcMain.on ('init-info', (event, arg) => {
 										.getUserAddress (hexUser).call ({from:userAddress, gas:300000}, (err, res) => {
 											if (err) {
 												// TODO Handle errors!
-												throw "Cannot get user address!"
+												throw "Cannot get user address!";
 											}
 											tmpAddress	= res;
 										}).then (() => {
 											if (tmpAddress == userAddress) {
 												console.log ("Good news. Getting balance and other info");
-												getOtherInfo (true)
+												getOtherInfo (true);
 											}
-											else
+											else {
+												// TODO Handle errors!
 												console.log ("Received address form catalog differs from chosen address: it is an error!");
-												throw "Error!"
+												throw "Error!";
+											}
 										})
 									}
 									else {
@@ -265,10 +313,10 @@ ipcMain.on ('init-info', (event, arg) => {
 											if (err) {
 												// TODO Handle errors!
 												console.log ("It is an error!");
-												throw "Error!"
+												throw "Error!";
 											}
 										}).then (() => {
-											getOtherInfo (false)
+											getOtherInfo (false);
 										});
 									}
 								})
@@ -294,7 +342,7 @@ ipcMain.on ('create-content-request', (event, data) => {
 	.send	({from: userAddress, gas: 10000000000000}, (err, res) => {
 		if (err){
 			errorOnLastCreation	= true;
-			consol.log (err);
+			console.log (err);
 		}
 	}) // TODO Handle errors
 	.on('error', function(error){})
@@ -385,10 +433,46 @@ ipcMain.on ('more-info-request', ((evt, arg) => {
 			rating	: 'Unknown',
 			price	: lastInfoObject.res['1'],
 			author	: web3.utils.hexToString (lastInfoObject.res['2'])
-		}
+		};
+		contentsPriceCache[lastInfoObject.title]	= toSend.price;
+		console.log (contentsPriceCache);
 		mainWindow.webContents.send ('more-info-reply', toSend);
 	});
 }))
+
+
+
+
+ipcMain.on ('buy-content-request', (evt, arg) => {
+	console.log ('Received request to buy content  ' + arg.title);
+	cachedPrice			= contentsPriceCache[arg.title];
+	tmpPriceInfoTitle	= arg.title;
+	
+	if (cachedPrice == undefined || cachedPrice == '') {
+		// Sending pice request to catalog
+		catalogInstance
+		.methods
+		.getPriceOf (web3.utils.stringToHex(tmpPriceInfoTitle))
+		.call ({from:userAddress, gas:300000}, (err, res) => {
+			contentsPriceCache[tmpPriceInfoTitle]	= res;
+		}).then (() => {
+			catalogInstance
+			.methods
+			.getContent (web3.utils.stringToHex(tmpPriceInfoTitle))
+			.send ({from:userAddress, gas:300000, value:contentsPriceCache[tmpPriceInfoTitle]}, (err, res) => {
+				// TODO Handle errors
+				console.log ("Content buyed");
+				console.log (err);
+				console.log (res);
+			})
+			.then (() => {
+				mainWindow.webContents.send ('buy-content-reply', {result:'success'});
+			})
+		});
+	} else {
+
+	}
+})
 
 
 

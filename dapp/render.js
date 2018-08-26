@@ -7,7 +7,7 @@ var ADDRESSES = []
 var notifications = []
 
 
-const ___TEST___ = false;
+const ___TEST___ = true;
 
 
 
@@ -116,6 +116,7 @@ ipcr.on ('contents-list-reply', ((evt, arg) => {
 		$('#more-info-'+i).click ((evt) => {getMoreInfo ($('#'+evt.target.id).prev())});
 		i++;
 	})
+	hideLoader ('refresh-contents-dimmer');
 }));
 
 
@@ -134,6 +135,13 @@ ipcr.on ('more-info-reply', ((evt, arg) => {
 	$('#more-info-modal').modal('show');
 	console.log (arg);
 }))
+
+
+
+
+ipcr.on ('buy-content-reply', (evt, arg) => {
+	hideLoader ('buy-gift-content-dimmer');
+})
 
 
 
@@ -459,6 +467,23 @@ $('#create-content-button').click((evt) => {
 
 $('#refresh-button').click ((evt) => {
 	ipcr.send ('contents-list-request');
+	showLoader('refresh-contents-dimmer');
+});
+
+
+
+
+$('#buy-content-button').click (evt => {
+	showLoader ('buy-gift-content-dimmer');
+	title	= $('#buy-gift-title').val();
+	ipcr.send ('buy-content-request', {title:title});
+});
+
+
+
+
+$('#gift-to-content-button').click (evt => {
+	
 });
 
 

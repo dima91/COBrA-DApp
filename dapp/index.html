@@ -277,51 +277,15 @@
 
 
 
-				<!-- CUSTOMER VIEW -->
+				<!-- ================= -->
+				<!--   CUSTOMER VIEW   -->
 				<div id='customerView' class='inactive'>
 					<div class='ui grid'>
 						<div class='one wide column'></div>
 
 
 						<div class='six wide column'>
-							<!-- ===================================== -->
-							<!--    SEGMENT FOR BUY OR GIFT CONTENT    -->
-							<!--<div class="ui clearing form segment" id='buy-gift-content-segment'>
-								<div class='ui medium header'>
-										Buy or gift a content
-								</div>
-	
-								<div class='ui hidden divider'></div>
-								<div class='ui hidden divider'></div>
-
-								<div class="required field">
-									<label>Content Title</label>
-									<div class="ui input" id=''>
-										<input placeholder='title' type='text' id=''>
-									</div>
-								</div>
-
-								<div class='ui hidden divider'></div>
-
-								<button class="ui right floated primary button" id=''>
-									Buy
-								</button>
-
-								<div class="ui action left floated input">
-									<div class='ui primary button' id=''>Gift to</div>
-									<input placeholder="Username" type="text">
-								</div>
-
-								<div class="ui dimmer" id='create-content-dimmer'>
-									<div class="ui text loader">
-										Performing requests...
-									</div>
-								</div>
-							</div>
-
-							<div class='ui hidden divider'></div>
-							<div class='ui hidden divider'></div>-->
-
+							
 							<!-- ============================================= -->
 							<!--    SEGMENT FOR BUY OR GIFT PREMIUM ACCOUNT    -->
 							<div class="ui clearing form segment" id='buy-gift-premium-segment'>
@@ -350,12 +314,53 @@
 
 							<div class='ui hidden divider'></div>
 							<div class='ui hidden divider'></div>
+						
+							<!-- ===================================== -->
+							<!--    SEGMENT FOR BUY OR GIFT CONTENT    -->
+							<div class="ui clearing form segment" id='buy-gift-content-segment'>
+								<div class='ui medium header'>
+										Buy or gift a content
+								</div>
+	
+								<div class='ui hidden divider'></div>
+								<div class='ui hidden divider'></div>
+
+								<div class="required field">
+									<label>Content Title</label>
+									<div class="ui input">
+										<input placeholder='title' type='text' id='buy-gift-title'>
+									</div>
+								</div>
+
+								<div class='ui hidden divider'></div>
+
+								<button class="ui right floated primary button" id='buy-content-button'>
+									Buy
+								</button>
+
+								<div class="ui action left floated input">
+									<div class='ui primary button' id='gift-to-content-button'>
+										Gift to
+									</div>
+									<input placeholder="Username" type="text">
+								</div>
+
+							
+								<div class="ui dimmer" id='buy-gift-content-dimmer'>
+									<div class="ui text loader">
+										Performing requests...
+									</div>
+								</div>
+							</div>
+
+							<div class='ui hidden divider'></div>
+							<div class='ui hidden divider'></div>
 
 							<!-- ================================ -->
 							<!--    SEGMENT FOR BUYED CONTENTS    -->
-							<div class="ui segment" id='your-contents-segment'>
+							<div class="ui segment" id='consumable-contents-segment'>
 								<div class='ui medium header'>
-									Your contents
+									Consumable/consumed contents
 								</div>
 
 								<div class='ui hidden divider'></div>
@@ -363,7 +368,7 @@
 								
 
 								<!-- List of published contents -->
-								<div class="ui divided items" id='your-contents-list'>
+								<div class="ui divided items" id='consumable-contents-list'>
 									<!--<div class="item">
 										<i class="large music icon"></i>
 										<div class="ui middle aligned clearing content">
@@ -440,15 +445,11 @@
 
 										<div class="ui hidden divider"></div>
 										<div class="ui hidden divider"></div>
-										
+									</div>
 
-										<button class="ui right floated primary button" id=''>
-											Buy
-										</button>
-		
-										<div class="ui action left floated input">
-											<div class='ui primary button' id=''>Gift to</div>
-											<input placeholder="Username" type="text">
+									<div class="ui dimmer" id='refresh-contents-dimmer'>
+										<div class="ui text loader">
+											Fetching data...
 										</div>
 									</div>
 								</div>								
