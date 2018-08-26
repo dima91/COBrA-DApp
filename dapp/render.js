@@ -1,13 +1,17 @@
+
+'use stict';
+
+
 const { ipcRenderer } = require('electron')
 const ipcr = ipcRenderer;
 
 var username;
 var userAddress;
-var ADDRESSES = []
-var notifications = []
+var ADDRESSES		= [];
+var notifications	= [];
 
 
-const ___TEST___ = true;
+const ___TEST___	= false;
 
 
 

@@ -1,4 +1,7 @@
 
+'use strict';
+
+
 const fs	= require('fs')
 const Web3	= require ("web3");
 
@@ -25,7 +28,7 @@ let CREATE_CATALOG = true;
 
 
 let readContract	= (contractPath) => {
-	content= fs.readFileSync (contractPath);
+	var content= fs.readFileSync (contractPath);
 	return JSON.parse(content);
 }
 
@@ -71,14 +74,26 @@ web3.eth.getAccounts (function (err, res) {
 	let catalogAbi	= (readContract (catalogSmartContractPath)).abi;
 	var catalogContract	= new web3.eth.Contract (catalogAbi, catalogAddress);
 
+	//console.log (addresses);
 
-	/****** Get content list */
+
+	/****** Get content list
 	catalogContract.methods.getContentList()
 						   .call ({from : addresses[0], gas:300000}, (err, res) => {
 								console.log (err);
 								console.log (res);
 							});
 	//*/
+
+
+
+
+	/****** Check if a user is present */
+	catalogContract.methods.userExists (tmpInstance)
+						   .call ({from : addresses[0], gas:300000}, (err, res) => {
+								console.log (err);
+								console.log (res);
+							});
 
 
 
