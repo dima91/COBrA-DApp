@@ -94,6 +94,7 @@ web3.eth.getAccounts (function (err, res) {
 								console.log (err);
 								console.log (res);
 							});
+//*/
 
 
 
@@ -131,8 +132,8 @@ web3.eth.getAccounts (function (err, res) {
 
 
 	
-	/****** Register an user 
-	catalogContract.methods.registerMe('0xab').send ({from : addresses[0], gas:300000}, (err, res) => {
+	/****** Register an user
+	catalogContract.methods.registerMe(tmpInstance).send ({from : addresses[0], gas:300000}, (err, res) => {
 												console.log (err);
 												console.log (res);
 											})

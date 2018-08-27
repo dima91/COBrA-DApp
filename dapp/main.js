@@ -6,7 +6,7 @@ const {app, BrowserWindow, ipcMain} = require('electron');
 const path		= require ('path');
 const Web3		= require ("web3");
 const fs		= require ('fs');
-const truffle	= require ("truffle-contract");
+const truffle	= require ('truffle-contract');
 
 
 // Send something -->      mainWindow.webContents.send('some-message', {})
@@ -22,7 +22,7 @@ const videoContractPath			= folderPrefix + 'VideoManagementContract.json'
 
 var provider;
 var web3;
-const ipcM	= ipcMain;
+var endpoint	= "http://localhost:8545";
 
 var mainWindow;
 
@@ -50,8 +50,6 @@ var contracts	= {
 var publishedContents	= [];		// Do I really need this variable?????
 var availableAddresses	= [];		// List of available addresses
 
-var endpoint;
-
 var user	= {
 	balance : {},
 	address : {},
@@ -63,7 +61,6 @@ var user	= {
 var contentsPriceCache	= {};		// Cotains price informations (which doesn't change) about some contents
 
 // Global variables used to share data between promises
-var errorOnLastCreation;
 var lastCreatedContentAddress;
 var lastCatalogContentsList;
 var lastInfoObject;
@@ -86,29 +83,6 @@ var tmpPriceInfoTitle;
 
 // ==============================
 // ===== HELPFUL FUNCTIONS  =====
-
-
-const string2Hex = (str) => {
-	var result = '';
-	for (var i=0; i<str.length; i++) {
-	  result += str.charCodeAt(i).toString(16);
-	}
-	return result;
-}
-
-
-
-
-const hex2String= (hexStr) => {
-	var hex = hexStr.toString();//force conversion
-	var str = '';
-	for (var i = 0; (i < hex.length && hex.substr(i, 2) !== '00'); i += 2)
-		str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
-	
-	return str;
-}
-
-
 
 
 const errorAndExit	= (err) => {
@@ -147,8 +121,6 @@ const createWindow= () => {
 const loadAddresses	= () => {
 	web3.eth.getAccounts (function (err, res) {
 		availableAddresses= res;
-		//console.log (availableAddresses);
-
 		linkToCatalogInstance ();
 	});
 }
@@ -188,7 +160,7 @@ const buildCompleteContentsList	= (arg) => {
 
 	addresses.forEach ((el) => {
 		item	= {
-			title	: hex2String (titles[i]),
+			title	: web3.toUtf8 (titles[i]),
 			address	: el,
 			type	: types[i]
 		};
@@ -222,8 +194,7 @@ const getOtherInfo	= (getContentLst) => {
 
 		var isPremium;
 		var tmpContentList;
-		console.log (user.balance);
-
+		console.log ('Balance is: ' + user.balance);
 
 		contracts.catalog.instance.isPremium (user.hexName, {from:user.address})
 		.then ((res) => {
@@ -278,23 +249,12 @@ const setupEventsCallbacks = () => {			// TODO Write me!
 	// It works!!!!
 	var event	= contracts.catalog.instance.NewUser ({from:user.address},{fromBlock: 0, toBlock: 'latest'});
 	event.watch ((err, res) => {
-		console.log ('New User!!!!!!!\n\n');
-		console.log (err);
-		console.log ('\n\n');
-		console.log (res);
+		console.log ('Received event about registration of ' + web3.toUtf8(res.args.username));
 	});
 
 	// event ContentPublished (bytes32 username, bytes32 contentTitle, address contentAddress);
 
-
-
-
-	/*console.log (contracts.catalog.instance.events.GrantedAccess);
-	// event GrantedAccess (bytes32 username, address user.address, bytes32 contentTitle, address contentAddress);
-	contracts.catalog.instance.events.GrantedAccess({}, (err, evt) => {
-		console.log ("Granted access for a content! Calling callback..");
-		grantedAccessCallback (err, evt);
-	});*/
+	// event GrantedAccess (bytes32 username, address userAddress, bytes32 contentTitle, address contentAddress);
 
 	// event GrantedPremium (bytes32 username, address user.address);
 }
@@ -316,12 +276,34 @@ const setupEventsCallbacks = () => {			// TODO Write me!
 // =====================================
 // ===== CATALOG EVENTS CALLBACKS  =====
 
-//     event GrantedAccess (bytes32 username, address user.address, bytes32 contentTitle, address contentAddress);
-// Listener for event 'granted access'
+// event ContentPublished (bytes32 username, bytes32 contentTitle, address contentAddress);
+// TODO Listener for event 'content published'
+const contentPublishedCallback = (err, evt) => {
+	console.log (err);
+	console.log (evt);
+}
+
+
+
+
+// event GrantedAccess (bytes32 username, address user.address, bytes32 contentTitle, address contentAddress);
+// TODO Listener for event 'granted access'
 const grantedAccessCallback = (err, evt) => {
 	console.log (err);
 	console.log (evt);
 }
+
+
+
+
+// event GrantedPremium (bytes32 username, address user.address);
+// TODO Listener for event 'granted premium'
+const grantedPremiumCallback = (err, evt) => {
+	console.log (err);
+	console.log (evt);
+}
+
+
 
 
 
@@ -360,22 +342,21 @@ ipcMain.on ('getAddresses', (event, arg) => {
 	If user exists, checks corrispondance with address
 	If it doesn't exists, try to register it */
 ipcMain.on ('init-info', (event, arg) => {
-	console.log ('Received request for\n\tuser:  ' + arg['user'] + '\n\taddress:  ' + arg['addr']);
 
 	user.stringName				= arg['user'];
-	user.hexName				= string2Hex (arg['user']);
+	user.hexName				= web3.fromUtf8 (user.stringName);
 	user.address				= arg['addr'];
 	user.addressIndex			= availableAddresses.indexOf (arg['addr']);
+
+	console.log ('address hex: ' + user.hexName + ' --> ' + web3.toUtf8 (user.hexName));
 	
 	setupEventsCallbacks ();		// FIXME Move me!!!
 	
 	var tmpAddress;
 	var callData;
-
-	console.log ('Hex user:  ' + user.hexName + '\taddress index: ' + user.addressIndex);
 	
-	contracts.catalog.instance.userExists ({form:user.address}, user.address)
-	.then ((res) => {
+	contracts.catalog.instance.userExists (user.hexName, {from:user.address})
+	.then (async (res) => {
 
 		console.log ("Result is: " + res);
 		
@@ -383,13 +364,13 @@ ipcMain.on ('init-info', (event, arg) => {
 			console.log ('User already exists! Checking corrispondance with address..');
 			contracts.catalog.instance.getUserAddress (user.hexName)
 			.then((res) => {
-				if (res == true) {
+				if (res == user.address) {
 					console.log ("Good news. Getting balance and other info");
 					return getOtherInfo (true);
 				}
 				else {
 					// TODO Handle errors!
-					console.log ("Received address form catalog differs from chosen address: it is an error!");
+					console.log ("Received address from catalog differs from chosen address: it is an error!");
 					throw "Error!";
 				}
 			}, (err) => {
@@ -401,9 +382,10 @@ ipcMain.on ('init-info', (event, arg) => {
 			contracts.catalog.instance.registerMe (user.hexName, {from:user.address, gas:1000000000})
 			.then ((res) => {
 				console.log ("Registered!");
-				//console.log (res.logs);
 				return getOtherInfo (false);
-			});
+			}).catch ((e) => {
+				console.log (e);
+			})
 		}
 	})
 })
@@ -413,24 +395,30 @@ ipcMain.on ('init-info', (event, arg) => {
 
 // Event to request content of deployed contracts
 ipcMain.on ('create-content-request', (event, data) => {
-	console.log ('Creating content:  '+ data.type +',   '+ data.title +',   '+ data.price)
-
+	console.log ('Creating content:  '+ data.type +',   '+ data.title +',   '+ data.price);
 
 	priceOfNextContent	= data.price;
-	abi					= contracts.extendedContents[data.type].abi;
-	bytecode			= contracts.extendedContents[data.type].bytecode;
-	contract			= new web3.eth.Contract (abi);
+	thisContract		= contracts.extendedContents[data.type];
 
-	errorOnLastCreation	= false;
+	var errorOnCreation	= false;
 
-	contract
-	.deploy	({data: bytecode, arguments: [string2Hex(data.title), contracts.catalog.address]})
-	.send	({from: user.address, gas: 10000000000000}, (err, res) => {
-		if (err){
-			errorOnLastCreation	= true;
-			console.log (err);
-		}
-	}) // TODO Handle errors
+	console.log (thisContract.bytecode);
+	console.log ('\n\n')
+	console.log (thisContract.abi);
+
+	//new thisContract (web3.fromUtf8(data.title), contracts.catalog.address, {from: user.address})
+	(new web3.eth.Contract (thisContract.abi))
+	.deploy ({data: thisContract.bytecode, arguments:[user.hexName, cotracts.catalog.address]})
+	.send ({from: user.address, gas:10000000}, (err, res) => {
+		console.log ('Deployed..');
+		console.log (err);
+		console.log (res);
+		console.log ('\n\n\n');
+	})
+	.then ((res) => {
+		console.log ('\n\nPerformed creation:')
+		console.log (res);
+	})
 	.on('error', function(error){})
 	.on('transactionHash', function(transactionHash){})
 	.on('receipt', function (receipt){
@@ -443,7 +431,7 @@ ipcMain.on ('create-content-request', (event, data) => {
 		console.log ('Deployed!');
 		contracts.catalog.instance
 		.methods
-		.publishContent (user.hexName, string2Hex(data.title),
+		.publishContent (user.hexName, web3.fromUtf8(data.title),
 							web3.utils.toWei (priceOfNextContent, "milliether"), lastCreatedContentAddress)
 		.send ({from : user.address, gas:30000000}, (err, res) => {
 			if (err) {
@@ -494,7 +482,7 @@ ipcMain.on ('contents-list-request', ((evt, arg) => {
 	.then (() => {
 		toSend	= [];
 		lastCatalogContentsList.forEach ((el) => {
-			toSend.push (hex2String (el))
+			toSend.push (web3.toUtf8 (el))
 		})
 		mainWindow.webContents.send ('contents-list-reply', {list: toSend, time: currentTime()});
 	})
@@ -508,7 +496,7 @@ ipcMain.on ('more-info-request', ((evt, arg) => {
 	
 	contracts.catalog.instance
 	.methods
-	.getInfoOf (string2Hex (arg.title))
+	.getInfoOf (web3.fromUtf8 (arg.title))
 	.call ({from:user.address, gas:300000}, (err, res) => {
 		lastInfoObject	= {res: res, title: arg.title};
 	}).then (() => {
@@ -518,7 +506,7 @@ ipcMain.on ('more-info-request', ((evt, arg) => {
 			title	: lastInfoObject.title,
 			rating	: 'Unknown',
 			price	: lastInfoObject.res['1'],
-			author	: hex2String (lastInfoObject.res['2'])
+			author	: web3.toUtf8 (lastInfoObject.res['2'])
 		};
 		contentsPriceCache[lastInfoObject.title]	= toSend.price;
 		console.log (contentsPriceCache);
@@ -538,13 +526,13 @@ ipcMain.on ('buy-content-request', (evt, arg) => {
 		// Sending pice request to catalog
 		contracts.catalog.instance
 		.methods
-		.getPriceOf (string2Hex(tmpPriceInfoTitle))
+		.getPriceOf (web3.fromUtf8(tmpPriceInfoTitle))
 		.call ({from:user.address, gas:300000}, (err, res) => {
 			contentsPriceCache[tmpPriceInfoTitle]	= res;
 		}).then (() => {
 			contracts.catalog.instance
 			.methods
-			.getContent (string2Hex(tmpPriceInfoTitle))
+			.getContent (web3.fromUtf8(tmpPriceInfoTitle))
 			.send ({from:user.address, gas:300000, value:contentsPriceCache[tmpPriceInfoTitle]}, (err, res) => {
 				// TODO Handle errors
 				console.log ("Content buyed");
@@ -586,17 +574,30 @@ else {
 }*/
 
 
-endpoint					= "http://localhost:8545";
-provider					=new Web3.providers.HttpProvider(endpoint);
-web3						= new Web3 (provider);
+
+
 contracts.catalog.address	= process.argv[2];
 
-console.log ("Catalog address:  " + contracts.catalog.address);
+
+if(typeof web3 != 'undefined') {
+	console.log ("I'm here");
+	console.log(web3);
+	provider	= web3.currentProvider;
+	web3 		= new Web3 (provider);
+} else {
+	provider	= new Web3.providers.HttpProvider(endpoint);
+	web3		= new Web3(provider);
+}
+
+
+
+//console.log ("Catalog: " + contracts.catalog.address);
 
 
 
 
 app.on('ready', () => {
+	console.log (provider);
 	loadAddresses ();
 	var tmpContract	= {};
 	var tmpObject	= {abi:'', bytecode:''};
@@ -605,23 +606,8 @@ app.on('ready', () => {
 	contracts.baseContent.abi		= tmpContract.abi;
 	contracts.baseContent.bytecode	= tmpContract.bytecode;
 
-	tmpContract						= readContract (songContractPath);
-	tmpObject.abi					= tmpContract.abi;
-	tmpObject.bytecode				= tmpContract.bytecode;
-	contracts.extendedContents[0]	= tmpObject;
-
-	tmpContract						= readContract (videoContractPath);
-	tmpObject.abi					= tmpContract.abi;
-	tmpObject.bytecode				= tmpContract.bytecode;
-	contracts.extendedContents[1]	= tmpObject;
-
-	tmpContract						= readContract (photoContractPath);
-	tmpObject.abi					= tmpContract.abi;
-	tmpObject.bytecode				= tmpContract.bytecode;
-	contracts.extendedContents[2]	= tmpObject;
-
-	tmpContract						= readContract (documentContractPath);
-	tmpObject.abi					= tmpContract.abi;
-	tmpObject.bytecode				= tmpContract.bytecode;
-	contracts.extendedContents[3]	= tmpObject;
-})
+	contracts.extendedContents[0]	= readContract (songContractPath);
+	contracts.extendedContents[1]	= readContract (videoContractPath);
+	contracts.extendedContents[2]	= readContract (photoContractPath);
+	contracts.extendedContents[3]	= readContract (documentContractPath);
+});

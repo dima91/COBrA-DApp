@@ -11,7 +11,7 @@ var ADDRESSES		= [];
 var notifications	= [];
 
 
-const ___TEST___	= false;
+const ___TEST___	= true;
 
 
 
@@ -43,7 +43,7 @@ ipcr.on('addresses', (event, arg) => {
 		idx++;
 	});
 
-	showCustomerView ();
+	showAuthorView ();
 })
 
 
