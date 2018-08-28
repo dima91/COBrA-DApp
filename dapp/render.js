@@ -147,7 +147,39 @@ ipcr.on ('more-info-reply', ((evt, arg) => {
 
 
 ipcr.on ('buy-content-reply', (evt, arg) => {
+	if (arg.result == 'error') {
+		// TODO Handle error
+		return;
+	}
+
 	hideLoader ('buy-gift-content-dimmer');
+	$('#consumable-contents-list').append (newBuyedItem (arg.title));
+	
+	$('#button-'+arg.title).click ((ev) => {
+		console.log ('Clicked for consume');
+		var title	= ev.target.id.substring (7);
+		ipcr.send ('consume-content-request', {'title':title});
+		showLoader ('consume-rate-content-dimmer');
+	});
+})
+
+
+
+
+ipcr.on ('consume-content-reply', (evt, arg) => {
+	if (arg.result == 'error') {
+		// TODO Handle error
+		return;
+	}
+	hideLoader ('consume-rate-content-dimmer');
+	
+	$('#button-' + arg.title).text	('Rate me');
+	$('#button-' + arg.title).off	('click');
+	
+	$('#button-' + arg.title).click	((ev) => {
+		console.log ('clicked for rate');
+		//TODO
+	})
 })
 
 
@@ -317,6 +349,22 @@ const getMoreInfo	= (arg) => {
 	$('#info-rating').text (arg.rating)
 
 	ipcr.send ('more-info-request', {title: arg.text()})
+}
+
+
+
+
+const newBuyedItem	= (title) => {
+	return  '<div class="item">'															+
+				'<div class="ui middle aligned clearing content">'							+
+					'<div class="ui left floated header">'									+
+						title																+
+					'</div>'																+
+					'<button class="ui right floated green button" id="button-'+title+'">'	+
+						'Consume me'														+
+					'</button>'																+
+				'</div>'																	+
+			'</div>';
 }
 
 

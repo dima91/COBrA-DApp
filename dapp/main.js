@@ -145,6 +145,9 @@ const linkToCatalogInstance	= () => {
 
 
 const loadExtendedContents	= () => {
+	contracts.baseContent			= truffle (readContract (baseContentContractPath));
+	contracts.baseContent.setProvider (provider);
+
 	contracts.extendedContents[0]	= truffle (readContract (songContractPath));
 	contracts.extendedContents[1]	= truffle (readContract (videoContractPath));
 	contracts.extendedContents[2]	= truffle (readContract (photoContractPath));
@@ -499,7 +502,7 @@ ipcMain.on ('buy-content-request', (evt, arg) => {
 	tmpPriceInfoTitle	= arg.title;
 	
 	if (cachedPrice == undefined || cachedPrice == '') {
-		// Sending pice request to catalog
+		// Sending price request to catalog
 		contracts.catalog.instance
 		.getPriceOf (web3.fromUtf8(arg.title), {from:user.address, gas:300000})
 		.then ((res) => {
@@ -509,7 +512,7 @@ ipcMain.on ('buy-content-request', (evt, arg) => {
 			.then ((res) => {
 				// TODO Handle errors
 				console.log ("Content buyed");
-				mainWindow.webContents.send ('buy-content-reply', {result:'success'});
+				mainWindow.webContents.send ('buy-content-reply', {result:'success', title:arg.title});
 			})
 			.catch ((err) => {
 				console.log ("Error during bought of content " + arg.title);
@@ -523,7 +526,7 @@ ipcMain.on ('buy-content-request', (evt, arg) => {
 		.then ((res) => {
 			// TODO Handle errors
 			console.log ("Content buyed");
-			mainWindow.webContents.send ('buy-content-reply', {result:'success'});
+			mainWindow.webContents.send ('buy-content-reply', {result:'success', title:arg.title});
 		})
 		.catch ((err) => {
 			console.log ("Error during bought of content " + arg.title);
@@ -533,6 +536,31 @@ ipcMain.on ('buy-content-request', (evt, arg) => {
 	
 	}
 })
+
+
+
+
+ipcMain.on ('consume-content-request', (evt, arg) => {
+	console.log ('Received reuest to consume content ' + arg.title);
+	contracts.catalog.instance.getAddressOf (web3.fromUtf8 (arg.title), {from:user.address, gas:3000000})
+	.then ((res) => {
+		console.log ('Address is : ' + res);
+		contracts.baseContent.at(res)
+		.then ((instance) => {
+			return instance.consumeContent (user.hexName, {from:user.address, gas:3000000});
+		})
+		.then ((res) => {
+			console.log ('Retrieved content ' + arg.title);
+			console.log (res);
+			mainWindow.webContents.send ('consume-content-reply', {result:'success', title:arg.title});
+		})
+		.catch ((err) => {
+			console.log ("Error consuming content " + arg.title);
+			console.log (err);
+			mainWindow.webContents.send ('consume-content-reply', {result:'error'});
+		})
+	})
+});
 
 
 
@@ -587,13 +615,4 @@ app.on('ready', () => {
 	loadAddresses ();
 	var tmpContract	= {};
 	var tmpObject	= {abi:'', bytecode:''};
-
-	tmpContract						= readContract (baseContentContractPath);
-	contracts.baseContent.abi		= tmpContract.abi;
-	contracts.baseContent.bytecode	= tmpContract.bytecode;
-
-	contracts.extendedContents[0]	= truffle (readContract(songContractPath));
-	contracts.extendedContents[1]	= truffle (readContract (videoContractPath));
-	contracts.extendedContents[2]	= truffle (readContract (photoContractPath));
-	contracts.extendedContents[3]	= truffle (readContract (documentContractPath));
 });
