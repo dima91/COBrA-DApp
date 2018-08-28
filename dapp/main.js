@@ -137,15 +137,24 @@ const linkToCatalogInstance	= () => {
 	.at (contracts.catalog.address)
 	.then ((instance) => {
 		contracts.catalog.instance	= instance;
-/*		console.log ("getting content list!");
-		return instance.getContentList.call ();			// FIXME Delete me!
-	}, (err) => {
-		console.log ("Cannot connect to Catalog contract! VERY DANGEROUS");
-		process.exit ();
-	}).then ((res) => {
-		console.log (res);*/
-		createWindow ();
+		loadExtendedContents ();
 	})
+}
+
+
+
+
+const loadExtendedContents	= () => {
+	contracts.extendedContents[0]	= truffle (readContract (songContractPath));
+	contracts.extendedContents[1]	= truffle (readContract (videoContractPath));
+	contracts.extendedContents[2]	= truffle (readContract (photoContractPath));
+	contracts.extendedContents[3]	= truffle (readContract (documentContractPath));
+
+	contracts.extendedContents.forEach ((el) => {
+		el.setProvider (provider);
+	});
+
+	createWindow ();
 }
 
 
@@ -199,7 +208,7 @@ const getOtherInfo	= (getContentLst) => {
 		contracts.catalog.instance.isPremium (user.hexName, {from:user.address})
 		.then ((res) => {
 			isPremium	= res;
-			console.log ('Is premium: ' + res);
+			
 			if (getContentLst) {
 				//console.log (contracts.catalog.instance.getContentsListByAuthor);
 				contracts.catalog.instance.getContentsListByAuthor (user.hexName)
@@ -402,66 +411,35 @@ ipcMain.on ('create-content-request', (event, data) => {
 
 	var errorOnCreation	= false;
 
-	console.log (thisContract.bytecode);
-	console.log ('\n\n')
-	console.log (thisContract.abi);
+	var newInstance	= thisContract
+	.new (web3.fromUtf8(data.title), contracts.catalog.address, { from: user.address,
+																	data:thisContract.bytecode,
+																	gas:10000000})
+	.then ((instance) => {
+		console.log ("Deployed!\nRegistering to catalog..");
 
-	//new thisContract (web3.fromUtf8(data.title), contracts.catalog.address, {from: user.address})
-	(new web3.eth.Contract (thisContract.abi))
-	.deploy ({data: thisContract.bytecode, arguments:[user.hexName, cotracts.catalog.address]})
-	.send ({from: user.address, gas:10000000}, (err, res) => {
-		console.log ('Deployed..');
-		console.log (err);
-		console.log (res);
-		console.log ('\n\n\n');
+		return contracts.catalog.instance
+		.publishContent (user.hexName, web3.fromUtf8(data.title),
+						  web3.toWei (priceOfNextContent, "milliether"), instance.address,
+						{from: user.address, gas:1000000});
 	})
 	.then ((res) => {
-		console.log ('\n\nPerformed creation:')
-		console.log (res);
+		mainWindow.webContents.send('create-content-reply', {
+			result: 'success',
+			type: data.type,
+			title: data.title,
+			address: lastCreatedContentAddress
+		});
 	})
-	.on('error', function(error){})
-	.on('transactionHash', function(transactionHash){})
-	.on('receipt', function (receipt){
-	   console.log("Contract address: " + receipt.contractAddress) // contains the new contract address
-	   lastCreatedContentAddress	= receipt.contractAddress;
-	})
-	.on('confirmation', function(confirmationNumber, receipt){})
-	.then ((newContractInstance) => {
-		// Success! --> publishing to the catalog
-		console.log ('Deployed!');
-		contracts.catalog.instance
-		.methods
-		.publishContent (user.hexName, web3.fromUtf8(data.title),
-							web3.utils.toWei (priceOfNextContent, "milliether"), lastCreatedContentAddress)
-		.send ({from : user.address, gas:30000000}, (err, res) => {
-			if (err) {
-				// Error linking content address to catalog! Destoying it! (content contract)
-				abi			= contracts.baseContent.abi;
-				bytecode	= contracts.baseContent.bytecode;
-				
-				(new web3.eth.Contract (abi, lastCreatedContentAddress))
-				.methods
-				.killMe()
-				.send ({from: user.address, gas: 1000000}, (err, res) => {
-					if (err){
-						consol.log (err);
-					}
-				})
-				.then (() => {console.log ('Contract destroyed')});
-				mainWindow.webContents.send ('create-content-reply', {result:'failure'});
-			}
-			else {
-				mainWindow.webContents.send('create-content-reply', {
-					result: 'success',
-					type: data.type,
-					title: data.title,
-					address: lastCreatedContentAddress
-				});
-			}
-			getOtherInfo (false);
-			errorOnLastCreation	= false;
-		}).then (() => {
-			console.log ("Published on catalog!")
+	.catch ((err) => {
+		// TODO
+		console.log ('\n\nSome errors! WARNING!');
+		console.log (err);
+		mainWindow.webContents.send('create-content-reply', {
+			result: 'failure',
+			type: data.type,
+			title: data.title,
+			address: lastCreatedContentAddress
 		});
 	});
 })
@@ -473,18 +451,17 @@ ipcMain.on ('contents-list-request', ((evt, arg) => {
 	console.log ('Received a contents list update request');
 
 	contracts.catalog.instance
-	.methods
-	.getContentList ()
-	.call ({from:user.address, gas:300000}, (err, res) => {
-		console.log (res);
-		lastCatalogContentsList	= res;
-	})
-	.then (() => {
+	.getContentList ({from:user.address, gas:300000})
+	.then ((res) => {
 		toSend	= [];
-		lastCatalogContentsList.forEach ((el) => {
+		res.forEach ((el) => {
 			toSend.push (web3.toUtf8 (el))
 		})
 		mainWindow.webContents.send ('contents-list-reply', {list: toSend, time: currentTime()});
+	})
+	.catch ((err) => {
+		console.log ("Error on getting contents list!!");
+		console.log (err);
 	})
 }));
 
@@ -495,23 +472,22 @@ ipcMain.on ('more-info-request', ((evt, arg) => {
 	console.log ('Received more-info-request for '+ arg.title);
 	
 	contracts.catalog.instance
-	.methods
-	.getInfoOf (web3.fromUtf8 (arg.title))
-	.call ({from:user.address, gas:300000}, (err, res) => {
-		lastInfoObject	= {res: res, title: arg.title};
-	}).then (() => {
-		console.log (lastInfoObject);
+	.getInfoOf (web3.fromUtf8 (arg.title), {from:user.address, gas:300000})
+	.then ((res) => {	// res	= {feedbacks, price, author}
 		// TODO Computation of feedback
 		toSend	= {
-			title	: lastInfoObject.title,
+			title	: arg.title,
 			rating	: 'Unknown',
-			price	: lastInfoObject.res['1'],
-			author	: web3.toUtf8 (lastInfoObject.res['2'])
+			price	: res['1'].toString(),		// FIXME What unit of measure is this?!?!?!?!
+			author	: web3.toUtf8 (res['2'])
 		};
-		contentsPriceCache[lastInfoObject.title]	= toSend.price;
-		console.log (contentsPriceCache);
+		contentsPriceCache[arg.title]	= toSend.price;
 		mainWindow.webContents.send ('more-info-reply', toSend);
-	});
+	})
+	.catch ((err) => {
+		console.log ("Error getting more info of " + arg.title);
+		console.log (err);
+	})
 }))
 
 
@@ -525,26 +501,36 @@ ipcMain.on ('buy-content-request', (evt, arg) => {
 	if (cachedPrice == undefined || cachedPrice == '') {
 		// Sending pice request to catalog
 		contracts.catalog.instance
-		.methods
-		.getPriceOf (web3.fromUtf8(tmpPriceInfoTitle))
-		.call ({from:user.address, gas:300000}, (err, res) => {
-			contentsPriceCache[tmpPriceInfoTitle]	= res;
-		}).then (() => {
-			contracts.catalog.instance
-			.methods
-			.getContent (web3.fromUtf8(tmpPriceInfoTitle))
-			.send ({from:user.address, gas:300000, value:contentsPriceCache[tmpPriceInfoTitle]}, (err, res) => {
+		.getPriceOf (web3.fromUtf8(arg.title), {from:user.address, gas:300000})
+		.then ((res) => {
+			contentsPriceCache[arg.title]	= res;
+			return contracts.catalog.instance
+			.getContent (web3.fromUtf8(arg.title), {from:user.address, gas:300000, value:contentsPriceCache[arg.title]})
+			.then ((res) => {
 				// TODO Handle errors
 				console.log ("Content buyed");
-				console.log (err);
-				console.log (res);
-			})
-			.then (() => {
 				mainWindow.webContents.send ('buy-content-reply', {result:'success'});
+			})
+			.catch ((err) => {
+				console.log ("Error during bought of content " + arg.title);
+				console.log (err);
+				mainWindow.webContents.send ('buy-content-reply', {result:'error'});
 			})
 		});
 	} else {
-
+		contracts.catalog.instance
+		.getContent (web3.fromUtf8(arg.title), {from:user.address, gas:300000, value:contentsPriceCache[arg.title]})
+		.then ((res) => {
+			// TODO Handle errors
+			console.log ("Content buyed");
+			mainWindow.webContents.send ('buy-content-reply', {result:'success'});
+		})
+		.catch ((err) => {
+			console.log ("Error during bought of content " + arg.title);
+			console.log (err);
+			mainWindow.webContents.send ('buy-content-reply', {result:'error'});
+		})
+	
 	}
 })
 
@@ -606,8 +592,8 @@ app.on('ready', () => {
 	contracts.baseContent.abi		= tmpContract.abi;
 	contracts.baseContent.bytecode	= tmpContract.bytecode;
 
-	contracts.extendedContents[0]	= readContract (songContractPath);
-	contracts.extendedContents[1]	= readContract (videoContractPath);
-	contracts.extendedContents[2]	= readContract (photoContractPath);
-	contracts.extendedContents[3]	= readContract (documentContractPath);
+	contracts.extendedContents[0]	= truffle (readContract(songContractPath));
+	contracts.extendedContents[1]	= truffle (readContract (videoContractPath));
+	contracts.extendedContents[2]	= truffle (readContract (photoContractPath));
+	contracts.extendedContents[3]	= truffle (readContract (documentContractPath));
 });

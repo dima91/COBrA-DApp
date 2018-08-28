@@ -43,7 +43,7 @@ ipcr.on('addresses', (event, arg) => {
 		idx++;
 	});
 
-	showAuthorView ();
+	showCustomerView ();
 })
 
 
@@ -52,7 +52,7 @@ ipcr.on('addresses', (event, arg) => {
 // Event handler for balance information --> {'balance':..}
 ipcr.on('newBalance', (event, arg) => {
 	jsonP = JSON.parse(arg);
-	console.log(jsonP['balance'])
+	$('#balanceContainer').html(jsonP['balance'] + " (ether)");
 })
 
 
@@ -85,6 +85,9 @@ ipcr.on('init-info', (event, arg) => {
 
 		$('#childContainer').removeClass('inactive')
 		hideLoader('loaderDiv');
+
+		// =========================  Test requests  =========================
+		// ipcr.send ('create-content-request', {type:0, title:'a beautiful song', price:10000});
 	}
 })
 

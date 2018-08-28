@@ -77,7 +77,7 @@ web3.eth.getAccounts (function (err, res) {
 	//console.log (addresses);
 
 
-	/****** Get content list
+	/****** Get content list */
 	catalogContract.methods.getContentList()
 						   .call ({from : addresses[0], gas:300000}, (err, res) => {
 								console.log (err);
@@ -88,7 +88,7 @@ web3.eth.getAccounts (function (err, res) {
 
 
 
-	/****** Check if a user is present */
+	/****** Check if a user is present
 	catalogContract.methods.userExists (tmpInstance)
 						   .call ({from : addresses[0], gas:300000}, (err, res) => {
 								console.log (err);
