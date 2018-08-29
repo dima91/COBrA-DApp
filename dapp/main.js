@@ -274,6 +274,25 @@ const setupEventsCallbacks = () => {			// TODO Write me!
 
 
 
+const computeFeedbacksAvg	= (feeds) => {
+	var sum=0, div=0;
+
+	feeds.forEach ((el) => {
+		var nEl	= Number (el);
+		if (nEl != 0) {
+			sum += nEl;
+			div++;
+		}
+	})
+	if (div != 0)
+		return (sum/div).toFixed(2);
+	else
+		return 'Unknown';
+}
+
+
+
+
 
 
 
@@ -477,11 +496,16 @@ ipcMain.on ('more-info-request', ((evt, arg) => {
 	contracts.catalog.instance
 	.getInfoOf (web3.fromUtf8 (arg.title), {from:user.address, gas:300000})
 	.then ((res) => {	// res	= {feedbacks, price, author}
-		// TODO Computation of feedback
+		/*console.log (Number(res[0][0]));
+		console.log ("feedbacks are: " + res[0]);
+		console.log ("Feedbacks are: " + computeFeedbacksAvg (res[0]));*/
+
+		/*console.log (web3.fromWei(res['1'], 'milliether'));
+		console.log (web3.fromWei(res['1'], 'milliether').toString());*/
 		toSend	= {
 			title	: arg.title,
-			rating	: 'Unknown',
-			price	: res['1'].toString(),		// FIXME What unit of measure is this?!?!?!?!
+			rating	: computeFeedbacksAvg (res[0]),
+			price	: web3.fromWei(res['1'], 'milliether').toString(),		// FIXME What unit of measure is this?!?!?!?!
 			author	: web3.toUtf8 (res['2'])
 		};
 		contentsPriceCache[arg.title]	= toSend.price;
@@ -593,6 +617,23 @@ ipcMain.on ('rating-request', (evt, arg) => {
 		console.log (err);
 	})
 });
+
+
+
+
+ipcMain.on ('gift-content-request', (evt, arg) => {
+	// TODO Write meeee!!!!!!!!!!!!!!! -->			function giftContent (bytes32 _contentTitle, bytes32 _receivingUser)
+	//console.log ('Gifting  ' + arg.title + ' ('+ web3.fromUtf8(arg.title)+')  to  ' + arg.user + ' (' + web3.fromUtf8(arg.user) +')')
+	console.log ('Gifting  ' + arg.title + '  to  ' + arg.user);
+	
+	contracts.catalog.instance.giftContent (web3.fromUtf8(arg.title), web3.fromUtf8(arg.user))
+	.then ((res) => {
+		mainWindow.webContents.send('gift-content-reply', {result:'success'});
+	})
+	.catch ((err) => {
+		mainWindow.webContents.send('gift-content-reply', {result:'failure', cause:'boh!'});
+	})
+})
 
 
 

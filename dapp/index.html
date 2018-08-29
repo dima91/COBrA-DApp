@@ -327,7 +327,7 @@
 
 								<div class="required field">
 									<label>Content Title</label>
-									<div class="ui input">
+									<div class="ui input" id='buy-gift-title-div'>
 										<input placeholder='title' type='text' id='buy-gift-title'>
 									</div>
 								</div>
@@ -338,11 +338,11 @@
 									Buy
 								</button>
 
-								<div class="ui action left floated input">
+								<div class="ui action left floated input" id='gift-to-div'>
 									<div class='ui primary button' id='gift-to-content-button'>
 										Gift to
 									</div>
-									<input placeholder="Username" type="text">
+									<input placeholder="Username" type="text" id='gift-to-user'>
 								</div>
 
 							
@@ -410,7 +410,7 @@
 								<!--   MORE INFO MODAL   -->
 								<div class="ui tiny modal" id="more-info-modal">
 									<div class='ui container'>
-										<div class="ui clearing medium centered header" id='infoModalHeader'>
+										<div class="ui header centered" id='infoModalHeader'>
 											Content info
 										</div>
 									</div>

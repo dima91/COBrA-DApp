@@ -138,7 +138,7 @@ ipcr.on ('more-info-reply', ((evt, arg) => {
 
 	$('#info-title').text (arg.title);
 	$('#info-author').text (arg.author);
-	$('#info-price').text (arg.price);
+	$('#info-price').text (arg.price + ' (milliether)');
 	$('#info-rating').text (arg.rating)
 
 
@@ -192,6 +192,14 @@ ipcr.on ('consume-content-reply', (evt, arg) => {
 	currentRating	= arg.title;
 
 	showModal ('rating-question-modal');
+})
+
+
+
+
+ipcr.on ('gift-content-reply', (ev, arg) => {
+	hideLoader ('buy-gift-content-dimmer');
+	// TODO Check result!
 })
 
 
@@ -561,8 +569,16 @@ $('#refresh-button').click ((evt) => {
 
 
 $('#buy-content-button').click (evt => {
+	var title	= $('#buy-gift-title').val();
+
+	if (title == undefined || title == '') {
+		$('#buy-gift-title-div').addClass ('error');
+		return ;
+	}
+
+	$('#buy-gift-title-div').removeClass ('error');
+
 	showLoader ('buy-gift-content-dimmer');
-	title	= $('#buy-gift-title').val();
 	ipcr.send ('buy-content-request', {title:title});
 });
 
@@ -570,7 +586,22 @@ $('#buy-content-button').click (evt => {
 
 
 $('#gift-to-content-button').click (evt => {
-	// TODO
+	// gift-to-user
+	var title	= $('#buy-gift-title').val();
+	var user	= $('#gift-to-user').val();
+
+	if (title == undefined || title == '') {
+		$('#buy-gift-title-div').addClass ('error');
+		return ;
+	}
+
+	if (user == undefined || user == ''){
+		$('#gift-to-div').addClass ('error');
+		return ;
+	}
+
+	showLoader ('buy-gift-content-dimmer');
+	ipcr.send ('gift-content-request', {title:title, user:user});
 });
 
 
@@ -606,6 +637,8 @@ $('#rating-submit-button').click ((evt) => {
 	console.log (data);
 
 	hideModal('rating-modal');
+
+	$('#button-'+data.title).addClass ('disabled');
 })
 
 
@@ -651,7 +684,7 @@ window.onload = () => {
 
 	$('#loginModal').modal('show')
 	$('.ui.dropdown').dropdown();
-	$('.ui.rating').rating();
+	//$('.ui.rating').rating();
 
 	$('#more-info-modal').modal('hide');
 
@@ -660,8 +693,8 @@ window.onload = () => {
 		// Timeout to automatically access with first address of array
 		setTimeout(() => {
 			console.log('Helo user: ' + ___TEST___)
-			userAddress = ADDRESSES[8]
-			username = 'andrea'
+			userAddress = ADDRESSES[9]
+			username = 'luca'
 			payload = { 'user': username, 'addr': userAddress };
 			$('#loginModal').modal('hide')
 			showLoader('loaderDiv')
