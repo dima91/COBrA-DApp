@@ -658,6 +658,22 @@ ipcMain.on ('buy-premium-request', (evt, arg) => {
 
 
 
+ipcMain.on ('gift-premium-request', (evt, arg) => {
+	console.log ('Performing request..');
+
+	contracts.catalog.instance.giftPremium (web3.fromAscii(arg.user), {from:user.address, gas:100000, value:web3.toWei(44000, 'szabo')})
+	.then ((res) => {
+		console.log ("Gifted!!!!");
+		mainWindow.webContents.send('gift-premium-reply', {result:'success'});
+	})
+	.catch ((err) => {
+		mainWindow.webContents.send('gift-premium-reply', {result:'failure', cause:'boh!'});
+	})
+});
+
+
+
+
 
 
 

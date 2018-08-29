@@ -12,7 +12,7 @@ var notifications	= [];
 var currentRating	= "";
 
 
-const ___TEST___	= true;
+const ___TEST___	= false;
 
 
 
@@ -216,7 +216,14 @@ ipcr.on ('buy-premium-reply', (evt, arg) => {
 		console.log ('NOT premium user');
 		$('#premium').addClass('inactive');
 	}
+})
 
+
+
+
+ipcr.on ('gift-premium-reply', (evt, arg) => {
+	hideLoader ('buy-gift-premium-dimmer');
+	console.log ('gifted!\t\tresult: ' + arg.result);
 })
 
 
@@ -672,6 +679,22 @@ $('#buy-premium-button').click ((evt) => {
 	showLoader ('buy-gift-premium-dimmer');
 
 	ipcr.send ('buy-premium-request');
+})
+
+
+
+
+$('#gift-premium-button').click ((evt) => {
+	var user	= $('#gift-premium-user').val();
+	if (user == undefined || user == '') {
+		$('#gift-premium-div').addClass ('error');
+		return ;
+	}
+
+	console.log ('Gifting premium')
+
+	showLoader ('buy-gift-premium-dimmer');
+	ipcr.send ('gift-premium-request', {user:user});
 })
 
 
