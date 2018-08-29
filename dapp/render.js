@@ -9,6 +9,7 @@ var username;
 var userAddress;
 var ADDRESSES		= [];
 var notifications	= [];
+var currentRating	= "";
 
 
 const ___TEST___	= true;
@@ -88,6 +89,9 @@ ipcr.on('init-info', (event, arg) => {
 
 		// =========================  Test requests  =========================
 		// ipcr.send ('create-content-request', {type:0, title:'a beautiful song', price:10000});
+		//showModal ('rating-modal');
+		//showModal ('rating-question-modal');
+		//ipcr.send ('rating-request', { '0': 5, '1': 3, '2': 2, title: '44' });
 	}
 })
 
@@ -178,8 +182,16 @@ ipcr.on ('consume-content-reply', (evt, arg) => {
 	
 	$('#button-' + arg.title).click	((ev) => {
 		console.log ('clicked for rate');
-		//TODO
+		showModal ('rating-modal');
+		var title		= ev.target.id.substring (7);
+		currentRating	= title;
+		// Cleaning values
+		$('.ui.rating').rating();
 	})
+
+	currentRating	= arg.title;
+
+	showModal ('rating-question-modal');
 })
 
 
@@ -211,6 +223,20 @@ const showLoader = (loaderId) => {
 
 const hideLoader = (loaderId) => {
 	$('#' + loaderId).removeClass('active')
+}
+
+
+
+
+const showModal	= (modalId) => {		// TODO Use me!
+	$('#'+modalId).modal('show');
+}
+
+
+
+
+const hideModal	= (modalId) => {		// TODO Use me!
+	$('#'+modalId).modal('hide');
 }
 
 
@@ -520,6 +546,12 @@ $('#create-content-button').click((evt) => {
 //					CUSTOMER VIEW
 // ==================================================
 
+/* Kind of feedback
+ * contentAppreciation  : how much the customer enjoyed the content
+ * priceFairness        : how fair the requested price is considered compared to the content
+ * availabilityTime     : how fair the availability of content is considered compating to the price
+ */
+
 $('#refresh-button').click ((evt) => {
 	ipcr.send ('contents-list-request');
 	showLoader('refresh-contents-dimmer');
@@ -538,8 +570,50 @@ $('#buy-content-button').click (evt => {
 
 
 $('#gift-to-content-button').click (evt => {
-	
+	// TODO
 });
+
+
+
+
+$('#yes-quest-button').click ((evt) => {
+	hideModal ('rating-question-modal');
+	showModal ('rating-modal');
+
+	// Cleaning values
+	$('.ui.rating').rating();
+})
+
+
+
+
+$('#no-quest-button').click ((evt) => {
+	hideModal ('rating-question-modal');
+})
+
+
+
+
+$('#rating-submit-button').click ((evt) => {
+	var data	=	{
+						'title' : currentRating,
+						'1' : $('#rating-1').rating('get rating'),
+						'2' : $('#rating-2').rating('get rating'),
+						'3' : $('#rating-3').rating('get rating')
+					}
+	ipcr.send ('rating-request', data);
+	console.log ('sengin..');
+	console.log (data);
+
+	hideModal('rating-modal');
+})
+
+
+
+
+$('#rating-cancel-button').click ((evt) => {
+	hideModal ('rating-modal');
+})
 
 
 
@@ -577,6 +651,7 @@ window.onload = () => {
 
 	$('#loginModal').modal('show')
 	$('.ui.dropdown').dropdown();
+	$('.ui.rating').rating();
 
 	$('#more-info-modal').modal('hide');
 
@@ -585,8 +660,8 @@ window.onload = () => {
 		// Timeout to automatically access with first address of array
 		setTimeout(() => {
 			console.log('Helo user: ' + ___TEST___)
-			userAddress = ADDRESSES[9]
-			username = 'luca'
+			userAddress = ADDRESSES[8]
+			username = 'andrea'
 			payload = { 'user': username, 'addr': userAddress };
 			$('#loginModal').modal('hide')
 			showLoader('loaderDiv')

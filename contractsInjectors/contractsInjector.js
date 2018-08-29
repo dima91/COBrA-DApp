@@ -179,6 +179,18 @@ web3.eth.getAccounts (function (err, res) {
 		console.log (res);
 	}));
 	//*/
+
+
+	/****** Check feedbacks */
+	let contentAbi		= (readContract (baseContentContractPath)).abi;
+	(new web3.eth.Contract (contentAbi, tmpInstance)
+	.methods
+	.getFeedbacksAverages()
+	.call ({from : addresses[0], gas:300000}, (err, res) => {
+		console.log (err);
+		console.log (res);
+	}));
+	//*/
 })
 
 

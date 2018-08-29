@@ -565,6 +565,38 @@ ipcMain.on ('consume-content-request', (evt, arg) => {
 
 
 
+ipcMain.on ('rating-request', (evt, arg) => {
+	console.log (arg);
+
+	var tmpInstance;
+
+	contracts.catalog.instance.getAddressOf (web3.fromUtf8 (arg.title), {fom:user.address, gas:200000})
+	.then ((res) => {
+		console.log (res);
+		return contracts.baseContent.at(res);
+	})
+	.then ((instance) => {
+		tmpInstance	= instance;
+		console.log ('1');
+		return instance.leaveFeedback (user.hexName, 1, arg['1'], {from:user.address, gas:3000000});
+	})
+	.then (() => {
+		console.log ('2');
+		return tmpInstance.leaveFeedback (user.hexName, 2, arg['2'], {from:user.address, gas:3000000});
+	})
+	.then (() => {
+		console.log ('3');
+		return tmpInstance.leaveFeedback (user.hexName, 3, arg['3'], {from:user.address, gas:3000000});
+	})
+	.catch ((err) => {
+		console.log ('Error leaving feedbacks!');
+		console.log (err);
+	})
+});
+
+
+
+
 
 
 
