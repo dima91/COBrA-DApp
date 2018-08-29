@@ -205,6 +205,23 @@ ipcr.on ('gift-content-reply', (ev, arg) => {
 
 
 
+ipcr.on ('buy-premium-reply', (evt, arg) => {
+	hideLoader ('buy-gift-premium-dimmer');
+
+	if (arg.result == 'success') {
+		console.log ("Premium user!");
+		$('#premium').removeClass('inactive');
+	}
+	else {
+		console.log ('NOT premium user');
+		$('#premium').addClass('inactive');
+	}
+
+})
+
+
+
+
 
 
 
@@ -646,6 +663,15 @@ $('#rating-submit-button').click ((evt) => {
 
 $('#rating-cancel-button').click ((evt) => {
 	hideModal ('rating-modal');
+})
+
+
+
+
+$('#buy-premium-button').click ((evt) => {
+	showLoader ('buy-gift-premium-dimmer');
+
+	ipcr.send ('buy-premium-request');
 })
 
 

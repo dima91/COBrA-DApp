@@ -210,14 +210,14 @@ const getOtherInfo	= (getContentLst) => {
 
 		contracts.catalog.instance.isPremium (user.hexName, {from:user.address})
 		.then ((res) => {
-			isPremium	= res;
+			user.isPremium	= res;
 			
 			if (getContentLst) {
 				//console.log (contracts.catalog.instance.getContentsListByAuthor);
 				contracts.catalog.instance.getContentsListByAuthor (user.hexName)
 				.then((res) => {
 					var conList	= buildCompleteContentsList (res);
-					data		= constructPayload (conList, isPremium);
+					data		= constructPayload (conList, user.isPremium);
 					
 					mainWindow.webContents.send('init-info', JSON.stringify(data));
 				}, (err) => {
@@ -522,43 +522,47 @@ ipcMain.on ('more-info-request', ((evt, arg) => {
 
 ipcMain.on ('buy-content-request', (evt, arg) => {
 	console.log ('Received request to buy content  ' + arg.title);
-	cachedPrice			= contentsPriceCache[arg.title];
-	tmpPriceInfoTitle	= arg.title;
+	var cachedPrice	= 0;
+	var tmpTitle	= arg.title;
 	
-	if (cachedPrice == undefined || cachedPrice == '') {
-		// Sending price request to catalog
+
+	// Sending price request to catalog
+	contracts.catalog.instance
+	.getPriceOf (web3.fromUtf8(tmpTitle), {from:user.address, gas:300000})
+	.then ((res) => {
+		cachedPrice	= res;
+
+		if (user.isPremium) {
+			console.log ('buying by premium!');
+			return	contracts.catalog.instance
+					.getContentPremium (web3.fromUtf8(tmpTitle), {from:user.address, gas:300000});
+		}
+		else {
+			console.log ("Buying by a mortal man");
+			user.isPremium	= false;
+			return	contracts.catalog.instance
+					.getContent (web3.fromUtf8(tmpTitle), {from:user.address, gas:300000, value:cachedPrice});
+		}
+	})
+	.then ((res) => {
+		// TODO Handle errors
+		console.log ("Content buyed");
+		mainWindow.webContents.send ('buy-content-reply', {result:'success', title:tmpTitle});
+	})
+	.catch ((err) => {
+		console.log ("Maybe the user is no longer premium!");
+		//console.log (err);
 		contracts.catalog.instance
-		.getPriceOf (web3.fromUtf8(arg.title), {from:user.address, gas:300000})
+		.getContent (web3.fromUtf8(tmpTitle), {from:user.address, gas:300000, value:cachedPrice})
 		.then ((res) => {
-			contentsPriceCache[arg.title]	= res;
-			return contracts.catalog.instance
-			.getContent (web3.fromUtf8(arg.title), {from:user.address, gas:300000, value:contentsPriceCache[arg.title]})
-			.then ((res) => {
-				// TODO Handle errors
-				console.log ("Content buyed");
-				mainWindow.webContents.send ('buy-content-reply', {result:'success', title:arg.title});
-			})
-			.catch ((err) => {
-				console.log ("Error during bought of content " + arg.title);
-				console.log (err);
-				mainWindow.webContents.send ('buy-content-reply', {result:'error'});
-			})
-		});
-	} else {
-		contracts.catalog.instance
-		.getContent (web3.fromUtf8(arg.title), {from:user.address, gas:300000, value:contentsPriceCache[arg.title]})
-		.then ((res) => {
-			// TODO Handle errors
-			console.log ("Content buyed");
-			mainWindow.webContents.send ('buy-content-reply', {result:'success', title:arg.title});
+			mainWindow.webContents.send ('buy-content-reply', {result:'success', title:tmpTitle});
 		})
 		.catch ((err) => {
-			console.log ("Error during bought of content " + arg.title);
 			console.log (err);
 			mainWindow.webContents.send ('buy-content-reply', {result:'error'});
 		})
-	
-	}
+
+	});
 })
 
 
@@ -622,7 +626,7 @@ ipcMain.on ('rating-request', (evt, arg) => {
 
 
 ipcMain.on ('gift-content-request', (evt, arg) => {
-	// TODO Write meeee!!!!!!!!!!!!!!! -->			function giftContent (bytes32 _contentTitle, bytes32 _receivingUser)
+	// function giftContent (bytes32 _contentTitle, bytes32 _receivingUser)
 	//console.log ('Gifting  ' + arg.title + ' ('+ web3.fromUtf8(arg.title)+')  to  ' + arg.user + ' (' + web3.fromUtf8(arg.user) +')')
 	console.log ('Gifting  ' + arg.title + '  to  ' + arg.user);
 	
@@ -634,6 +638,22 @@ ipcMain.on ('gift-content-request', (evt, arg) => {
 		mainWindow.webContents.send('gift-content-reply', {result:'failure', cause:'boh!'});
 	})
 })
+
+
+
+
+ipcMain.on ('buy-premium-request', (evt, arg) => {
+	contracts.catalog.instance.buyPremium ({from:user.address, gas:3000000, value:web3.toWei(44000, 'szabo')})
+	.then ((res) => {
+		console.log ("Premium accoutn buyed");
+		mainWindow.webContents.send('buy-premium-reply', {result:'success'});
+	})
+	.catch ((err) => {
+		console.log ('Error during buy premium')
+		console.log (err);
+		mainWindow.webContents.send('gift-content-reply', {result:'failure', cause:'boh!'});
+	})
+});
 
 
 
