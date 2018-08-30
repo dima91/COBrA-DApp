@@ -60,13 +60,6 @@ var user	= {
 
 var contentsPriceCache	= {};		// Cotains price informations (which doesn't change) about some contents
 
-// Global variables used to share data between promises
-var lastCreatedContentAddress;
-var lastCatalogContentsList;
-var lastInfoObject;
-var priceOfNextContent;
-var tmpPriceInfoTitle;
-
 
 
 
@@ -89,7 +82,6 @@ const errorAndExit	= (err) => {
 	console.log ('\n\nIt is an error!!\n');
 	console.log (err);
 	process.exit ();
-	
 }
 
 
@@ -107,10 +99,10 @@ const createWindow= () => {
 	
 	mainWindow.loadURL(`file://${__dirname}/index.html`)
 
+
 	mainWindow.once ('ready-to-show', () => {
 		mainWindow.maximize ();
 	})
-
 	mainWindow.on ('closed', () => {
 		mainWindow = undefined
 	})
@@ -119,8 +111,11 @@ const createWindow= () => {
 
 
 const loadAddresses	= () => {
-	web3.eth.getAccounts (function (err, res) {
-		availableAddresses= res;
+	web3.eth.getAccounts ((err, res) => {
+		if (err)
+			errorAndExit (err);
+
+		availableAddresses	= res;
 		linkToCatalogInstance ();
 	});
 }
@@ -138,6 +133,9 @@ const linkToCatalogInstance	= () => {
 	.then ((instance) => {
 		contracts.catalog.instance	= instance;
 		loadExtendedContents ();
+	})
+	.catch ((err) => {
+		errorAndExit (err);
 	})
 }
 
@@ -187,8 +185,7 @@ const buildCompleteContentsList	= (arg) => {
 
 
 
-const getOtherInfo	= (getContentLst) => {
-
+const getUserInfo	= (getContentList) => {
 	const constructPayload = (conList,isPremium) => {
 		return {
 			'balance'		: user.balance,
@@ -198,38 +195,34 @@ const getOtherInfo	= (getContentLst) => {
 		};
 	};
 
-	
-	
-	web3.eth.getBalance (user.address, (err, res) => {
-		// Recived balance in 'wei' --> converting it into 'ether'
-		user.balance	= web3.fromWei (res);
 
-		var isPremium;
-		var tmpContentList;
-		console.log ('Balance is: ' + user.balance);
-
-		contracts.catalog.instance.isPremium (user.hexName, {from:user.address})
-		.then ((res) => {
-			user.isPremium	= res;
-			
-			if (getContentLst) {
-				//console.log (contracts.catalog.instance.getContentsListByAuthor);
-				contracts.catalog.instance.getContentsListByAuthor (user.hexName)
-				.then((res) => {
-					var conList	= buildCompleteContentsList (res);
-					data		= constructPayload (conList, user.isPremium);
-					
-					mainWindow.webContents.send('init-info', JSON.stringify(data));
-				}, (err) => {
-					console.log ('\n\nDo something!');
-				})
-			}
-			else {
-				data= constructPayload ([], res);
-				mainWindow.webContents.send('init-info', JSON.stringify(data));
-			}
+	return new Promise ((resolve, reject) => {
+		web3.eth.getBalance (user.address, (err, res) => {
+			// Recived balance in 'wei' --> converting it into 'ether'
+			user.balance	= web3.fromWei (res);
+			console.log ('Balance is: ' + user.balance);
+	
+			contracts.catalog.instance.isPremium (user.hexName, {from:user.address})
+			.then ((res) => {
+				user.isPremium	= res;
+				
+				if (getContentList) {
+					contracts.catalog.instance.getContentsListByAuthor (user.hexName)
+					.then((res) => {
+						var conList	= buildCompleteContentsList (res);
+						var payload	= constructPayload (conList, user.isPremium);
+						resolve (payload);
+					},
+					(err) => {
+						reject (err);
+					});
+				}
+				else {
+					resolve (constructPayload ([], res));
+				}
+			})
 		})
-	})
+	});
 }
 
 
@@ -387,17 +380,18 @@ ipcMain.on ('init-info', (event, arg) => {
 	var callData;
 	
 	contracts.catalog.instance.userExists (user.hexName, {from:user.address})
-	.then (async (res) => {
+	.then ((res) => {
 
-		console.log ("Result is: " + res);
+		console.log ("User exists??  -->  " + res);
 		
 		if (res == true) {
-			console.log ('User already exists! Checking corrispondance with address..');
 			contracts.catalog.instance.getUserAddress (user.hexName)
 			.then((res) => {
 				if (res == user.address) {
-					console.log ("Good news. Getting balance and other info");
-					return getOtherInfo (true);
+					getUserInfo (true)
+					.then ((userInfo) => {
+						mainWindow.webContents.send('init-info', JSON.stringify(userInfo));
+					})
 				}
 				else {
 					// TODO Handle errors!
@@ -409,11 +403,12 @@ ipcMain.on ('init-info', (event, arg) => {
 			})
 		}
 		else {
-			console.log ('Registering user  ' + user.hexName);
 			contracts.catalog.instance.registerMe (user.hexName, {from:user.address, gas:1000000000})
 			.then ((res) => {
-				console.log ("Registered!");
-				return getOtherInfo (false);
+				getUserInfo (false)
+				.then ((userInfo) => {
+					mainWindow.webContents.send('init-info', JSON.stringify(userInfo));
+				});
 			}).catch ((e) => {
 				console.log (e);
 			})
@@ -428,21 +423,22 @@ ipcMain.on ('init-info', (event, arg) => {
 ipcMain.on ('create-content-request', (event, data) => {
 	console.log ('Creating content:  '+ data.type +',   '+ data.title +',   '+ data.price);
 
-	priceOfNextContent	= data.price;
-	thisContract		= contracts.extendedContents[data.type];
+	var priceOfNextContent	= data.price;
+	var thisContract		= contracts.extendedContents[data.type];
+	var instanceAddress		= '';
 
-	var errorOnCreation	= false;
 
-	var newInstance	= thisContract
+	thisContract
 	.new (web3.fromUtf8(data.title), contracts.catalog.address, { from: user.address,
 																	data:thisContract.bytecode,
 																	gas:10000000})
 	.then ((instance) => {
-		console.log ("Deployed!\nRegistering to catalog..");
+		//console.log ("Deployed!\nRegistering to catalog..\nAddress : " + instance.address);
+		instanceAddress	= instance.address;
 
 		return contracts.catalog.instance
 		.publishContent (user.hexName, web3.fromUtf8(data.title),
-						  web3.toWei (priceOfNextContent, "milliether"), instance.address,
+						  web3.toWei (priceOfNextContent, "milliether"), instanceAddress,
 						{from: user.address, gas:1000000});
 	})
 	.then ((res) => {
@@ -450,8 +446,16 @@ ipcMain.on ('create-content-request', (event, data) => {
 			result: 'success',
 			type: data.type,
 			title: data.title,
-			address: lastCreatedContentAddress
+			address: instanceAddress
 		});
+	})
+	.then ((res) => {
+		return getUserInfo (true);
+	})
+	.then ((userInfo) => {
+		console.log (userInfo);
+		console.log (JSON.stringify(userInfo));
+		mainWindow.webContents.send('user-info', JSON.stringify(userInfo));
 	})
 	.catch ((err) => {
 		// TODO
@@ -459,9 +463,7 @@ ipcMain.on ('create-content-request', (event, data) => {
 		console.log (err);
 		mainWindow.webContents.send('create-content-reply', {
 			result: 'failure',
-			type: data.type,
-			title: data.title,
-			address: lastCreatedContentAddress
+			title: data.title
 		});
 	});
 })

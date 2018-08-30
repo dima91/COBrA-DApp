@@ -2,7 +2,7 @@
 'use stict';
 
 
-const { ipcRenderer } = require('electron')
+const { ipcRenderer } = require('electron');
 const ipcr = ipcRenderer;
 
 var username;
@@ -12,7 +12,7 @@ var notifications	= [];
 var currentRating	= "";
 
 
-const ___TEST___	= false;
+const ___TEST___	= true;
 
 
 
@@ -59,6 +59,36 @@ ipcr.on('newBalance', (event, arg) => {
 
 
 
+ipcr.on ('user-info', (evt, arg) => {
+	jsonP = JSON.parse(arg);
+	console.log(jsonP);
+
+	console.log ('Received new user infos..');
+	console.log (arg.balance);
+
+	if (jsonP['result'] == 'error') {
+		// TODO Handle this error
+	}
+	else {
+		$('#balanceContainer').html(jsonP['balance'] + " (ether)");
+		if (jsonP['isPremium'] == true)
+			$('#premium').removeClass('inactive');
+		else
+			$('#premium').addClass('inactive');
+
+		
+		jsonP.contentsList.forEach ((el) => {
+			console.log ('Address: ' + el.address);
+			htmlText	= newContentItem (el.address, Number(el.type), el.title);
+			$('#published-contents-list').append(htmlText);
+			$('#delete-' + el.address).click(deleteItem);
+		});
+	}
+})
+
+
+
+
 // Event handler for incoming user information
 ipcr.on('init-info', (event, arg) => {
 	jsonP = JSON.parse(arg);
@@ -76,15 +106,15 @@ ipcr.on('init-info', (event, arg) => {
 			$('#premium').addClass('inactive');
 
 		
-			jsonP.contentsList.forEach ((el) => {
-				console.log ('Address: ' + el.address);
-				htmlText	= newContentItem (el.address, Number(el.type), el.title);
-				$('#published-contents-list').append(htmlText);
-				$('#delete-' + el.address).click(deleteItem);
-			});
+		jsonP.contentsList.forEach ((el) => {
+			console.log ('Address: ' + el.address);
+			htmlText	= newContentItem (el.address, Number(el.type), el.title);
+			$('#published-contents-list').append(htmlText);
+			$('#delete-' + el.address).click(deleteItem);
+		});
 
 
-		$('#childContainer').removeClass('inactive')
+		$('#childContainer').removeClass('inactive');
 		hideLoader('loaderDiv');
 
 		// =========================  Test requests  =========================
@@ -752,8 +782,8 @@ window.onload = () => {
 
 		// Timeout to create new notification
 		setTimeout(() => {
-			newNotification({ name: "testNotification" })
-		}, 10000);
+			newNotification({ name: "testNotification" });
+		}, 5000);
 	}
 }
 
