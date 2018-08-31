@@ -24,8 +24,6 @@ let tmpInstance		= process.argv[3];
 
 var lucaHex	= '0x6c756361';
 
-let CREATE_CATALOG = true;
-
 
 let readContract	= (contractPath) => {
 	var content= fs.readFileSync (contractPath);

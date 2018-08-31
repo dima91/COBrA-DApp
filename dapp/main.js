@@ -28,20 +28,25 @@ var mainWindow;
 
 
 var contracts	= {
-	catalog : {instance:{}, bytecode:{}, address:{}},	// Instance, bytecode, truffle contract
-	baseContent : {},									// Truffle contract
-	extendedContents : []								// Truffle contracts
+	catalog : {
+		instance	:{},				// Instance of catalog
+		bytecode	:{},				// Catalog's bytecode
+		address		:{}					// catalog's truffle contract
+	},
+	
+	baseContent			: {},			// Truffle contract
+	extendedContents	: []			// Truffle contracts
 };		
 
 
 var availableAddresses	= [];		// List of available addresses
 
 var user	= {
-	balance : {},
-	address : {},
-	addressIndex : {},
-	hexName : {},
-	stringName : {}
+	balance			: {},
+	address			: {},
+	addressIndex	: {},
+	hexName			: {},
+	stringName		: {}
 }
 
 var contentsPriceCache	= {};		// Cotains price informations (which doesn't change) about some contents
@@ -564,7 +569,6 @@ ipcMain.on ('consume-content-request', (evt, arg) => {
 		})
 		.then ((res) => {
 			console.log ('Retrieved content ' + arg.title);
-			console.log (res);
 			mainWindow.webContents.send ('consume-content-reply', {result:'success', title:arg.title});
 		})
 		.catch ((err) => {

@@ -361,7 +361,7 @@ ipcr.on ('get-most-popular-content-by-genre-reply', (evt, arg) => {		// TODO Han
 	hideLoader ('loaderDiv');
 
 	if (arg.result == 'success') {
-		$('#query-reply-title').text ('Latest content');
+		$('#query-reply-title').text ('Most popular content');
 		$('#query-reply-list').empty ();
 
 		$('#query-reply-list').append (newQueryItem (arg.data));
