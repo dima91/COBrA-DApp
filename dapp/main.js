@@ -26,28 +26,14 @@ var endpoint	= "http://localhost:8545";
 
 var mainWindow;
 
-/*	{
-	catalog : {
-		...
-	}
-	baseContent : {
-		abi : -
-		bytecode : -
-	}
-	extendedContents: [{
-		abi : -
-		bytecode : -
 
-	}]
-}*/
 var contracts	= {
-	catalog : {abi:{}, instance:{}, bytecode:{}, address:{}},
-	baseContent : {},
-	extendedContents : []
+	catalog : {instance:{}, bytecode:{}, address:{}},	// Instance, bytecode, truffle contract
+	baseContent : {},									// Truffle contract
+	extendedContents : []								// Truffle contracts
 };		
 
 
-var publishedContents	= [];		// Do I really need this variable?????
 var availableAddresses	= [];		// List of available addresses
 
 var user	= {
@@ -886,6 +872,4 @@ if(typeof web3 != 'undefined') {
 app.on('ready', () => {
 	console.log (provider);
 	loadAddresses ();
-	var tmpContract	= {};
-	var tmpObject	= {abi:'', bytecode:''};
 });
