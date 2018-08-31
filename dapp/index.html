@@ -113,47 +113,104 @@
 			<!--****************-->
 			<!--     HEADER     -->
 			<header id="header" class="ui tabular menu">
-					<a id="authorRoleBtn" class="item">Author</a>
-					<a id="customerRoleBtn" class="item">Customer</a>
-					<!-- to align navigation to the right -->
-					<div class="right menu">
-						<div class="ui dropdown item" id='actionsDropdown' onclick="$('#actionsDropdown').dropdown('restore default value')">
-							Perform a query
-							<i class="dropdown icon"></i>
-							<div class="menu">
-								<div class="item">Get some statistics</div>
-								<div class="item">Get contents list</div>
-								<div class="item">Get newest contents list</div>
-								<div class="item">Get latest content by author</div>
-								<div class="item">Get latest content by genre</div>
-								<div class="item">Get most popular content by author</div>
-								<div class="item">Get most popular content by genre</div>
-								<div class='item'>Get most rated content</div>
-								<div class='item'>Get most rated content by genre</div>
-								<div class='item'>Get most rated content by author</div>
-							</div>
+				<a id="authorRoleBtn" class="item">Author</a>
+				<a id="customerRoleBtn" class="item">Customer</a>
+				<!-- to align navigation to the right -->
+				<div class="right menu">
+					<div class="ui dropdown item" id='actionsDropdown' onclick="$('#actionsDropdown').dropdown('restore default value')">
+						Perform a query
+						<i class="dropdown icon"></i>
+						<div class="menu">
+							<div class="item" onclick="getViewsCount(event)">Get contents' views count</div>
+							<div class="item" onclick="prepareNewestContentList(event)">Get newest contents list</div>
+							<div class="item" onclick='prepareLatestContentByAuthor(event)'>Get latest content by author</div>
+							<!--<div class="item">Get latest content by genre</div>
+							<div class="item">Get most popular content by author</div>
+							<div class="item">Get most popular content by genre</div>
+							<div class='item'>Get most rated content</div>
+							<div class='item'>Get most rated content by genre</div>
+							<div class='item'>Get most rated content by author</div>-->
 						</div>
-
-						<div class='ui dropdown item' id='notificationsDropdown'>
-							<div>
-								<i class="large bell icon outline" id="notificationsIcon"></i>
-								<!--<div class="floating ui red circular mini label hidden" id='notificationsNumber'></div>-->
-							</div>
-							<div class="menu" id='noticationsMenu'>
-								<!--<div class="item">N_0</div>
-								<div class="item">N_1</div>
-								<div class="item">N_2</div>
-								<div class="item">N_3</div>
-								<div class="item">N_4</div>
-								<div class="item">N_5</div>
-								<div class="item">...</div>
-								<div class='item'>N_n</div>-->
-							</div>
-						</div>
-
-						<!--<div class="item" id="headerCloseButton"> <i class="red close link icon"></i> </div>-->
 					</div>
-				</header>
+
+					<div class='ui dropdown item' id='notificationsDropdown'>
+						<div>
+							<i class="large bell icon outline" id="notificationsIcon"></i>
+							<!--<div class="floating ui red circular mini label hidden" id='notificationsNumber'></div>-->
+						</div>
+						<div class="menu" id='noticationsMenu'>
+							<!--<div class="item">N_0</div>
+							<div class="item">N_1</div>
+							<div class="item">N_2</div>
+							<div class="item">N_3</div>
+							<div class="item">N_4</div>
+							<div class="item">N_5</div>
+							<div class="item">...</div>
+							<div class='item'>N_n</div>-->
+						</div>
+					</div>
+
+					<!--<div class="item" id="headerCloseButton"> <i class="red close link icon"></i> </div>-->
+				</div>
+
+
+				<!-- Modal to show queries' input -->
+				<div class='ui tiny modal' id='prepare-query-modal'>
+					<div class="ui clearing segment">
+						<div class='ui large list'>
+
+							<div class='ui item' id='first-item'>
+								<div class="ui labeled input">
+									<div class="ui label" id='first-label'></div>
+									<input placeholder="" id='first-input'>
+								</div>
+							</div>
+
+							<div class='ui item' id='second-item'>
+								<div class="ui labeled input">
+									<div class="ui label" id='second-label'></div>
+									<input placeholder="" id='second-input'>
+								</div>
+							</div>
+						</div>
+						
+						<div class="ui center aligned basic segment">
+							<button id="prepare-query-send-buttton" class="ui primary button">Send query</button>
+						</div>
+					</div>
+				</div>
+
+
+
+				<!-- Modal to show queries' replies -->
+
+				<div class="ui tiny modal" id="query-reply-modal">
+				
+					<div class="ui hidden divider"></div>
+				
+					<div class='ui container'>
+						<div class="ui header centered" id='query-reply-title'>
+							Content info
+						</div>
+					</div>
+
+					<div class="ui hidden divider"></div>
+
+					<div class="ui clearing segment">
+						<div class='ui large bulleted list' id='query-reply-list'>
+							<!--<div class='ui item'>
+								<div class="middle aligned content">
+									<p>How much did you enjoy the content?</p>
+								</div>
+							</div>-->
+						</div>
+						
+						<div class="ui center aligned basic segment">
+							<button id="query-reply-close-buttton" class="ui red button">Close</button>
+						</div>
+					</div>
+				</div>
+			</header>
 
 
 			<!-- ===================== -->

@@ -116,12 +116,6 @@ ipcr.on('init-info', (event, arg) => {
 
 		$('#childContainer').removeClass('inactive');
 		hideLoader('loaderDiv');
-
-		// =========================  Test requests  =========================
-		// ipcr.send ('create-content-request', {type:0, title:'a beautiful song', price:10000});
-		//showModal ('rating-modal');
-		//showModal ('rating-question-modal');
-		//ipcr.send ('rating-request', { '0': 5, '1': 3, '2': 2, title: '44' });
 	}
 })
 
@@ -255,6 +249,153 @@ ipcr.on ('gift-premium-reply', (evt, arg) => {
 	hideLoader ('buy-gift-premium-dimmer');
 	console.log ('gifted!\t\tresult: ' + arg.result);
 })
+
+
+
+
+ipcr.on ('get-views-count-reply', (evt, arg) => {
+	//console.log (arg);
+	hideLoader ('loaderDiv');
+
+	if (arg.result == 'success') {
+
+		$('#query-reply-title').text ('Count of contents views');
+		$('#query-reply-list').empty ();
+
+		arg.data.forEach(el => {
+			//console.log (el);
+			$('#query-reply-list').append (newQueryItem (el.title + ' : ' + el.count));
+		});
+
+		showModal ('query-reply-modal');
+	}
+	else {
+		// TODO Handle me!
+	}
+})
+
+
+
+
+ipcr.on ('get-newest-content-list-reply', (evt, arg) => {
+	hideLoader ('loaderDiv');
+
+	if (arg.result == 'success') {
+
+		$('#query-reply-title').text ('Newest published contents');
+		$('#query-reply-list').empty ();
+
+		arg.data.forEach(el => {
+			console.log (el);
+			$('#query-reply-list').append (newQueryItem (el));
+		});
+
+		showModal ('query-reply-modal');
+	}
+	else {
+		// TODO Handle me!
+	}
+})
+
+
+
+
+ipcr.on ('get-latest-content-by-author-reply', (evt, arg) => {
+	hideLoader ('loaderDiv');
+
+	if (arg.result == 'success') {
+		$('#query-reply-title').text ('Latest content');
+		$('#query-reply-list').empty ();
+		
+		$('#query-reply-list').append (newQueryItem (arg.data));
+
+		showModal ('query-reply-modal');
+	}
+	else {
+		// TODO Handle me!
+	}
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ========================================
+//					QUERIES
+// ========================================
+
+const getViewsCount = (evt) => {
+	ipcr.send ('get-views-count-request', {});
+	showLoader ('loaderDiv');
+}
+
+
+
+
+const prepareNewestContentList	= (evt) => {
+	var count	= 0;
+	$('#second-item').hide ();
+	$('#first-label').text ('Number of newest content');
+	$('#prepare-query-send-buttton').off ();
+	
+	$('#prepare-query-send-buttton').click ((evt) => {
+		count	= Number ($('#first-input').val ());
+		if (count != 0 && count != NaN ) {
+			showLoader ('loaderDiv');
+			ipcr.send ('get-newest-content-list-request', {count:count});
+		}
+		// FIXME Handle wrong input
+		
+		hideModal ('prepare-query-modal');
+	});
+	
+	showModal ('prepare-query-modal')
+};
+
+
+
+
+const prepareLatestContentByAuthor	= (evt) => {
+	var author	= 0;
+	$('#second-item').hide ();
+	$('#first-label').text ('Author');
+	$('#prepare-query-send-buttton').off ();
+	
+	$('#prepare-query-send-buttton').click ((evt) => {
+		author	= $('#first-input').val ();
+		if (author != undefined && author != '') {
+			showLoader ('loaderDiv');
+			ipcr.send ('get-latest-content-by-author-request', {author:author});
+		}
+		// FIXME Handle wrong input
+		
+		hideModal ('prepare-query-modal');
+	});
+	
+	showModal ('prepare-query-modal');
+}
+
+
+
+
+
+
+
+
+
 
 
 
@@ -429,7 +570,7 @@ const newAvailableContent	= (title, idx) => {
 
 
 const getMoreInfo	= (arg) => {
-	showLoader('loaderDiv');
+	showLoader ('loaderDiv');
 
 	$('#info-title').text (arg.title);
 	$('#info-author').text (arg.author);
@@ -452,6 +593,17 @@ const newBuyedItem	= (title) => {
 						'Consume me'														+
 					'</button>'																+
 				'</div>'																	+
+			'</div>';
+}
+
+
+
+
+const newQueryItem	= (text) => {
+	return	'<div class="ui item">'						+
+				'<div class="middle aligned content">'	+
+					'<p>' + text + '</p>'				+
+				'</div>'								+
 			'</div>';
 }
 
@@ -525,15 +677,22 @@ $('#modal_submitButton').click((evt) => {
 
 
 
-$("#authorRoleBtn").click((evt) => {
+$("#authorRoleBtn").click ((evt) => {
 	showAuthorView();
-})
+});
 
 
 
-$("#customerRoleBtn").click((evt) => {
+$("#customerRoleBtn").click ((evt) => {
 	showCustomerView();
-})
+});
+
+
+
+
+$('#query-reply-close-buttton').click ((evt) => {
+	hideModal ('query-reply-modal');
+});
 
 
 
@@ -741,18 +900,6 @@ $('#gift-premium-button').click ((evt) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 // Ignoring escape key!
 $("#body").keyup((evt) => {
 });
@@ -783,6 +930,14 @@ window.onload = () => {
 		// Timeout to create new notification
 		setTimeout(() => {
 			newNotification({ name: "testNotification" });
+
+			// =========================  Test requests  =========================
+			// ipcr.send ('create-content-request', {type:0, title:'a beautiful song', price:10000});
+			//showModal ('rating-modal');
+			//showModal ('rating-question-modal');
+			//ipcr.send ('rating-request', { '0': 5, '1': 3, '2': 2, title: '44' });
+			//ipcr.send ('get-views-count-request', {});
+
 		}, 5000);
 	}
 }

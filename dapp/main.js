@@ -128,6 +128,7 @@ const linkToCatalogInstance	= () => {
 	contracts.catalog.contract	= truffle (jsonContract);
 	
 	contracts.catalog.contract.setProvider (provider);
+	
 	contracts.catalog.contract
 	.at (contracts.catalog.address)
 	.then ((instance) => {
@@ -156,6 +157,24 @@ const loadExtendedContents	= () => {
 	});
 
 	createWindow ();
+}
+
+
+
+
+const setupEventsCallbacks = () => {			// TODO Write me!
+
+	// It works!!!!
+	var event	= contracts.catalog.instance.NewUser ({from:user.address},{fromBlock: 0, toBlock: 'latest'});
+	event.watch ((err, res) => {
+		console.log ('Received event about registration of ' + web3.toUtf8(res.args.username));
+	});
+
+	// event ContentPublished (bytes32 username, bytes32 contentTitle, address contentAddress);
+
+	// event GrantedAccess (bytes32 username, address userAddress, bytes32 contentTitle, address contentAddress);
+
+	// event GrantedPremium (bytes32 username, address user.address);
 }
 
 
@@ -244,24 +263,6 @@ const currentTime = () => {
 			+ currentdate.getHours() + ":"  
 			+ currentdate.getMinutes() + ":" 
 			+ currentdate.getSeconds();
-}
-
-
-
-
-const setupEventsCallbacks = () => {			// TODO Write me!
-
-	// It works!!!!
-	var event	= contracts.catalog.instance.NewUser ({from:user.address},{fromBlock: 0, toBlock: 'latest'});
-	event.watch ((err, res) => {
-		console.log ('Received event about registration of ' + web3.toUtf8(res.args.username));
-	});
-
-	// event ContentPublished (bytes32 username, bytes32 contentTitle, address contentAddress);
-
-	// event GrantedAccess (bytes32 username, address userAddress, bytes32 contentTitle, address contentAddress);
-
-	// event GrantedPremium (bytes32 username, address user.address);
 }
 
 
@@ -376,8 +377,6 @@ ipcMain.on ('init-info', (event, arg) => {
 	
 	setupEventsCallbacks ();		// FIXME Move me!!!
 	
-	var tmpAddress;
-	var callData;
 	
 	contracts.catalog.instance.userExists (user.hexName, {from:user.address})
 	.then ((res) => {
@@ -450,11 +449,9 @@ ipcMain.on ('create-content-request', (event, data) => {
 		});
 	})
 	.then ((res) => {
-		return getUserInfo (true);
+		return getUserInfo (false);
 	})
 	.then ((userInfo) => {
-		console.log (userInfo);
-		console.log (JSON.stringify(userInfo));
 		mainWindow.webContents.send('user-info', JSON.stringify(userInfo));
 	})
 	.catch ((err) => {
@@ -647,7 +644,7 @@ ipcMain.on ('gift-content-request', (evt, arg) => {
 ipcMain.on ('buy-premium-request', (evt, arg) => {
 	contracts.catalog.instance.buyPremium ({from:user.address, gas:3000000, value:web3.toWei(44000, 'szabo')})
 	.then ((res) => {
-		console.log ("Premium accoutn buyed");
+		console.log ("Premium account buyed");
 		mainWindow.webContents.send('buy-premium-reply', {result:'success'});
 	})
 	.catch ((err) => {
@@ -672,6 +669,72 @@ ipcMain.on ('gift-premium-request', (evt, arg) => {
 		mainWindow.webContents.send('gift-premium-reply', {result:'failure', cause:'boh!'});
 	})
 });
+
+
+
+
+ipcMain.on ('get-views-count-request', (evt, arg) => {
+	
+	contracts.catalog.instance.getStatistics ({from:user.address, gas:300000})
+	.then ((res) => {
+		var toRet	= [];
+		var i		= 0;
+		if (res[0].length != res[1].length)
+			throw ('This is an error!');		// TODO ...
+		
+		res[1].forEach ((el) => {
+			var c	= Number (res[0][i]);
+			toRet.push ({count: c, title: web3.toUtf8 (el)});
+			i++;
+		})
+
+		mainWindow.webContents.send('get-views-count-reply', {result:'success', data:toRet});
+	})
+	.catch ((err) => {
+		// TODO Handle errors
+		console.log (err);
+		mainWindow.webContents.send('get-views-count-reply', {result:'failure', cause:'boh!'});
+	})
+});
+
+
+
+
+ipcMain.on ('get-newest-content-list-request', (evt, arg) => {
+
+	contracts.catalog.instance.getNewContentList  (arg.count, {from:user.address, gas:300000})
+	.then ((res) => {
+		var toRet	= [];
+
+		res.forEach ((el) => {
+			toRet.push (web3.toUtf8 (el));
+		})
+		console.log (toRet);
+		mainWindow.webContents.send('get-newest-content-list-reply', {result:'success', data:toRet});
+	})
+	.catch ((err) => {
+		// TODO Handle errors
+		console.log (err);
+		mainWindow.webContents.send('get-newest-content-list-reply', {result:'failure', cause:'boh!'});
+	})
+});
+
+
+
+
+ipcMain.on ('get-latest-content-by-author-request', (evt, arg) => {
+
+	contracts.catalog.instance.getLatestByAuthor  (web3.fromUtf8(arg.author), {from:user.address, gas:300000})
+	.then ((res) => {
+		console.log (web3.toUtf8 (res));
+		mainWindow.webContents.send('get-latest-content-by-author-reply', {result:'success', data:web3.toUtf8 (res)});
+	})
+	.catch ((err) => {
+		// TODO Handle errors
+		console.log (err);
+		mainWindow.webContents.send('get-latest-content-by-author-reply', {result:'failure', cause:'boh!'});
+	})
+})
 
 
 
