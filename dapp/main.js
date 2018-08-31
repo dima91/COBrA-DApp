@@ -739,6 +739,105 @@ ipcMain.on ('get-latest-content-by-author-request', (evt, arg) => {
 
 
 
+ipcMain.on ('get-latest-content-by-genre-request', (evt, arg) => {
+	contracts.catalog.instance.getLatestByGenre  (arg.genre, {from:user.address, gas:300000})
+	.then ((res) => {
+		console.log (web3.toUtf8 (res));
+		mainWindow.webContents.send('get-latest-content-by-genre-reply', {result:'success', data:web3.toUtf8 (res)});
+	})
+	.catch ((err) => {
+		// TODO Handle errors
+		console.log (err);
+		mainWindow.webContents.send('get-latest-content-by-genre-reply', {result:'failure', cause:'boh!'});
+	})
+});
+
+
+
+
+ipcMain.on ('get-most-popular-content-by-author-request', (evt, arg) => {
+
+	contracts.catalog.instance.getMostPopularByAuthor  (web3.fromUtf8(arg.author), {from:user.address, gas:300000})
+	.then ((res) => {
+		console.log (web3.toUtf8 (res));
+		mainWindow.webContents.send('get-most-popular-content-by-author-reply', {result:'success', data:web3.toUtf8 (res)});
+	})
+	.catch ((err) => {
+		// TODO Handle errors
+		console.log (err);
+		mainWindow.webContents.send('get-most-popular-content-by-author-reply', {result:'failure', cause:'boh!'});
+	})
+});
+
+
+
+
+ipcMain.on ('get-most-popular-content-by-genre-request', (evt, arg) => {
+	contracts.catalog.instance.getMostPopularByGenre  (arg.genre, {from:user.address, gas:300000})
+	.then ((res) => {
+		console.log (web3.toUtf8 (res));
+		mainWindow.webContents.send('get-most-popular-content-by-genre-reply', {result:'success', data:web3.toUtf8 (res)});
+	})
+	.catch ((err) => {
+		// TODO Handle errors
+		console.log (err);
+		mainWindow.webContents.send('get-most-popular-content-by-genre-reply', {result:'failure', cause:'boh!'});
+	})
+});
+
+
+
+
+ipcMain.on ('get-most-rated-content-request', (evt, arg) => {
+	contracts.catalog.instance.getMostRated  (arg.category, {from:user.address, gas:300000})
+	.then ((res) => {
+		console.log (web3.toUtf8 (res));
+		mainWindow.webContents.send('get-most-rated-content-reply', {result:'success', data:web3.toUtf8 (res)});
+	})
+	.catch ((err) => {
+		// TODO Handle errors
+		console.log (err);
+		mainWindow.webContents.send('get-most-rated-content-reply', {result:'failure', cause:'boh!'});
+	})
+});
+
+
+
+
+ipcMain.on ('get-most-rated-content-by-genre-request', (evt, arg) => {
+
+	contracts.catalog.instance.getMostRatedByGenre  (arg.genre, arg.category, {from:user.address, gas:300000})
+	.then ((res) => {
+		console.log (web3.toUtf8 (res));
+		mainWindow.webContents.send('get-most-rated-content-by-genre-reply', {result:'success', data:web3.toUtf8 (res)});
+	})
+	.catch ((err) => {
+		// TODO Handle errors
+		console.log (err);
+		mainWindow.webContents.send('get-most-rated-content-by-genre-reply', {result:'failure', cause:'boh!'});
+	})
+});
+
+
+
+
+ipcMain.on ('get-most-rated-content-by-author-request', (evt, arg) => {
+
+	contracts.catalog.instance.getMostRatedByAuthor  (arg.author, arg.category, {from:user.address, gas:300000})
+	.then ((res) => {
+		console.log (web3.toUtf8 (res));
+		mainWindow.webContents.send('get-most-rated-content-by-genre-reply', {result:'success', data:web3.toUtf8 (res)});
+	})
+	.catch ((err) => {
+		// TODO Handle errors
+		console.log (err);
+		mainWindow.webContents.send('get-most-rated-content-by-genre-reply', {result:'failure', cause:'boh!'});
+	})
+});
+
+
+
+
 
 
 

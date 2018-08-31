@@ -300,13 +300,127 @@ ipcr.on ('get-newest-content-list-reply', (evt, arg) => {
 
 
 
-ipcr.on ('get-latest-content-by-author-reply', (evt, arg) => {
+ipcr.on ('get-latest-content-by-author-reply', (evt, arg) => {		// TODO Handle empty reply
 	hideLoader ('loaderDiv');
 
 	if (arg.result == 'success') {
 		$('#query-reply-title').text ('Latest content');
 		$('#query-reply-list').empty ();
-		
+
+		$('#query-reply-list').append (newQueryItem (arg.data));
+
+		showModal ('query-reply-modal');
+	}
+	else {
+		// TODO Handle me!
+	}
+});
+
+
+
+
+ipcr.on ('get-latest-content-by-genre-reply', (evt, arg) => {		// TODO Handle empty reply
+	hideLoader ('loaderDiv');
+
+	if (arg.result == 'success') {
+		$('#query-reply-title').text ('Latest content');
+		$('#query-reply-list').empty ();
+
+		$('#query-reply-list').append (newQueryItem (arg.data));
+
+		showModal ('query-reply-modal');
+	}
+	else {
+		// TODO Handle me!
+	}
+});
+
+
+
+
+ipcr.on ('get-most-popular-content-by-author-reply', (evt, arg) => {	// TODO Handle empty reply
+	hideLoader ('loaderDiv');
+
+	if (arg.result == 'success') {
+		$('#query-reply-title').text ('Most popular content');
+		$('#query-reply-list').empty ();
+
+		$('#query-reply-list').append (newQueryItem (arg.data));
+
+		showModal ('query-reply-modal');
+	}
+	else {
+		// TODO Handle me!
+	}
+});
+
+
+
+
+ipcr.on ('get-most-popular-content-by-genre-reply', (evt, arg) => {		// TODO Handle empty reply
+	hideLoader ('loaderDiv');
+
+	if (arg.result == 'success') {
+		$('#query-reply-title').text ('Latest content');
+		$('#query-reply-list').empty ();
+
+		$('#query-reply-list').append (newQueryItem (arg.data));
+
+		showModal ('query-reply-modal');
+	}
+	else {
+		// TODO Handle me!
+	}
+});
+
+
+
+
+ipcr.on ('get-most-rated-content-reply', (evt, arg) => {		// TODO Handle empty reply
+	hideLoader ('loaderDiv');
+
+	if (arg.result == 'success') {
+		$('#query-reply-title').text ('Most rated content');
+		$('#query-reply-list').empty ();
+
+		$('#query-reply-list').append (newQueryItem (arg.data));
+
+		showModal ('query-reply-modal');
+	}
+	else {
+		// TODO Handle me!
+	}
+});
+
+
+
+
+ipcr.on ('get-most-rated-content-by-genre-reply', (evt, arg) => {		// TODO Handle empty reply
+	hideLoader ('loaderDiv');
+
+	if (arg.result == 'success') {
+		$('#query-reply-title').text ('Most rated content');
+		$('#query-reply-list').empty ();
+
+		$('#query-reply-list').append (newQueryItem (arg.data));
+
+		showModal ('query-reply-modal');
+	}
+	else {
+		// TODO Handle me!
+	}
+});
+
+
+
+
+ipcr.on ('get-most-rated-content-by-author-reply', (evt, arg) => {		// TODO Handle empty reply
+	hideLoader ('loaderDiv');
+
+	if (arg.result == 'success') {
+		$('#query-reply-title').text ('Most rated content');
+		$('#query-reply-list').empty ();
+
 		$('#query-reply-list').append (newQueryItem (arg.data));
 
 		showModal ('query-reply-modal');
@@ -347,8 +461,13 @@ const getViewsCount = (evt) => {
 
 const prepareNewestContentList	= (evt) => {
 	var count	= 0;
+	$('#first-item').show ();
 	$('#second-item').hide ();
+	$('#genre-item').hide ();
+	$('#category-item').hide ();
+
 	$('#first-label').text ('Number of newest content');
+
 	$('#prepare-query-send-buttton').off ();
 	
 	$('#prepare-query-send-buttton').click ((evt) => {
@@ -370,8 +489,13 @@ const prepareNewestContentList	= (evt) => {
 
 const prepareLatestContentByAuthor	= (evt) => {
 	var author	= 0;
+	$('#first-item').show ();
 	$('#second-item').hide ();
+	$('#genre-item').hide ();
+	$('#category-item').hide ();
+
 	$('#first-label').text ('Author');
+
 	$('#prepare-query-send-buttton').off ();
 	
 	$('#prepare-query-send-buttton').click ((evt) => {
@@ -386,7 +510,193 @@ const prepareLatestContentByAuthor	= (evt) => {
 	});
 	
 	showModal ('prepare-query-modal');
+};
+
+
+
+
+const prepareLatestContentByGenre	= (evt) => {
+	var genre	= 0;
+
+	$('#first-item').hide ();
+	$('#second-item').hide ();
+	$('#genre-item').show ();
+	$('#category-item').hide ();
+
+	$('#prepare-query-send-buttton').off ();
+
+	$('#prepare-query-send-buttton').click ((evt) => {
+		genre	= $('#genre-item').dropdown('get value');
+		genre	= typeString2Type(genre+' content');
+		
+		if (genre != undefined) {
+			showLoader ('loaderDiv');
+			ipcr.send ('get-latest-content-by-genre-request', {genre:genre});
+		}
+		// FIXME Handle wrong input
+
+		hideModal ('prepare-query-modal');
+		$('#genre-item').dropdown('restore defaults');
+	});
+	
+	showModal ('prepare-query-modal');
+};
+
+
+
+
+const prepareMostPopularContentByAuthor	= (evt) => {
+	var author	= 0;
+	$('#first-item').show ();
+	$('#second-item').hide ();
+	$('#genre-item').hide ();
+	$('#category-item').hide ();
+
+	$('#first-label').text ('Author');
+	
+	$('#prepare-query-send-buttton').off ();
+	
+	$('#prepare-query-send-buttton').click ((evt) => {
+		author	= $('#first-input').val ();
+		if (author != undefined && author != '') {
+			showLoader ('loaderDiv');
+			ipcr.send ('get-most-popular-content-by-author-request', {author:author});
+		}
+		// FIXME Handle wrong input
+		
+		hideModal ('prepare-query-modal');
+	});
+	
+	showModal ('prepare-query-modal');
 }
+
+
+
+
+const prepareMostPopularContentByGenre	= (evt) => {
+	var genre	= 0;
+
+	$('#first-item').hide ();
+	$('#second-item').hide ();
+	$('#genre-item').show ();
+	$('#category-item').hide ();
+
+	$('#prepare-query-send-buttton').off ();
+
+	$('#prepare-query-send-buttton').click ((evt) => {
+		genre	= $('#genre-item').dropdown('get value');
+		genre	= typeString2Type(genre+' content');
+		
+		if (genre != undefined) {
+			showLoader ('loaderDiv');
+			ipcr.send ('get-most-popular-content-by-genre-request', {genre:genre});
+		}
+		// FIXME Handle wrong input
+
+		hideModal ('prepare-query-modal');
+		$('#genre-item').dropdown('restore defaults');
+	});
+	
+	showModal ('prepare-query-modal');
+};
+
+
+
+
+const prepareGetMostRatedContent	= (evt) => {
+	var category	= 0;
+
+	$('#first-item').hide ();
+	$('#second-item').hide ();
+	$('#genre-item').hide ();
+	$('#category-item').show ();
+
+	$('#prepare-query-send-buttton').off ();
+
+	$('#prepare-query-send-buttton').click ((evt) => {
+		category	= $('#category-item').dropdown('get value');
+		category	= stringCategory2Int (category);
+		
+		showLoader ('loaderDiv');
+		ipcr.send ('get-most-rated-content-request', {category:category});
+
+		// FIXME Handle wrong input
+
+		hideModal ('prepare-query-modal');
+		$('#category-item').dropdown('restore defaults');
+	});
+	
+	showModal ('prepare-query-modal');
+};
+
+
+
+
+const prepareGetMostRatedContentByGenre	= (evt, arg) => {
+	var category	= 0;
+	var genre		= 0;
+
+	$('#first-item').hide ();
+	$('#second-item').hide ();
+	$('#genre-item').show ();
+	$('#category-item').show ();
+
+	$('#prepare-query-send-buttton').off ();
+
+	$('#prepare-query-send-buttton').click ((evt) => {
+		category	= $('#category-item').dropdown('get value');
+		category	= stringCategory2Int (category);
+
+		genre		= $('#genre-item').dropdown('get value');
+		genre		= typeString2Type(genre+' content');
+		
+		if (genre != undefined) {
+			showLoader ('loaderDiv');
+			ipcr.send ('get-most-rated-content-by-genre-request', {category:category, genre:genre});
+		}
+		// FIXME Handle wrong input
+
+		hideModal ('prepare-query-modal');
+		$('#category-item').dropdown('restore defaults');
+	});
+	
+	showModal ('prepare-query-modal');
+};
+
+
+
+
+const prepareGetMostRatedContentByAuthor	= (evt, arg) => {
+	var category	= 0;
+	var author		= "";
+
+	$('#first-item').show ();
+	$('#second-item').hide ();
+	$('#genre-item').hide ();
+	$('#category-item').show ();
+
+	$('#first-label').text ('Author');
+
+	$('#prepare-query-send-buttton').off ();
+
+	$('#prepare-query-send-buttton').click ((evt) => {
+		category	= $('#category-item').dropdown('get value');
+		category	= stringCategory2Int (category);
+
+		author	= $('#first-input').val ();
+
+		if (author != undefined && author != '') {
+			showLoader ('loaderDiv');
+			ipcr.send ('get-most-rated-content-by-author-request', {category:category, author:author});
+		}
+		// FIXME Handle wrong input
+
+		hideModal ('prepare-query-modal');
+		$('#category-item').dropdown('restore defaults');
+	});
+	
+	showModal ('prepare-query-modal');
+};
 
 
 
@@ -478,7 +788,7 @@ const showAuthorView = () => {
 
 
 
-const showCustomerView = () => {
+const showCustomerView	= () => {
 	$("#authorRoleBtn").removeClass('active');
 	$('#autorView').addClass('inactive')
 
@@ -489,7 +799,7 @@ const showCustomerView = () => {
 
 
 
-const typeString2Type = (typeStr) => {
+const typeString2Type	= (typeStr) => {
 	console.log('Incoming: ' + typeStr)
 	if (typeStr == 'song content')
 		return 0;
@@ -503,7 +813,23 @@ const typeString2Type = (typeStr) => {
 
 
 
-const createContent = (type, title, price) => {
+
+const stringCategory2Int	= (typeStr) => {
+	console.log ('incoming: ' + typeStr);
+
+	if (typeStr == '')
+		return 0;
+	if (typeStr == 'content appreciation')
+		return 1;
+	if (typeStr == 'price fairness')
+		return 2;
+	if (typeStr == 'availability time')
+		return 3;
+}
+
+
+
+const createContent	= (type, title, price) => {
 	ipcr.send('create-content-request', { type: type, title: title, price: price });
 	showLoader('create-content-dimmer')
 }

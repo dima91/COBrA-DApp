@@ -124,12 +124,12 @@
 							<div class="item" onclick="getViewsCount(event)">Get contents' views count</div>
 							<div class="item" onclick="prepareNewestContentList(event)">Get newest contents list</div>
 							<div class="item" onclick='prepareLatestContentByAuthor(event)'>Get latest content by author</div>
-							<!--<div class="item">Get latest content by genre</div>
-							<div class="item">Get most popular content by author</div>
-							<div class="item">Get most popular content by genre</div>
-							<div class='item'>Get most rated content</div>
-							<div class='item'>Get most rated content by genre</div>
-							<div class='item'>Get most rated content by author</div>-->
+							<div class="item" onclick='prepareLatestContentByGenre(event)'>Get latest content by genre</div>
+							<div class="item" onclick='prepareMostPopularContentByAuthor(event)'>Get most popular content by author</div>
+							<div class="item" onclick='prepareMostPopularContentByGenre(event)'>Get most popular content by genre</div>
+							<div class='item' onclick='prepareGetMostRatedContent(event)'>Get most rated content</div>
+							<div class='item' onclick='prepareGetMostRatedContentByGenre(event)'>Get most rated content by genre</div>
+							<div class='item' onclick='prepareGetMostRatedContentByAuthor(event)'>Get most rated content by author</div>
 						</div>
 					</div>
 
@@ -172,6 +172,33 @@
 									<input placeholder="" id='second-input'>
 								</div>
 							</div>
+
+							<div class="ui selection dropdown" id='genre-item'>
+								<div class="default text">Select</div>
+								<i class="dropdown icon"></i>
+								<div class="menu">
+									<!-- $('#contentDropdown').dropdown('set value'); -->
+									<!-- $('#contentDropdown').dropdown('restore defaults'); -->
+									<li class="item" data-val="1">Song</li>
+									<li class="item" data-val="2">Video</li>
+									<li class="item" data-val="3">Photo</li>
+									<li class="item" data-val="4">Document</li>
+								</div>
+							</div>
+
+							<div class='ui horizontal hidden divider'></div>
+
+							<div class="ui selection dropdown" id='category-item'>
+									<div class="default text">Categoy (OPTIONAL)</div>
+									<i class="dropdown icon"></i>
+									<div class="menu">
+										<!-- $('#contentDropdown').dropdown('set value'); -->
+										<!-- $('#contentDropdown').dropdown('restore defaults'); -->
+										<li class="item" data-val="1">Content appreciation</li>
+										<li class="item" data-val="2">Price fairness</li>
+										<li class="item" data-val="3">Availability time</li>
+									</div>
+								</div>
 						</div>
 						
 						<div class="ui center aligned basic segment">
@@ -573,7 +600,7 @@
 													<div class="ui massive star rating" data-rating="1" data-max-rating="5" id="rating-3"></div>
 													<div class="middle aligned content">
 														<div class="header">
-															availabilityTime
+															Availability time
 														</div>
 														<p>How fair the availability of content is considered comparing to the price?</p>
 													</div>
