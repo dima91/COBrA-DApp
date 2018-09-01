@@ -153,6 +153,11 @@ web3.eth.getAccounts (function (err, res) {
 
 
 
+	/* a: a2[1]  a1[0]
+	 * b: b3[3]  b0[2]
+	 * c: c2[3]  c3[3]  c1[2]
+	 * d: d0[3]
+	 */
 	await createAndLink (usr.d, d0)
 	await createAndLink (usr.a, a2)
 	await createAndLink (usr.c, c2)
@@ -165,6 +170,7 @@ web3.eth.getAccounts (function (err, res) {
 
 
 	// getStatistics  &&  getNewContentList  &&  getLatestByGenre
+	//	a2:2	c1:1	b3:2	c3:3	c2:1
 	await buyAndConsume (usr.d, a2);
 	await buyAndConsume (usr.b, c1);
 	await buyAndConsume (usr.d, b3);
@@ -174,6 +180,7 @@ web3.eth.getAccounts (function (err, res) {
 	await buyAndConsume (usr.d, c3);
 	await buyAndConsume (usr.a, b3);
 	await buyAndConsume (usr.b, c3);
+	await buyAndConsume (usr.d, a1);
 	
 
 	//*/

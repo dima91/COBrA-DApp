@@ -486,9 +486,10 @@ contract CatalogSmartContract is Ownable {
     
     // Returns the content with genre x, which has received the maximum number of views
     function getMostPopularByGenre (SharedTypes.contentType _ct) public view returns (bytes32) {
-        bytes32 reqStr= "";
-        uint maximum=0;
-        uint i= contentsCount;
+        bytes32 reqStr	= "";
+        uint maximum	=0;
+        uint i			= contentsCount;
+		uint count		= 0;
         
         if (contentsCount == 0) {
             return "";
@@ -498,8 +499,11 @@ contract CatalogSmartContract is Ownable {
             i--;
             BaseContentManagementContract remoteContract= BaseContentManagementContract(contentsMapping[contentsArray[i]].contractAddress);
             if (remoteContract.getType() == _ct) {
-                if (remoteContract.getViewsCount() > maximum)
-                    reqStr= remoteContract.getTitle();
+				count	= remoteContract.getViewsCount();
+                if (count > maximum) {
+					maximum	= count;
+                    reqStr	= remoteContract.getTitle();
+				}
             }
         }
         
@@ -510,9 +514,9 @@ contract CatalogSmartContract is Ownable {
     
     // Returns the most recent content of the author x
     function getLatestByAuthor (bytes32 _author) userExistsM (_author) public view returns (bytes32) {
-        bytes32 reqStr;
-        bool found= false;
-        uint i= contentsCount;
+        bytes32 reqStr	= "";
+        bool found		= false;
+        uint i			= contentsCount;
         
         if (contentsCount == 0) {
             return "";
@@ -534,9 +538,10 @@ contract CatalogSmartContract is Ownable {
     
     // FIXME Returns the content with most views of the author x
     function getMostPopularByAuthor (bytes32 _author) userExistsM (_author) public view returns (bytes32) {
-        bytes32 reqStr= "";
-        uint maximum=0;
-        uint i= contentsCount;
+        bytes32 reqStr	= "";
+        uint maximum	= 0;
+        uint i			= contentsCount;
+		uint count		= 0;
         
         if (contentsCount == 0) {
             return "";
@@ -546,8 +551,11 @@ contract CatalogSmartContract is Ownable {
             i--;
             BaseContentManagementContract remoteContract= BaseContentManagementContract(contentsMapping[contentsArray[i]].contractAddress);
             if (contentsMapping[contentsArray[i]].author == _author) {
-                if (remoteContract.getViewsCount() > maximum)
-                    reqStr= remoteContract.getTitle();
+				count	= remoteContract.getViewsCount();
+                if (count > maximum) {
+					maximum	= count;
+                    reqStr	= remoteContract.getTitle();
+				}
             }
         }
         
