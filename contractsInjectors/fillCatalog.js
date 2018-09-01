@@ -51,13 +51,14 @@ const createAndLink	= (u, cnt) => {
 
 		(new web3.eth.Contract (contr[cnt.type].abi))
 		.deploy ({data:contr[cnt.type].bytecode, arguments:[cnt.name, catalogAddress]})
-		.send ({from : u.address, gas:10000000}, (err, res) => {})
+		.send ({from : u.address, gas:1000000000}, (err, res) => {if (err) console.log (err);})
 		.on('receipt', (receipt) => {
 			cnt.addr	= receipt.contractAddress
 
 			catalogContract.methods
 			.publishContent (u.name, cnt.name, web3.utils.toWei ("6300", "szabo"), cnt.addr)
-			.send ({from : u.address, gas:300000}, (err, res) => {
+			.send ({from : u.address, gas:30000000}, (err, res) => {
+				if (err) console.log (err);
 				resolve (newAddr);
 			});
 		})
@@ -69,16 +70,16 @@ const buyAndConsume	= (u, c) => {
 	return new Promise ((resolve, reject) => {
 		catalogContract.methods
 		.getContent (c.name)
-		.send ({from:u.address, gas:300000, value:web3.utils.toWei ("6300", "szabo")}, (err, res) => {
-			/*console.log (err);
-			console.log (res);*/
+		.send ({from:u.address, gas:30000000, value:web3.utils.toWei ("6300", "szabo")}, (err, res) => {
+			if (err) console.log (err);
+			//console.log (res);*/
 			new web3.eth.Contract (contr[c.type].abi, c.addr, (err, res) => {
-				/*console.log (err);
-				console.log (res);*/
+				if (err) console.log (err);
+				//console.log (res);*/
 			})
 			.methods
 			.consumeContent (u.name)
-			.send ({from:u.address, gas:300000}, (err, res) => {
+			.send ({from:u.address, gas:300000000}, (err, res) => {
 				resolve (true);
 			})
 		});
@@ -181,7 +182,10 @@ web3.eth.getAccounts (function (err, res) {
 	await buyAndConsume (usr.a, b3);
 	await buyAndConsume (usr.b, c3);
 	await buyAndConsume (usr.d, a1);
-	
+
+	catalogContract.methods.getContentList ().call ({from : usr.a.address, gas:300000}, (err, res) => {
+		console.log (res);
+	});
 
 	//*/
 

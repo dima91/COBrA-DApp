@@ -172,11 +172,12 @@ const setupEventsCallbacks = () => {			// TODO Write me!
 
 
 const buildCompleteContentsList	= (arg) => {
-	titles			= arg['0'];
-	addresses		= arg['1'];
-	types			= arg['2'];
-	contentsList	= [];
-	i				= 0;
+	var count			= arg['0']
+	var titles			= arg['1'];
+	var addresses		= arg['2'];
+	var types			= arg['3'];
+	var contentsList	= [];
+	var i				= 0;
 
 	addresses.forEach ((el) => {
 		item	= {
@@ -217,8 +218,10 @@ const getUserInfo	= (getContentList) => {
 				user.isPremium	= res;
 				
 				if (getContentList) {
+					console.log ('\nQuerying content list for ' + user.hexName);
 					contracts.catalog.instance.getContentsListByAuthor (user.hexName)
 					.then((res) => {
+						console.log (res)
 						var conList	= buildCompleteContentsList (res);
 						var payload	= constructPayload (conList, user.isPremium);
 						resolve (payload);

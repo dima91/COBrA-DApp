@@ -6,12 +6,6 @@ import "./BaseContentManagementContract.sol";
 
 
 contract CatalogSmartContract is Ownable {
-
-	// Struct which is returned in 'getContentsListByAuthor' function
-    struct TitleAndAddress {
-        bytes32 title;
-        address contractAddress;
-    }
     
     // Event list
     event NewUser (bytes32 username, address userAddress);
@@ -167,6 +161,7 @@ contract CatalogSmartContract is Ownable {
         contentsMapping[_contentTitle].contentPrice     = _price;
         
         usersMapping[_username].latestContent= _contentTitle;
+		usersMapping[_username].publishedContentsCount++;
     }
     
     // Return true if current premium account is valid
@@ -358,18 +353,17 @@ contract CatalogSmartContract is Ownable {
 
 
 	// Returns list of contents published by an author
-    function getContentsListByAuthor (bytes32 _author) userExistsM (_author) public view returns (bytes32[], address[], SharedTypes.contentType[]) {
-        bytes32[] memory titles					= new bytes32[] (contentsCount);
-        address[] memory addresses				= new address[] (contentsCount);
-        SharedTypes.contentType[] memory types	= new SharedTypes.contentType[] (contentsCount);
-        uint i	= 0;
-        uint j	= 0;
-        
-        if (contentsCount == 0) {
-            return (titles, addresses, types);
-        }
+    function getContentsListByAuthor (bytes32 _author) userExistsM (_author) public view returns (uint count, bytes32[], address[], SharedTypes.contentType[]) {
+		uint userContentsCount					= usersMapping[_author].publishedContentsCount;
+        bytes32[] memory titles					= new bytes32[] (userContentsCount);
+        address[] memory addresses				= new address[] (userContentsCount);
+        SharedTypes.contentType[] memory types	= new SharedTypes.contentType[] (userContentsCount);
 
-        for (i=0; i<contentsCount; i++) {
+        uint i					= 0;
+        uint j					= 0;
+		
+
+        for (i=0; i<contentsCount && j<userContentsCount; i++) {
             bytes32 title	= contentsArray[i];
             if (contentsMapping[title].author == _author) {
                 titles[j]		= title;
@@ -379,7 +373,7 @@ contract CatalogSmartContract is Ownable {
 			}
         }
         
-        return (titles, addresses, types);
+        return (userContentsCount, titles, addresses, types);
     }
 
 

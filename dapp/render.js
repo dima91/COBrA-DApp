@@ -44,7 +44,7 @@ ipcr.on('addresses', (event, arg) => {
 		idx++;
 	});
 
-	showCustomerView ();
+	showAuthorView ();
 })
 
 
