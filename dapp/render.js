@@ -820,7 +820,7 @@ const hideModal	= (modalId) => {		// TODO Use me!
 
 const newNotification	= (ni) => {
 	console.log (ni);
-	notifications.push(ni)
+	//notifications.push(ni)
 	/*$('#notificationsNumber').html (notifications.length)
 	$('#notificationsNumber').removeClass ('hidden')*/
 	$('#notificationsIcon').removeClass('outline')
@@ -828,6 +828,29 @@ const newNotification	= (ni) => {
 
 	// Adding new element to html!
 	$('#noticationsMenu').append('<div class="item">' + ni.name + '</div>');
+
+	setTimeout(() => {
+		$('#notificationsIcon').addClass('outline')
+		$('#notificationsIcon').removeClass('red')
+	}, 300);
+
+	setTimeout(() => {
+		$('#notificationsIcon').removeClass('outline')
+		$('#notificationsIcon').addClass('red')
+	}, 600);
+
+	setTimeout(() => {
+		$('#notificationsIcon').addClass('outline')
+		$('#notificationsIcon').removeClass('red')
+	}, 300);
+
+
+	setTimeout(() => {
+		$('#notificationsIcon').removeClass('outline')
+		$('#notificationsIcon').addClass('red')
+	}, 1200);
+
+
 }
 
 
@@ -1301,6 +1324,13 @@ window.onload = () => {
 	$('#loginModal').modal('show')
 	$('.ui.dropdown').dropdown();
 	//$('.ui.rating').rating();
+
+	// Adding listener to dropdown notfication about onchange event
+	$('#notificationsDropdown').dropdown ('setting', 'onHide', () => {
+		$('#noticationsMenu').empty ();
+		$('#notificationsIcon').addClass('outline');
+		$('#notificationsIcon').removeClass('red');
+	})
 
 	$('#more-info-modal').modal('hide');
 
