@@ -20,9 +20,42 @@ const photoContractPath			= folderPrefix + 'PhotoManagementContract.json'
 const videoContractPath			= folderPrefix + 'VideoManagementContract.json'
 
 
+
+
+
 var provider;
 var web3;
 var endpoint	= "http://localhost:8545";
+//FIXME !!!!!!  Parsing comman line arguments
+/*if (process.argv.length !=3) {
+	endpoint= "http://localhost:8545";
+}
+else {
+	endpoint= process.argv[2];
+}*/
+
+
+if(typeof web3 != 'undefined') {
+	console.log ("I'm here");
+	console.log(web3);
+	provider	= web3.currentProvider;
+	web3 		= new Web3 (provider);
+} else {
+	provider	= new Web3.providers.HttpProvider(endpoint);
+	web3		= new Web3(provider);
+}
+
+
+
+
+app.on('ready', () => {
+	console.log (provider);
+	loadAddresses ();
+});
+
+
+
+
 
 var mainWindow;
 
@@ -50,6 +83,9 @@ var user	= {
 }
 
 var contentsPriceCache	= {};		// Cotains price informations (which doesn't change) about some contents
+const premiumCost		= web3.toWei (44000, 'szabo');
+
+contracts.catalog.address	= process.argv[2];
 
 
 
@@ -153,19 +189,67 @@ const loadExtendedContents	= () => {
 
 
 
-const setupEventsCallbacks = () => {			// TODO Write me!
+const setupEventsCallbacks = (blockNum) => {			// TODO Write me!
+	/*
+	event NewUser			(bytes32 username, address userAddress);
+    event ContentPublished	(bytes32 username, bytes32 contentTitle, address contentAddress);
+    event GrantedAccess		(bytes32 username, address userAddress, bytes32 contentTitle, address contentAddress);
+	event GiftedAccess		(bytes32 rcvUsername, address rcvUserAddress, bytes32 sndUsername, bytes32 contentTitle, address contentAddress);
+    event GrantedPremium	(bytes32 username, address userAddress);
+	event GiftedPremium		(bytes32 rcvUsername, address rcvUserAddress, bytes32 sndUsername);
+	event CatalogDied		();
+	*/
 
-	// It works!!!!
-	var event	= contracts.catalog.instance.NewUser ({from:user.address},{fromBlock: 0, toBlock: 'latest'});
-	event.watch ((err, res) => {
+	var tmpEvt;
+	var initBlock	= 'latest';
+
+	// It works, but i don't care about it 
+	contracts.catalog.instance.NewUser ({from:user.address}, {fromBlock: initBlock, toBlock: 'latest'})
+	.watch ((err, res) => {
 		console.log ('Received event about registration of ' + web3.toUtf8(res.args.username));
 	});
 
 	// event ContentPublished (bytes32 username, bytes32 contentTitle, address contentAddress);
+	contracts.catalog.instance.ContentPublished ({from:user.address}, {fromBlock: initBlock, toBlock: 'latest'})
+	.watch ((err, res) => {
+		contentPublishedCallback (err, res);
+	})
+
+
 
 	// event GrantedAccess (bytes32 username, address userAddress, bytes32 contentTitle, address contentAddress);
+	contracts.catalog.instance.GrantedAccess ({from:user.address}, {fromBlock: initBlock, toBlock: 'latest'})
+	.watch ((err, res) => {
+		grantedAccessCallback (err, res);
+	})
+
+
 
 	// event GrantedPremium (bytes32 username, address user.address);
+	contracts.catalog.instance.GrantedPremium ({from:user.address}, {fromBlock: initBlock, toBlock: 'latest'})
+	.watch ((err, res) => {
+		grantedPremiumCallback (err, res);
+	})
+
+
+
+	// event GiftedAccess		(bytes32 rcvUsername, address rcvUserAddress, bytes32 sndUsername, bytes32 contentTitle, address contentAddress);
+	contracts.catalog.instance.GiftedAccess ({from:user.address}, {fromBlock: initBlock, toBlock: 'latest'})
+	.watch ((err, res) => {
+		giftedAccessCallback (err, res);
+	})
+
+
+
+	// event GiftedPremium		(bytes32 rcvUsername, address rcvUserAddress, bytes32 sndUsername);
+	contracts.catalog.instance.GiftedPremium ({from:user.address}, {fromBlock: initBlock, toBlock: 'latest'})
+	.watch ((err, res) => {
+		giftedPremiumCallback (err, res);
+	})
+
+
+
+	// event CatalogDied		();
 }
 
 
@@ -298,18 +382,34 @@ const computeFeedbacksAvg	= (feeds) => {
 // event ContentPublished (bytes32 username, bytes32 contentTitle, address contentAddress);
 // TODO Listener for event 'content published'
 const contentPublishedCallback = (err, evt) => {
-	console.log (err);
-	console.log (evt);
+	console.log ("Someone published a content!");
+	/*console.log (evt);
+	console.log (err);*/
+	contracts.baseContent.at(evt.args.contentAddress)
+	.then ((instance) => {
+		return instance.getType ({from:user.address, gas:3000000});
+	})
+	.then ((res) => {
+		var stringTitle	= web3.toUtf8 (evt.args.contentTitle);
+		var hexTitle	= web3.fromUtf8(stringTitle);
+		
+		mainWindow.webContents.send ('content-published-event', {stringTitle:stringTitle});
+	});
 }
 
 
 
 
-// event GrantedAccess (bytes32 username, address user.address, bytes32 contentTitle, address contentAddress);
-// TODO Listener for event 'granted access'
+// event GrantedAccess (bytes32 username, address userAddress, bytes32 contentTitle, address contentAddress);
+// Listener for event 'granted access' --> action already handled
 const grantedAccessCallback = (err, evt) => {
-	console.log (err);
-	console.log (evt);
+	var rcvUser	= web3.toUtf8 (evt.args.username);
+
+	if (rcvUser == user.stringName) {
+		var stringTitle	=	web3.toUtf8 (evt.args.contentTitle);
+		console.log ("You're granted to access to content  " + web3.toUtf8 (evt.args.contentTitle));
+		mainWindow.webContents.send ('granted-access-event', {title:stringTitle});
+	}
 }
 
 
@@ -318,8 +418,51 @@ const grantedAccessCallback = (err, evt) => {
 // event GrantedPremium (bytes32 username, address user.address);
 // TODO Listener for event 'granted premium'
 const grantedPremiumCallback = (err, evt) => {
-	console.log (err);
-	console.log (evt);
+	var rcvUser	= web3.toUtf8 (evt.args.username);
+
+	if (rcvUser == user.stringName) {
+		console.log ("You bought a premium account. Enjoy yourself!");
+		mainWindow.webContents.send ('granted-premium-event', {});
+	}
+}
+
+
+
+
+// event GiftedAccess (bytes32 rcvUsername, address rcvUserAddress, bytes32 sndUsername, bytes32 contentTitle, address contentAddress);
+const giftedAccessCallback	= (err, evt) => {
+	var rcvUser	= web3.toUtf8 (evt.args.rcvUsername);
+
+	if (rcvUser == user.stringName) {
+		var sender	= web3.toUtf8 (evt.args.sndUsername);
+		var title	= web3.toUtf8 (evt.args.contentTitle);
+		console.log ('User  ' + sender + '  gift to you this content:  ' + title);
+
+		mainWindow.webContents.send ('gifted-content-event', {title:title, sender:sender});
+	}
+}
+
+
+
+
+// event GiftedPremium		(bytes32 rcvUsername, address rcvUserAddress, bytes32 sndUsername);
+const giftedPremiumCallback	= (err, evt) => {
+	var rcvUser	= web3.toUtf8 (evt.args.rcvUsername);
+
+	//console.log ('Receiver name is  ' + rcvUser);
+
+	if (rcvUser == user.stringName) {
+		var sender	= web3.toUtf8 (evt.args.sndUsername);
+		console.log ('User  ' + sender + '  gift to you premium account!');
+		getUserInfo (false)
+		.then ((userInfo) => {
+			mainWindow.webContents.send('gifted-premium-event', {sender:sender});
+			mainWindow.webContents.send('init-info', JSON.stringify(userInfo));
+		})
+		.catch ((err) => {
+			// Is it possible??
+		})
+	}
 }
 
 
@@ -369,7 +512,11 @@ ipcMain.on ('init-info', (event, arg) => {
 
 	console.log ('address hex: ' + user.hexName + ' --> ' + web3.toUtf8 (user.hexName));
 	
-	setupEventsCallbacks ();		// FIXME Move me!!!
+
+	web3.eth.getBlockNumber((err, res) => {
+		setupEventsCallbacks (res);		// FIXME Move me!!!	
+	})
+	
 	
 	
 	contracts.catalog.instance.userExists (user.hexName, {from:user.address})
@@ -496,7 +643,7 @@ ipcMain.on ('more-info-request', ((evt, arg) => {
 		/*console.log (web3.fromWei(res['1'], 'milliether'));
 		console.log (web3.fromWei(res['1'], 'milliether').toString());*/
 		console.log (res[0]);
-		
+
 		toSend	= {
 			title	: arg.title,
 			rating	: computeFeedbacksAvg (res[0]),
@@ -623,8 +770,15 @@ ipcMain.on ('gift-content-request', (evt, arg) => {
 	// function giftContent (bytes32 _contentTitle, bytes32 _receivingUser)
 	//console.log ('Gifting  ' + arg.title + ' ('+ web3.fromUtf8(arg.title)+')  to  ' + arg.user + ' (' + web3.fromUtf8(arg.user) +')')
 	console.log ('Gifting  ' + arg.title + '  to  ' + arg.user);
-	
-	contracts.catalog.instance.giftContent (web3.fromUtf8(arg.title), web3.fromUtf8(arg.user))
+
+	// FICME Doesn't work!
+
+	contracts.catalog.instance
+	.getPriceOf (web3.fromUtf8(arg.title), {from:user.address, gas:300000})
+	.then ((res) => {
+		cachedPrice	= res;
+		contracts.catalog.instance.giftContent (web3.fromUtf8(arg.title), web3.fromUtf8(arg.user), {from:user.address, gas:1000000, value:cachedPrice})
+	})
 	.then ((res) => {
 		mainWindow.webContents.send('gift-content-reply', {result:'success'});
 	})
@@ -637,7 +791,7 @@ ipcMain.on ('gift-content-request', (evt, arg) => {
 
 
 ipcMain.on ('buy-premium-request', (evt, arg) => {
-	contracts.catalog.instance.buyPremium ({from:user.address, gas:3000000, value:web3.toWei(44000, 'szabo')})
+	contracts.catalog.instance.buyPremium ({from:user.address, gas:3000000, value:premiumCost})
 	.then ((res) => {
 		console.log ("Premium account buyed");
 		mainWindow.webContents.send('buy-premium-reply', {result:'success'});
@@ -655,7 +809,7 @@ ipcMain.on ('buy-premium-request', (evt, arg) => {
 ipcMain.on ('gift-premium-request', (evt, arg) => {
 	console.log ('Performing request..');
 
-	contracts.catalog.instance.giftPremium (web3.fromAscii(arg.user), {from:user.address, gas:100000, value:web3.toWei(44000, 'szabo')})
+	contracts.catalog.instance.giftPremium (web3.fromAscii(arg.user), {from:user.address, gas:100000, value:premiumCost})
 	.then ((res) => {
 		console.log ("Gifted!!!!");
 		mainWindow.webContents.send('gift-premium-reply', {result:'success'});
@@ -828,57 +982,4 @@ ipcMain.on ('get-most-rated-content-by-author-request', (evt, arg) => {
 		console.log (err);
 		mainWindow.webContents.send('get-most-rated-content-by-genre-reply', {result:'failure', cause:'boh!'});
 	})
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// ==================================
-// ===== OTHER ELECTRON EVENTS  =====
-
-// FIXME !!!!!!  Parsing comman line arguments
-/*if (process.argv.length !=3) {
-	endpoint= "http://localhost:8545";
-}
-else {
-	endpoint= process.argv[2];
-}*/
-
-
-
-
-contracts.catalog.address	= process.argv[2];
-
-
-if(typeof web3 != 'undefined') {
-	console.log ("I'm here");
-	console.log(web3);
-	provider	= web3.currentProvider;
-	web3 		= new Web3 (provider);
-} else {
-	provider	= new Web3.providers.HttpProvider(endpoint);
-	web3		= new Web3(provider);
-}
-
-
-
-//console.log ("Catalog: " + contracts.catalog.address);
-
-
-
-
-app.on('ready', () => {
-	console.log (provider);
-	loadAddresses ();
 });

@@ -201,7 +201,7 @@ web3.eth.getAccounts (function (err, res) {
 	await createAndLink (usr.c, c1)
 	await createAndLink (usr.b, b0)
 	await createAndLink (usr.a, a1)
-	
+	//*/
 
 
 	//	a2:2	c1:1	b3:2	c3:3	c2:1
@@ -215,7 +215,7 @@ web3.eth.getAccounts (function (err, res) {
 	await buyAndConsume (usr.a, b3);
 	await buyAndConsume (usr.b, c3);
 	await buyAndConsume (usr.d, a1);
-
+	//*/
 	
 	
 	
@@ -226,6 +226,7 @@ web3.eth.getAccounts (function (err, res) {
 	await leaveFeedback (usr.a, c2, [2,2,5]);
 	await leaveFeedback (usr.d, c3, [5,2,1]);
 	await leaveFeedback (usr.a, b3, [4,3,3]);
+	//*/
 	
 	
 	

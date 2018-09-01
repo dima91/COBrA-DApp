@@ -13,9 +13,9 @@ library SharedTypes {
     /* Kind of feedback
      * contentAppreciation  : how much the customer enjoyed the content
      * priceFairness        : how fair the requested price is considered compared to the content
-     * availabilityTime     : how fair the availability of content is considered compating to the price
+     * suitableForChildren  : how much the content is suitable for guys
      */
-    enum feedbackType {contentAppreciation, priceFairness, availabilityTime}
+    enum feedbackType {contentAppreciation, priceFairness, suitableForChildren}
     
     // Type for registered users, both authors or customers. This struct is stored in the catalog
     // Username is the identifier of content

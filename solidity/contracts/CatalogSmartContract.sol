@@ -8,11 +8,13 @@ import "./BaseContentManagementContract.sol";
 contract CatalogSmartContract is Ownable {
     
     // Event list
-    event NewUser (bytes32 username, address userAddress);
-    event ContentPublished (bytes32 username, bytes32 contentTitle, address contentAddress);
-    event GrantedAccess (bytes32 username, address userAddress, bytes32 contentTitle, address contentAddress);
-    event GrantedPremium (bytes32 username, address userAddress);
-    event CatalogDied ();
+    event NewUser			(bytes32 username, address userAddress);
+    event ContentPublished	(bytes32 username, bytes32 contentTitle, address contentAddress);
+    event GrantedAccess		(bytes32 username, address userAddress, bytes32 contentTitle, address contentAddress);
+	event GiftedAccess		(bytes32 rcvUsername, address rcvUserAddress, bytes32 sndUsername, bytes32 contentTitle, address contentAddress);
+    event GrantedPremium	(bytes32 username, address userAddress);
+	event GiftedPremium		(bytes32 rcvUsername, address rcvUserAddress, bytes32 sndUsername);
+    event CatalogDied		();
     
     
 
@@ -625,7 +627,8 @@ contract CatalogSmartContract is Ownable {
         // ******* --> Check preconditions (enough value..) + handle payments <-- *******
         (BaseContentManagementContract (contentsMapping[_contentTitle].contractAddress)).grantAccessToUser (_receivingUser, usersMapping[_receivingUser].userAddress, false);
         
-        emit GrantedAccess (_receivingUser, usersMapping[_receivingUser].userAddress, _contentTitle, contentsMapping[_contentTitle].contractAddress);
+        //emit GrantedAccess (_receivingUser, usersMapping[_receivingUser].userAddress, _contentTitle, contentsMapping[_contentTitle].contractAddress);
+		emit GiftedAccess (_receivingUser, usersMapping[_receivingUser].userAddress, addr2User[msg.sender], _contentTitle, contentsMapping[_contentTitle].contractAddress);
     }
     
     
@@ -636,7 +639,8 @@ contract CatalogSmartContract is Ownable {
         usersMapping[_receivingUser].accType= SharedTypes.accountType.premium;
         usersMapping[_receivingUser].expirationTime= block.number + PREMIUM_ACCOUNT_DURATION;
         
-        emit GrantedPremium (_receivingUser,  usersMapping[_receivingUser].userAddress);
+        //emit GrantedPremium (_receivingUser,  usersMapping[_receivingUser].userAddress);
+		emit GiftedPremium (_receivingUser, usersMapping[_receivingUser].userAddress, addr2User[msg.sender]);
     }
     
     

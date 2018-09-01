@@ -12,7 +12,7 @@ var notifications	= [];
 var currentRating	= "";
 
 
-const ___TEST___	= true;
+const ___TEST___	= false;
 
 
 
@@ -44,7 +44,7 @@ ipcr.on('addresses', (event, arg) => {
 		idx++;
 	});
 
-	showAuthorView ();
+	showCustomerView ();
 })
 
 
@@ -223,7 +223,14 @@ ipcr.on ('consume-content-reply', (evt, arg) => {
 
 ipcr.on ('gift-content-reply', (ev, arg) => {
 	hideLoader ('buy-gift-content-dimmer');
-	// TODO Check result!
+
+	if (arg.result == 'success') {
+		// Do nothing
+	}
+	else {
+		console.log ("Error gifting a content to someone!\n" + arg.cause);
+		// TODO Check result!
+	}
 })
 
 
@@ -428,6 +435,62 @@ ipcr.on ('get-most-rated-content-by-author-reply', (evt, arg) => {		// TODO Hand
 	else {
 		// TODO Handle me!
 	}
+});
+
+
+
+
+
+
+
+
+
+
+ipcr.on ('content-published-event', (evt, arg) => {
+	var id	= arg.hexTitle;
+	$('#available-contents-list').append (newAvailableContent (arg.stringTitle, id));
+	$('#more-info-'+id).click ((evt) => {console.log ('getting more info'); getMoreInfo ($('#'+evt.target.id).prev())});
+	
+	// TODO More attention requested!
+});
+
+
+
+
+ipcr.on ('granted-access-event', (evt, arg) => {
+	newNotification ({name:'You can access to content  ' + arg.title});
+});
+
+
+
+
+ipcr.on ('granted-premium-event', (evt, arg) => {
+	newNotification ({name:'You obtained premium acces'});
+});
+
+
+
+
+ipcr.on ('gifted-content-event', (evt, arg) => {
+	$('#consumable-contents-list').append (newBuyedItem (arg.title));
+	
+	$('#button-'+arg.title).click ((ev) => {
+		console.log ('Clicked for consume');
+		var title	= ev.target.id.substring (7);
+		ipcr.send ('consume-content-request', {'title':title});
+		showLoader ('consume-rate-content-dimmer');
+		console.log ('Done');
+	});
+
+	var notif	= {name:'User  "' + arg.sender + '"  gifted to you content  "'+ arg.title + '"'};
+	newNotification (notif);
+})
+
+
+
+
+ipcr.on ('gifted-premium-event', (evt, arg) => {
+	newNotification ({name:'User "' + arg.sender +'" gifted you a premium account'});
 });
 
 
@@ -755,7 +818,8 @@ const hideModal	= (modalId) => {		// TODO Use me!
 
 
 
-const newNotification = (ni) => {
+const newNotification	= (ni) => {
+	console.log (ni);
 	notifications.push(ni)
 	/*$('#notificationsNumber').html (notifications.length)
 	$('#notificationsNumber').removeClass ('hidden')*/
@@ -769,7 +833,7 @@ const newNotification = (ni) => {
 
 
 
-const readNotification = (ith) => {
+const readNotification	= (ith) => {
 	// TODO Deelte element from html. If (notifications.length == 0) then remove 'notificationsNumber' element.
 	// TODO remove class 'blue' from 'notificationsIcon' and insert 'outline'
 }

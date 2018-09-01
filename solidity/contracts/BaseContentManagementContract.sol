@@ -21,7 +21,7 @@ contract BaseContentManagementContract {
     
     /* Variables to store feedbacks from users: each user has a unique position in each array. feedbacksSums stores sum of all given feedbacks
      * and feedbacksCount stores number of given feedbacks for each category (A user may or not rate a content for a category) */
-    uint[3] private feedbacksSums;		// contentAppreciation, priceFairness, availabilityTime
+    uint[3] private feedbacksSums;		// contentAppreciation, priceFairness, suitableForChildren
     uint8[3] private feedbacksCount;	// Number of feedbacks given for each category
 
     address private owner;                              // Address of author (owner of content)
