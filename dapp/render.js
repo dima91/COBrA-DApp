@@ -856,14 +856,6 @@ const newNotification	= (ni) => {
 
 
 
-const readNotification	= (ith) => {
-	// TODO Deelte element from html. If (notifications.length == 0) then remove 'notificationsNumber' element.
-	// TODO remove class 'blue' from 'notificationsIcon' and insert 'outline'
-}
-
-
-
-
 const showAuthorView = () => {
 	$("#authorRoleBtn").addClass("active");
 	$('#autorView').removeClass('inactive');

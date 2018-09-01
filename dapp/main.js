@@ -189,7 +189,7 @@ const loadExtendedContents	= () => {
 
 
 
-const setupEventsCallbacks = (blockNum) => {			// TODO Write me!
+const setupEventsCallbacks = (blockNum) => {
 	/*
 	event NewUser			(bytes32 username, address userAddress);
     event ContentPublished	(bytes32 username, bytes32 contentTitle, address contentAddress);
@@ -394,7 +394,14 @@ const contentPublishedCallback = (err, evt) => {
 		var hexTitle	= web3.fromUtf8(stringTitle);
 		
 		mainWindow.webContents.send ('content-published-event', {stringTitle:stringTitle});
-	});
+		return getUserInfo (false);
+	})
+	.then ((userInfo) => {
+		mainWindow.webContents.send('user-info', JSON.stringify(userInfo));
+	})
+	.catch ((err) => {
+		// Is it possible??
+	})
 }
 
 
@@ -409,6 +416,17 @@ const grantedAccessCallback = (err, evt) => {
 		var stringTitle	=	web3.toUtf8 (evt.args.contentTitle);
 		console.log ("You're granted to access to content  " + web3.toUtf8 (evt.args.contentTitle));
 		mainWindow.webContents.send ('granted-access-event', {title:stringTitle});
+		getUserInfo (false)
+		.then ((userInfo) => {
+			mainWindow.webContents.send('user-info', JSON.stringify(userInfo));
+			return getUserInfo (false);
+		})
+		.then ((userInfo) => {
+			mainWindow.webContents.send('user-info', JSON.stringify(userInfo));
+		})
+		.catch ((err) => {
+			// Is it possible??
+		})
 	}
 }
 
@@ -423,6 +441,10 @@ const grantedPremiumCallback = (err, evt) => {
 	if (rcvUser == user.stringName) {
 		console.log ("You bought a premium account. Enjoy yourself!");
 		mainWindow.webContents.send ('granted-premium-event', {});
+		getUserInfo (false)
+		.then ((userInfo) => {
+			mainWindow.webContents.send('user-info', JSON.stringify(userInfo));
+		})
 	}
 }
 
@@ -690,6 +712,10 @@ ipcMain.on ('buy-content-request', (evt, arg) => {
 		// TODO Handle errors
 		console.log ("Content buyed");
 		mainWindow.webContents.send ('buy-content-reply', {result:'success', title:tmpTitle});
+		return getUserInfo (false);
+	})
+	.then ((userInfo) => {
+		mainWindow.webContents.send('user-info', JSON.stringify(userInfo));
 	})
 	.catch ((err) => {
 		console.log ("Maybe the user is no longer premium!");
@@ -698,6 +724,10 @@ ipcMain.on ('buy-content-request', (evt, arg) => {
 		.getContent (web3.fromUtf8(tmpTitle), {from:user.address, gas:300000, value:cachedPrice})
 		.then ((res) => {
 			mainWindow.webContents.send ('buy-content-reply', {result:'success', title:tmpTitle});
+			return getUserInfo (false);
+		})
+		.then ((userInfo) => {
+			mainWindow.webContents.send('user-info', JSON.stringify(userInfo));
 		})
 		.catch ((err) => {
 			console.log (err);
@@ -722,6 +752,10 @@ ipcMain.on ('consume-content-request', (evt, arg) => {
 		.then ((res) => {
 			console.log ('Retrieved content ' + arg.title);
 			mainWindow.webContents.send ('consume-content-reply', {result:'success', title:arg.title});
+			return getUserInfo (false);
+		})
+		.then ((userInfo) => {
+			mainWindow.webContents.send('user-info', JSON.stringify(userInfo));
 		})
 		.catch ((err) => {
 			console.log ("Error consuming content " + arg.title);
@@ -757,6 +791,16 @@ ipcMain.on ('rating-request', (evt, arg) => {
 		console.log ('3');
 		return tmpInstance.leaveFeedback (user.hexName, 3, arg['3'], {from:user.address, gas:3000000});
 	})
+	.then (() => {
+		return getUserInfo (false);
+	})
+	.then ((userInfo) => {
+		mainWindow.webContents.send('user-info', JSON.stringify(userInfo));
+		return getUserInfo (false);
+	})
+	.then ((userInfo) => {
+		mainWindow.webContents.send('user-info', JSON.stringify(userInfo));
+	})
 	.catch ((err) => {
 		console.log ('Error leaving feedbacks!');
 		console.log (err);
@@ -781,6 +825,10 @@ ipcMain.on ('gift-content-request', (evt, arg) => {
 	})
 	.then ((res) => {
 		mainWindow.webContents.send('gift-content-reply', {result:'success'});
+		return getUserInfo (false);
+	})
+	.then ((userInfo) => {
+		mainWindow.webContents.send('user-info', JSON.stringify(userInfo));
 	})
 	.catch ((err) => {
 		mainWindow.webContents.send('gift-content-reply', {result:'failure', cause:'boh!'});
@@ -795,6 +843,10 @@ ipcMain.on ('buy-premium-request', (evt, arg) => {
 	.then ((res) => {
 		console.log ("Premium account buyed");
 		mainWindow.webContents.send('buy-premium-reply', {result:'success'});
+		return getUserInfo (false);
+	})
+	.then ((userInfo) => {
+		mainWindow.webContents.send('user-info', JSON.stringify(userInfo));
 	})
 	.catch ((err) => {
 		console.log ('Error during buy premium')
@@ -813,6 +865,10 @@ ipcMain.on ('gift-premium-request', (evt, arg) => {
 	.then ((res) => {
 		console.log ("Gifted!!!!");
 		mainWindow.webContents.send('gift-premium-reply', {result:'success'});
+		return getUserInfo (false);
+	})
+	.then ((userInfo) => {
+		mainWindow.webContents.send('user-info', JSON.stringify(userInfo));
 	})
 	.catch ((err) => {
 		mainWindow.webContents.send('gift-premium-reply', {result:'failure', cause:'boh!'});
