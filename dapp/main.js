@@ -495,6 +495,8 @@ ipcMain.on ('more-info-request', ((evt, arg) => {
 
 		/*console.log (web3.fromWei(res['1'], 'milliether'));
 		console.log (web3.fromWei(res['1'], 'milliether').toString());*/
+		console.log (res[0]);
+		
 		toSend	= {
 			title	: arg.title,
 			rating	: computeFeedbacksAvg (res[0]),

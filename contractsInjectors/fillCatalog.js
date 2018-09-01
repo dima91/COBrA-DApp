@@ -34,8 +34,8 @@ let readContract	= (contractPath) => {
  */
 
 
-
- const contr = [
+const baseContract	= readContract (baseContentContractPath);
+const contr 		= [
 	readContract (songContractPath),
 	readContract (videoContractPath),
 	readContract (photoContractPath),
@@ -66,6 +66,8 @@ const createAndLink	= (u, cnt) => {
 }
 
 
+
+
 const buyAndConsume	= (u, c) => {
 	return new Promise ((resolve, reject) => {
 		catalogContract.methods
@@ -83,6 +85,38 @@ const buyAndConsume	= (u, c) => {
 				resolve (true);
 			})
 		});
+	})
+}
+
+
+
+
+const leaveFeedback	=	(u, c, fs) => {
+	return new Promise ((resolve, reject) => {
+		// function leaveFeedback (bytes32 _username, uint8 _c, uint8 _v)
+		var tmpContract	= new web3.eth.Contract (baseContract.abi, c.addr);
+		console.log ('leaving feed  ' + fs[0] + '  for category  1');
+		tmpContract.methods
+		.leaveFeedback (u.name, 1, fs[0])
+		.send ({from:u.address, gas:30000000}, (err, res) => {
+			if (err) console.log (err);
+
+			console.log ('leaving feed  ' + fs[1] + '  for category  2');
+			tmpContract.methods
+			.leaveFeedback (u.name, 2, fs[1])
+			.send ({from:u.address, gas:30000000}, (err, res) => {
+				if (err) console.log (err);
+
+				console.log ('leaving feed  ' + fs[2] + '  for category  3');
+				tmpContract.methods
+				.leaveFeedback (u.name, 3, fs[2])
+				.send ({from:u.address, gas:30000000}, (err, res) => {
+					if (err) console.log (err);
+
+					resolve (true);
+				})
+			})
+		})
 	})
 }
 
@@ -170,7 +204,6 @@ web3.eth.getAccounts (function (err, res) {
 	
 
 
-	// getStatistics  &&  getNewContentList  &&  getLatestByGenre
 	//	a2:2	c1:1	b3:2	c3:3	c2:1
 	await buyAndConsume (usr.d, a2);
 	await buyAndConsume (usr.b, c1);
@@ -183,28 +216,27 @@ web3.eth.getAccounts (function (err, res) {
 	await buyAndConsume (usr.b, c3);
 	await buyAndConsume (usr.d, a1);
 
+	
+	
+	
+	
+	await leaveFeedback (usr.d, a2, [3,2,5]);
+	await leaveFeedback (usr.b, c1, [4,4,5]);
+	await leaveFeedback (usr.d, b3, [1,3,2]);
+	await leaveFeedback (usr.a, c2, [2,2,5]);
+	await leaveFeedback (usr.d, c3, [5,2,1]);
+	await leaveFeedback (usr.a, b3, [4,3,3]);
+	
+	
+	
+	
+	
+	
+	
+	
 	catalogContract.methods.getContentList ().call ({from : usr.a.address, gas:300000}, (err, res) => {
 		console.log (res);
 	});
-
-	//*/
-
-
-	
-	/****** Register an user
-	catalogContract.methods.registerMe(tmpInstance).send ({from : addresses[0], gas:300000}, (err, res) => {
-												console.log (err);
-												console.log (res);
-											})
-	//*/
-	
-
-	/****** Buy premium account
-	catalogContract.methods.buyPremium ()
-	.send ({from: addresses[9], value:web3.utils.toWei ("44000", "szabo")})
-	.then (() => {console.log ("Premium buyied")})
-	//*/
-	
 })
 .catch ((err) => {
 	console.log ("\n\n============================\nERROR DURING CATALOG FILLING\n============================");

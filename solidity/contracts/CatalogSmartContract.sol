@@ -204,10 +204,10 @@ contract CatalogSmartContract is Ownable {
                                 private view isCorrectCategoryForGetRating(_category) returns (bytes32) {
         require (contentsCount > 0);
         
-        uint i                  = 0;
-        uint mostRatedIdx       = 0;
-        uint mostRateValue      = 0;
-        uint inspectedElements  = 0;
+        uint i					= 0;
+        uint mostRatedIdx		= 0;
+        uint mostRateValue		= 0;
+        uint inspectedElements	= 0;
         
         for (i=0; i<contentsCount; i++) {
             BaseContentManagementContract content  = BaseContentManagementContract (contentsMapping[contentsArray[i]].contractAddress);
@@ -225,24 +225,26 @@ contract CatalogSmartContract is Ownable {
                 // Calculating average and compare to temporary most rated
                 // FIXME Add check on feedsCount > 0
                 uint tmpRating  = feedbacksAverage (feeds, feedsCount);
-                if (tmpRating > mostRateValue) {
+                if (tmpRating >= mostRateValue) {
                     mostRatedIdx    = i;
                     mostRateValue   = tmpRating;
+					inspectedElements++;
                 }
             }
             else {
                 // FIXME Add check on feedsCount > 0
-                if (feeds[_category-1] > mostRateValue) {
+                if (feeds[_category-1] >= mostRateValue) {
                     mostRatedIdx    = i;
                     mostRateValue   = feeds[_category-1];
+					inspectedElements++;
                 }
             }
             
-            inspectedElements++;
+            // inspectedElements++;
         }
         
         // This instruction
-        require (inspectedElements > 0);
+        require (inspectedElements > 0 && mostRateValue > 0);
         
         return contentsArray[mostRatedIdx];
     }
