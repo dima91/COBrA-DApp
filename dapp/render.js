@@ -12,7 +12,7 @@ var notifications	= [];
 var currentRating	= "";
 
 
-const ___TEST___	= false;
+const ___TEST___	= true;
 
 
 
@@ -76,13 +76,15 @@ ipcr.on ('user-info', (evt, arg) => {
 		else
 			$('#premium').addClass('inactive');
 
-		
-		jsonP.contentsList.forEach ((el) => {
-			console.log ('Address: ' + el.address);
-			htmlText	= newContentItem (el.address, Number(el.type), el.title);
-			$('#published-contents-list').append(htmlText);
-			$('#delete-' + el.address).click(deleteItem);
-		});
+		if (jsonP.contentsList != undefined) {
+
+				jsonP.contentsList.forEach ((el) => {
+				console.log ('Address: ' + el.address);
+				htmlText	= newContentItem (el.address, Number(el.type), el.title);
+				$('#published-contents-list').append(htmlText);
+				$('#delete-' + el.address).click(deleteItem);
+			});
+		}
 	}
 })
 
@@ -176,19 +178,21 @@ ipcr.on ('more-info-reply', ((evt, arg) => {
 
 ipcr.on ('buy-content-reply', (evt, arg) => {
 	if (arg.result == 'error') {
-		// TODO Handle error
+		// TODO Handle error	
 		return;
+	}
+	else {
+		$('#consumable-contents-list').append (newBuyedItem (arg.title));
+
+		$('#button-'+arg.title).click ((ev) => {
+			console.log ('Clicked for consume');
+			var title	= ev.target.id.substring (7);
+			ipcr.send ('consume-content-request', {'title':title});
+			showLoader ('consume-rate-content-dimmer');
+		});
 	}
 
 	hideLoader ('buy-gift-content-dimmer');
-	$('#consumable-contents-list').append (newBuyedItem (arg.title));
-	
-	$('#button-'+arg.title).click ((ev) => {
-		console.log ('Clicked for consume');
-		var title	= ev.target.id.substring (7);
-		ipcr.send ('consume-content-request', {'title':title});
-		showLoader ('consume-rate-content-dimmer');
-	});
 })
 
 
@@ -819,38 +823,23 @@ const hideModal	= (modalId) => {		// TODO Use me!
 
 
 const newNotification	= (ni) => {
+	const blinkAlert = () => {
+		$('#notificationsIcon').removeClass('outline')
+		$('#notificationsIcon').addClass('red')
+		for (var i=1; i<7; i++) {
+			setTimeout(() => {
+				$('#notificationsIcon').toggleClass('outline');
+				$('#notificationsIcon').toggleClass('red');
+			}, 300*i);
+		}
+	}
 	console.log (ni);
 	//notifications.push(ni)
 	/*$('#notificationsNumber').html (notifications.length)
 	$('#notificationsNumber').removeClass ('hidden')*/
-	$('#notificationsIcon').removeClass('outline')
-	$('#notificationsIcon').addClass('red')
-
 	// Adding new element to html!
 	$('#noticationsMenu').append('<div class="item">' + ni.name + '</div>');
-
-	setTimeout(() => {
-		$('#notificationsIcon').addClass('outline')
-		$('#notificationsIcon').removeClass('red')
-	}, 300);
-
-	setTimeout(() => {
-		$('#notificationsIcon').removeClass('outline')
-		$('#notificationsIcon').addClass('red')
-	}, 600);
-
-	setTimeout(() => {
-		$('#notificationsIcon').addClass('outline')
-		$('#notificationsIcon').removeClass('red')
-	}, 300);
-
-
-	setTimeout(() => {
-		$('#notificationsIcon').removeClass('outline')
-		$('#notificationsIcon').addClass('red')
-	}, 1200);
-
-
+	blinkAlert ();
 }
 
 
@@ -1317,11 +1306,14 @@ window.onload = () => {
 	$('.ui.dropdown').dropdown();
 	//$('.ui.rating').rating();
 
-	// Adding listener to dropdown notfication about onchange event
-	$('#notificationsDropdown').dropdown ('setting', 'onHide', () => {
-		$('#noticationsMenu').empty ();
+	// Adding listener to dropdown notfication about onHide and onShow events
+	$('#notificationsDropdown').dropdown ('setting', 'onShow', () => {
 		$('#notificationsIcon').addClass('outline');
 		$('#notificationsIcon').removeClass('red');
+	});
+
+	$('#notificationsDropdown').dropdown ('setting', 'onHide', () => {
+		$('#noticationsMenu').empty ();
 	})
 
 	$('#more-info-modal').modal('hide');
@@ -1341,7 +1333,7 @@ window.onload = () => {
 
 		// Timeout to create new notification
 		setTimeout(() => {
-			newNotification({ name: "testNotification" });
+			newNotification({ name: "notifica di test" });
 
 			// =========================  Test requests  =========================
 			// ipcr.send ('create-content-request', {type:0, title:'a beautiful song', price:10000});
