@@ -8,12 +8,12 @@ import "./BaseContentManagementContract.sol";
 contract CatalogSmartContract is Ownable {
     
     // Event list
-    event NewUser			(bytes32 username, address userAddress);
-    event ContentPublished	(bytes32 username, bytes32 contentTitle, address contentAddress);
-    event GrantedAccess		(bytes32 username, address userAddress, bytes32 contentTitle, address contentAddress);
-	event GiftedAccess		(bytes32 rcvUsername, address rcvUserAddress, bytes32 sndUsername, bytes32 contentTitle, address contentAddress);
-    event GrantedPremium	(bytes32 username, address userAddress);
-	event GiftedPremium		(bytes32 rcvUsername, address rcvUserAddress, bytes32 sndUsername);
+    event NewUser				(bytes32 username, address userAddress);
+    event ContentPublished		(bytes32 username, bytes32 contentTitle, address contentAddress);
+    event GrantedAccess			(bytes32 username, address userAddress, bytes32 contentTitle, address contentAddress);
+	event GiftedAccess			(bytes32 rcvUsername, address rcvUserAddress, bytes32 sndUsername, bytes32 contentTitle, address contentAddress);
+    event GrantedPremium		(bytes32 username, address userAddress);
+	event GiftedPremium			(bytes32 rcvUsername, address rcvUserAddress, bytes32 sndUsername);
     event CatalogDied		();
     
     

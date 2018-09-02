@@ -8,7 +8,6 @@ const ipcr = ipcRenderer;
 var username;
 var userAddress;
 var ADDRESSES		= [];
-var notifications	= [];
 var currentRating	= "";
 
 
@@ -34,7 +33,6 @@ const ___TEST___	= true;
 // Event handler for incoming addresses
 ipcr.on('addresses', (event, arg) => {
 	jsonP = JSON.parse(arg);
-	//console.log (jsonP);
 	var idx = 0;
 	ADDRESSES = jsonP;
 	jsonP.forEach(el => {
@@ -50,7 +48,7 @@ ipcr.on('addresses', (event, arg) => {
 
 
 
-// Event handler for balance information --> {'balance':..}
+// Event handler for balance information
 ipcr.on('newBalance', (event, arg) => {
 	jsonP = JSON.parse(arg);
 	$('#balanceContainer').html(jsonP['balance'] + " (ether)");
@@ -67,7 +65,10 @@ ipcr.on ('user-info', (evt, arg) => {
 	console.log (arg.balance);
 
 	if (jsonP['result'] == 'error') {
-		// TODO Handle this error
+		var cause	= '';
+		if (jsonP.cause != undefined)
+			cause	= jsonP.cause;
+		error ('Problem fetching user information: ' + cause);
 	}
 	else {
 		$('#balanceContainer').html(jsonP['balance'] + " (ether)");
@@ -82,7 +83,6 @@ ipcr.on ('user-info', (evt, arg) => {
 				console.log ('Address: ' + el.address);
 				htmlText	= newContentItem (el.address, Number(el.type), el.title);
 				$('#published-contents-list').append(htmlText);
-				$('#delete-' + el.address).click(deleteItem);
 			});
 		}
 	}
@@ -94,10 +94,15 @@ ipcr.on ('user-info', (evt, arg) => {
 // Event handler for incoming user information
 ipcr.on('init-info', (event, arg) => {
 	jsonP = JSON.parse(arg);
-	console.log(jsonP);
+	//console.log(jsonP);
 
-	if (jsonP['status'] == 'error') {
-		// TODO Handle this error
+	if (jsonP['result'] == 'error') {
+		var cause	= '';
+		if (jsonP.cause != undefined)
+			cause	= jsonP.cause;
+		error ('Problem fetching user information: ' + cause);
+
+		showModal ('loginModal');
 	}
 	else {
 		$('#usernameContainer').html(username);
@@ -112,7 +117,6 @@ ipcr.on('init-info', (event, arg) => {
 			console.log ('Address: ' + el.address);
 			htmlText	= newContentItem (el.address, Number(el.type), el.title);
 			$('#published-contents-list').append(htmlText);
-			$('#delete-' + el.address).click(deleteItem);
 		});
 
 
@@ -131,11 +135,12 @@ ipcr.on('create-content-reply', ((evt, arg) => {
 	if (arg.result == 'success') {
 		htmlText = newContentItem (arg.address, arg.type, arg.title);
 		$('#published-contents-list').append (htmlText);
-		$('#delete-' + arg.address).click (deleteItem);
 	}
 	else {
-		// FIXME Notify this
-		console.log('Error on publish content!');
+		if (arg.cause != undefined && arg.cause != '')
+			error ('Error on publish content: ' + arg.cause);
+		else
+			error ('Error on publish content');
 	}
 
 	hideLoader('create-content-dimmer');
@@ -149,7 +154,7 @@ ipcr.on ('contents-list-reply', ((evt, arg) => {
 	$('#last-sync').text (arg.time);
 	$('#available-contents-list').empty ();
 	arg.list.forEach ((el) => {
-		$('#available-contents-list').append (newAvailableContent (el, i));
+		$('#available-contents-list').prepend (newAvailableContent (el, i));
 		$('#more-info-'+i).click ((evt) => {getMoreInfo ($('#'+evt.target.id).prev())});
 		i++;
 	})
@@ -160,8 +165,6 @@ ipcr.on ('contents-list-reply', ((evt, arg) => {
 
 
 ipcr.on ('more-info-reply', ((evt, arg) => {
-	// TODO Insert values of content into modal div    -->  arg.text()  --> titolo in alfanumerico
-
 	$('#info-title').text (arg.title);
 	$('#info-author').text (arg.author);
 	$('#info-price').text (arg.price + ' (milliether)');
@@ -178,13 +181,15 @@ ipcr.on ('more-info-reply', ((evt, arg) => {
 
 ipcr.on ('buy-content-reply', (evt, arg) => {
 	if (arg.result == 'error') {
-		// TODO Handle error	
-		return;
+		if (arg.cause != undefined && arg.cause != '')
+			error ('Error buying content: ' + arg.cause);
+		else
+			error ('Error buying content. Have you enough money?');
 	}
 	else {
-		$('#consumable-contents-list').append (newBuyedItem (arg.title));
+		$('#consumable-contents-list').append (newBuyedItem (arg.title, arg.hexTitle));
 
-		$('#button-'+arg.title).click ((ev) => {
+		$('#button-'+arg.hexTitle).click ((ev) => {
 			console.log ('Clicked for consume');
 			var title	= ev.target.id.substring (7);
 			ipcr.send ('consume-content-request', {'title':title});
@@ -200,26 +205,28 @@ ipcr.on ('buy-content-reply', (evt, arg) => {
 
 ipcr.on ('consume-content-reply', (evt, arg) => {
 	if (arg.result == 'error') {
-		// TODO Handle error
-		return;
+		if (arg.cause != undefined && arg.cause != '')
+			error ('Error consuming content: ' + arg.cause);
+		else
+			error ('Error consuming content');
+	}
+	else {
+	
+		$('#button-' + arg.title).text	('Rate me');
+		$('#button-' + arg.title).addClass ('disabled');
+		$('#button-' + arg.title).off	('click');
+
+		
+		$('#button-' + arg.title).click	((ev) => {
+			console.log ('clicked for rate');
+			showModal ('rating-modal');
+			var title		= ev.target.id.substring (7);
+			currentRating	= title;
+			// Cleaning values
+			$('.ui.rating').rating();
+		})
 	}
 	hideLoader ('consume-rate-content-dimmer');
-	
-	$('#button-' + arg.title).text	('Rate me');
-	$('#button-' + arg.title).off	('click');
-	
-	$('#button-' + arg.title).click	((ev) => {
-		console.log ('clicked for rate');
-		showModal ('rating-modal');
-		var title		= ev.target.id.substring (7);
-		currentRating	= title;
-		// Cleaning values
-		$('.ui.rating').rating();
-	})
-
-	currentRating	= arg.title;
-
-	showModal ('rating-question-modal');
 })
 
 
@@ -233,7 +240,10 @@ ipcr.on ('gift-content-reply', (ev, arg) => {
 	}
 	else {
 		console.log ("Error gifting a content to someone!\n" + arg.cause);
-		// TODO Check result!
+		if (arg.cause != undefined && arg.cause != '')
+			error ('Error gifting content: ' + arg.cause);
+		else
+			error ('Error gifting content. Have you enough money?');
 	}
 })
 
@@ -249,7 +259,10 @@ ipcr.on ('buy-premium-reply', (evt, arg) => {
 	}
 	else {
 		console.log ('NOT premium user');
-		$('#premium').addClass('inactive');
+		if (arg.cause != undefined && arg.cause != '')
+			error ('Error buying premium: ' + arg.cause);
+		else
+			error ('Error buying premium. Have you enough money?');
 	}
 })
 
@@ -258,8 +271,20 @@ ipcr.on ('buy-premium-reply', (evt, arg) => {
 
 ipcr.on ('gift-premium-reply', (evt, arg) => {
 	hideLoader ('buy-gift-premium-dimmer');
-	console.log ('gifted!\t\tresult: ' + arg.result);
+	
+	if (arg.result == 'failure') {
+		if (arg.cause != undefined && arg.cause != '')
+			error ('Error buying content: ' + arg.cause);
+		else
+			error ('Error buying content. Have you enough money?');
+	}
 })
+
+
+
+
+
+
 
 
 
@@ -281,7 +306,7 @@ ipcr.on ('get-views-count-reply', (evt, arg) => {
 		showModal ('query-reply-modal');
 	}
 	else {
-		// TODO Handle me!
+		error ('Error executing operation');
 	}
 })
 
@@ -304,14 +329,14 @@ ipcr.on ('get-newest-content-list-reply', (evt, arg) => {
 		showModal ('query-reply-modal');
 	}
 	else {
-		// TODO Handle me!
+		error ('Error executing operation');
 	}
 })
 
 
 
 
-ipcr.on ('get-latest-content-by-author-reply', (evt, arg) => {		// TODO Handle empty reply
+ipcr.on ('get-latest-content-by-author-reply', (evt, arg) => {
 	hideLoader ('loaderDiv');
 
 	if (arg.result == 'success') {
@@ -323,14 +348,14 @@ ipcr.on ('get-latest-content-by-author-reply', (evt, arg) => {		// TODO Handle e
 		showModal ('query-reply-modal');
 	}
 	else {
-		// TODO Handle me!
+		error ("Error executing operation. Maybe user doesn't exists");
 	}
 });
 
 
 
 
-ipcr.on ('get-latest-content-by-genre-reply', (evt, arg) => {		// TODO Handle empty reply
+ipcr.on ('get-latest-content-by-genre-reply', (evt, arg) => {
 	hideLoader ('loaderDiv');
 
 	if (arg.result == 'success') {
@@ -342,14 +367,14 @@ ipcr.on ('get-latest-content-by-genre-reply', (evt, arg) => {		// TODO Handle em
 		showModal ('query-reply-modal');
 	}
 	else {
-		// TODO Handle me!
+		error ("Error executing operation");
 	}
 });
 
 
 
 
-ipcr.on ('get-most-popular-content-by-author-reply', (evt, arg) => {	// TODO Handle empty reply
+ipcr.on ('get-most-popular-content-by-author-reply', (evt, arg) => {
 	hideLoader ('loaderDiv');
 
 	if (arg.result == 'success') {
@@ -361,14 +386,14 @@ ipcr.on ('get-most-popular-content-by-author-reply', (evt, arg) => {	// TODO Han
 		showModal ('query-reply-modal');
 	}
 	else {
-		// TODO Handle me!
+		error ("Error executing operation. Maybe user doesn't exists");
 	}
 });
 
 
 
 
-ipcr.on ('get-most-popular-content-by-genre-reply', (evt, arg) => {		// TODO Handle empty reply
+ipcr.on ('get-most-popular-content-by-genre-reply', (evt, arg) => {
 	hideLoader ('loaderDiv');
 
 	if (arg.result == 'success') {
@@ -380,14 +405,14 @@ ipcr.on ('get-most-popular-content-by-genre-reply', (evt, arg) => {		// TODO Han
 		showModal ('query-reply-modal');
 	}
 	else {
-		// TODO Handle me!
+		error ("Error executing operation.");
 	}
 });
 
 
 
 
-ipcr.on ('get-most-rated-content-reply', (evt, arg) => {		// TODO Handle empty reply
+ipcr.on ('get-most-rated-content-reply', (evt, arg) => {
 	hideLoader ('loaderDiv');
 
 	if (arg.result == 'success') {
@@ -399,14 +424,14 @@ ipcr.on ('get-most-rated-content-reply', (evt, arg) => {		// TODO Handle empty r
 		showModal ('query-reply-modal');
 	}
 	else {
-		// TODO Handle me!
+		error ("Error executing operation.");
 	}
 });
 
 
 
 
-ipcr.on ('get-most-rated-content-by-genre-reply', (evt, arg) => {		// TODO Handle empty reply
+ipcr.on ('get-most-rated-content-by-genre-reply', (evt, arg) => {
 	hideLoader ('loaderDiv');
 
 	if (arg.result == 'success') {
@@ -418,14 +443,14 @@ ipcr.on ('get-most-rated-content-by-genre-reply', (evt, arg) => {		// TODO Handl
 		showModal ('query-reply-modal');
 	}
 	else {
-		// TODO Handle me!
+		error ("Error executing operation.");
 	}
 });
 
 
 
 
-ipcr.on ('get-most-rated-content-by-author-reply', (evt, arg) => {		// TODO Handle empty reply
+ipcr.on ('get-most-rated-content-by-author-reply', (evt, arg) => {
 	hideLoader ('loaderDiv');
 
 	if (arg.result == 'success') {
@@ -437,7 +462,7 @@ ipcr.on ('get-most-rated-content-by-author-reply', (evt, arg) => {		// TODO Hand
 		showModal ('query-reply-modal');
 	}
 	else {
-		// TODO Handle me!
+		error ("Error executing operation. Maybe user doesn't exists");
 	}
 });
 
@@ -451,18 +476,20 @@ ipcr.on ('get-most-rated-content-by-author-reply', (evt, arg) => {		// TODO Hand
 
 
 ipcr.on ('content-published-event', (evt, arg) => {
+	// TODO Type of content is present
 	var id	= arg.hexTitle;
 	$('#available-contents-list').append (newAvailableContent (arg.stringTitle, id));
 	$('#more-info-'+id).click ((evt) => {console.log ('getting more info'); getMoreInfo ($('#'+evt.target.id).prev())});
-	
-	// TODO More attention requested!
+	console.log ();
+	if (arg.author != username)
+		newNotification ({name:'The author  "' +arg.author+ '" published  "'+arg.stringTitle+'"'});
 });
 
 
 
 
 ipcr.on ('granted-access-event', (evt, arg) => {
-	newNotification ({name:'You can access to content  ' + arg.title});
+	newNotification ({name:'You can access to content  "' + arg.title +'"'});
 });
 
 
@@ -476,9 +503,9 @@ ipcr.on ('granted-premium-event', (evt, arg) => {
 
 
 ipcr.on ('gifted-content-event', (evt, arg) => {
-	$('#consumable-contents-list').append (newBuyedItem (arg.title));
+	$('#consumable-contents-list').append (newBuyedItem (arg.title, arg.hexTitle));
 	
-	$('#button-'+arg.title).click ((ev) => {
+	$('#button-'+arg.hexTitle).click ((ev) => {
 		console.log ('Clicked for consume');
 		var title	= ev.target.id.substring (7);
 		ipcr.send ('consume-content-request', {'title':title});
@@ -495,6 +522,18 @@ ipcr.on ('gifted-content-event', (evt, arg) => {
 
 ipcr.on ('gifted-premium-event', (evt, arg) => {
 	newNotification ({name:'User "' + arg.sender +'" gifted you a premium account'});
+});
+
+
+
+
+ipcr.on ('feedback-activation-event', (evt, arg) => {
+	console.log ("Received new feedback activation");
+	console.log (arg);
+
+	$('#button-' + arg.title).removeClass ('disabled');
+	showModal ('rating-question-modal');
+	currentRating	= arg.title;
 });
 
 
@@ -532,6 +571,8 @@ const prepareNewestContentList	= (evt) => {
 	$('#second-item').hide ();
 	$('#genre-item').hide ();
 	$('#category-item').hide ();
+	
+	$('#first-input').val('');
 
 	$('#first-label').text ('Number of newest content');
 
@@ -543,7 +584,6 @@ const prepareNewestContentList	= (evt) => {
 			showLoader ('loaderDiv');
 			ipcr.send ('get-newest-content-list-request', {count:count});
 		}
-		// FIXME Handle wrong input
 		
 		hideModal ('prepare-query-modal');
 	});
@@ -561,6 +601,8 @@ const prepareLatestContentByAuthor	= (evt) => {
 	$('#genre-item').hide ();
 	$('#category-item').hide ();
 
+	$('#first-input').val('');
+
 	$('#first-label').text ('Author');
 
 	$('#prepare-query-send-buttton').off ();
@@ -571,7 +613,6 @@ const prepareLatestContentByAuthor	= (evt) => {
 			showLoader ('loaderDiv');
 			ipcr.send ('get-latest-content-by-author-request', {author:author});
 		}
-		// FIXME Handle wrong input
 		
 		hideModal ('prepare-query-modal');
 	});
@@ -600,7 +641,6 @@ const prepareLatestContentByGenre	= (evt) => {
 			showLoader ('loaderDiv');
 			ipcr.send ('get-latest-content-by-genre-request', {genre:genre});
 		}
-		// FIXME Handle wrong input
 
 		hideModal ('prepare-query-modal');
 		$('#genre-item').dropdown('restore defaults');
@@ -619,6 +659,8 @@ const prepareMostPopularContentByAuthor	= (evt) => {
 	$('#genre-item').hide ();
 	$('#category-item').hide ();
 
+	$('#first-input').val('');
+
 	$('#first-label').text ('Author');
 	
 	$('#prepare-query-send-buttton').off ();
@@ -629,7 +671,6 @@ const prepareMostPopularContentByAuthor	= (evt) => {
 			showLoader ('loaderDiv');
 			ipcr.send ('get-most-popular-content-by-author-request', {author:author});
 		}
-		// FIXME Handle wrong input
 		
 		hideModal ('prepare-query-modal');
 	});
@@ -658,7 +699,6 @@ const prepareMostPopularContentByGenre	= (evt) => {
 			showLoader ('loaderDiv');
 			ipcr.send ('get-most-popular-content-by-genre-request', {genre:genre});
 		}
-		// FIXME Handle wrong input
 
 		hideModal ('prepare-query-modal');
 		$('#genre-item').dropdown('restore defaults');
@@ -686,8 +726,6 @@ const prepareGetMostRatedContent	= (evt) => {
 		
 		showLoader ('loaderDiv');
 		ipcr.send ('get-most-rated-content-request', {category:category});
-
-		// FIXME Handle wrong input
 
 		hideModal ('prepare-query-modal');
 		$('#category-item').dropdown('restore defaults');
@@ -721,7 +759,6 @@ const prepareGetMostRatedContentByGenre	= (evt, arg) => {
 			showLoader ('loaderDiv');
 			ipcr.send ('get-most-rated-content-by-genre-request', {category:category, genre:genre});
 		}
-		// FIXME Handle wrong input
 
 		hideModal ('prepare-query-modal');
 		$('#category-item').dropdown('restore defaults');
@@ -742,6 +779,8 @@ const prepareGetMostRatedContentByAuthor	= (evt, arg) => {
 	$('#genre-item').hide ();
 	$('#category-item').show ();
 
+	$('#first-input').val('');
+
 	$('#first-label').text ('Author');
 
 	$('#prepare-query-send-buttton').off ();
@@ -756,7 +795,6 @@ const prepareGetMostRatedContentByAuthor	= (evt, arg) => {
 			showLoader ('loaderDiv');
 			ipcr.send ('get-most-rated-content-by-author-request', {category:category, author:author});
 		}
-		// FIXME Handle wrong input
 
 		hideModal ('prepare-query-modal');
 		$('#category-item').dropdown('restore defaults');
@@ -808,15 +846,33 @@ const hideLoader = (loaderId) => {
 
 
 
-const showModal	= (modalId) => {		// TODO Use me!
+const showModal	= (modalId) => {
 	$('#'+modalId).modal('show');
 }
 
 
 
 
-const hideModal	= (modalId) => {		// TODO Use me!
+const hideModal	= (modalId) => {
 	$('#'+modalId).modal('hide');
+}
+
+
+
+
+const error	= (text, time) => {
+	$('#error-text').text (text);
+	showModal ('error-modal');
+
+	if (time != undefined) {
+		var t	= Number (time);
+	}
+	else {
+		var t	= 2000;
+	}
+	setTimeout(() => {
+		hideModal ('error-modal');
+	}, t);
 }
 
 
@@ -830,15 +886,11 @@ const newNotification	= (ni) => {
 			setTimeout(() => {
 				$('#notificationsIcon').toggleClass('outline');
 				$('#notificationsIcon').toggleClass('red');
-			}, 300*i);
+			}, 200*i);
 		}
 	}
-	console.log (ni);
-	//notifications.push(ni)
-	/*$('#notificationsNumber').html (notifications.length)
-	$('#notificationsNumber').removeClass ('hidden')*/
-	// Adding new element to html!
-	$('#noticationsMenu').append('<div class="item">' + ni.name + '</div>');
+
+	$('#noticationsMenu').prepend('<div class="item">' + ni.name + '</div>');
 	blinkAlert ();
 }
 
@@ -900,14 +952,6 @@ const stringCategory2Int	= (typeStr) => {
 const createContent	= (type, title, price) => {
 	ipcr.send('create-content-request', { type: type, title: title, price: price });
 	showLoader('create-content-dimmer')
-}
-
-
-
-
-const deleteItem = (evt) => {
-	console.log(evt)
-	// TODO Remove me from UI and send deletion to blockchain!
 }
 
 
@@ -977,13 +1021,13 @@ const getMoreInfo	= (arg) => {
 
 
 
-const newBuyedItem	= (title) => {
+const newBuyedItem	= (title, id) => {
 	return  '<div class="item">'															+
 				'<div class="ui middle aligned clearing content">'							+
 					'<div class="ui left floated header">'									+
 						title																+
 					'</div>'																+
-					'<button class="ui right floated green button" id="button-'+title+'">'	+
+					'<button class="ui right floated green button" id="button-'+id+'">'	+
 						'Consume me'														+
 					'</button>'																+
 				'</div>'																	+
@@ -1022,23 +1066,24 @@ $("#modal_closeButton").click((evt) => {
 	ipcRenderer.send("quitDapp", {});
 });
 
+
+
+
 $('#modal_submitButton').click((evt) => {
 	$('#modal_uiInput').removeClass('error')
 	$('#modal_dropdown').removeClass('error')
 
-	// Handle submit button click
-	// TODO Check iput username
-	username = $("#modal_usernameInput").val()
-	userAddress = $('#modal_dropdown')[0].outerText
+	username	= $("#modal_usernameInput").val();
+	userAddress	= $('#modal_dropdown')[0].outerText;
 
-	if (username != undefined && username.length != 0 && userAddress != "Addresses..." && userAddress != "") {
-		payload = { 'user': username, 'addr': userAddress };
+	if (username != undefined && username.length != 0 && username.indexOf(' ')<0 && userAddress != "Addresses..." && userAddress != "") {
+		payload	= { 'user': username, 'addr': userAddress };
 		$('#loginModal').modal('hide')
 		showLoader('loaderDiv')
 		ipcr.send('init-info', payload);
 	}
 	else {
-		if (username == undefined || username.length == 0) {
+		if (username == undefined || username.length == 0 || username.indexOf(' ')<0) {
 			$('#modal_uiInput').addClass('error')
 		}
 		if (userAddress == "Addresses..." || userAddress == "" || userAddress == undefined) {
@@ -1091,6 +1136,32 @@ $('#query-reply-close-buttton').click ((evt) => {
 
 
 
+$('#interests-button').click ((evt) => {
+	showModal ('interests-modal');
+})
+
+
+
+
+$('#interests-apply-button').click ((evt) => {
+	var authors	= $('#authors-input').val();
+	var genres	= $('#genres-input').val();
+	
+	ipcr.send ('apply-filters', {authors:authors, genres:genres});
+
+	hideModal ('interests-modal');
+})
+
+
+
+
+$('#interests-cancel-button').click ((evt) => {
+	hideModal ('interests-modal');
+})
+
+
+
+
 
 
 
@@ -1126,8 +1197,8 @@ $('#create-content-button').click((evt) => {
 	console.log(type + '  ' + title + '  ' + price)
 
 	error = error || checkAndError(type, 'contentDropdown');
-	error = error || checkAndError(title, 'conTitleInpContainer');	// FIXME
-	error = error || checkAndError(price, 'priceInpContainer');		// FIXME
+	error = error || checkAndError(title, 'conTitleInpContainer');
+	error = error || checkAndError(price, 'priceInpContainer');
 
 	if (error) {
 		console.log('Error!')
@@ -1302,7 +1373,9 @@ $("#body").keyup((evt) => {
 window.onload = () => {
 	ipcr.send('getAddresses', {})
 
-	$('#loginModal').modal('show')
+	$('#error-modal').modal	({closable:false});
+	$('#loginModal').modal	({closable:false});
+	showModal ('loginModal');
 	$('.ui.dropdown').dropdown();
 	//$('.ui.rating').rating();
 
@@ -1314,6 +1387,8 @@ window.onload = () => {
 
 	$('#notificationsDropdown').dropdown ('setting', 'onHide', () => {
 		$('#noticationsMenu').empty ();
+		$('#notificationsIcon').removeClass('red');
+		$('#notificationsIcon').addClass('outline');
 	})
 
 	$('#more-info-modal').modal('hide');
@@ -1331,16 +1406,21 @@ window.onload = () => {
 			ipcr.send('init-info', payload);
 		}, 100);
 
+		
 		// Timeout to create new notification
 		setTimeout(() => {
-			newNotification({ name: "notifica di test" });
+			//newNotification({ name: "notifica di test" });
+
+			//error ('Errore di prova', 3000);
 
 			// =========================  Test requests  =========================
-			// ipcr.send ('create-content-request', {type:0, title:'a beautiful song', price:10000});
+			//ipcr.send ('create-content-request', {type:0, title:'a beautiful song', price:10000});
 			//showModal ('rating-modal');
 			//showModal ('rating-question-modal');
 			//ipcr.send ('rating-request', { '0': 5, '1': 3, '2': 2, title: '44' });
 			//ipcr.send ('get-views-count-request', {});
+			//ipcr.send ('rating-request', {'1': 5, '2': 4, '3': 3, title: 'a1' });
+			//ipcr.send ('apply-filters' , {authors:'andre, b', genres:'photo'});
 
 		}, 5000);
 	}

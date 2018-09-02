@@ -7,6 +7,9 @@ import "./Ownable.sol";
 
 contract BaseContentManagementContract {
 
+	// Event to notify to user taht is possible to leave feedbacks
+	event FeedbackActivation	(bytes32 targetUsername, bytes32 contentTitle);
+
     // Enum that describe type of access which an user has
     enum AccessType {noneAccess, standardAccess, premiumAccess}
     
@@ -110,6 +113,8 @@ contract BaseContentManagementContract {
     
         allowedUsers[_username].accessType      = AccessType.noneAccess;
         allowedUsers[_username].toBeConsumed    = false;
+
+		emit FeedbackActivation (_username, contentTitle);
     }
     
     

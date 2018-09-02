@@ -9,7 +9,6 @@ const fs		= require ('fs');
 const truffle	= require ('truffle-contract');
 
 
-// Send something -->      mainWindow.webContents.send('some-message', {})
 
 const folderPrefix	= '../solidity/build/contracts/'
 const baseContentContractPath	= folderPrefix + 'BaseContentManagementContract.json'
@@ -87,6 +86,11 @@ const premiumCost		= web3.toWei (44000, 'szabo');
 contracts.catalog.address	= process.argv[2];
 
 
+// Lists used to filter notifications, which are sent to user, about new contents
+authorFilters	= [];
+genreFilters	= [];
+
+
 
 
 
@@ -104,9 +108,8 @@ contracts.catalog.address	= process.argv[2];
 // ===== HELPFUL FUNCTIONS  =====
 
 
-const errorAndExit	= (err) => {		// TODO Only for test --> remove me!
-	console.log ('\n\nIt is an error!!\n');
-	console.log (err);
+const errorAndExit	= (err) => {
+	console.log ('\n\n' + '==============================\n' + err + '\n');
 	process.exit ();
 }
 
@@ -139,7 +142,7 @@ const createWindow= () => {
 const loadAddresses	= () => {
 	web3.eth.getAccounts ((err, res) => {
 		if (err)
-			errorAndExit (err);
+			errorAndExit ('Cannot retrieve addresses. Check geth client');
 
 		availableAddresses	= res;
 		linkToCatalogInstance ();
@@ -162,7 +165,7 @@ const linkToCatalogInstance	= () => {
 		loadExtendedContents ();
 	})
 	.catch ((err) => {
-		errorAndExit (err);
+		errorAndExit ('Cannot find catalog instance!');
 	})
 }
 
@@ -188,7 +191,6 @@ const loadExtendedContents	= () => {
 
 
 
-// FIXME Problems here!
 const setupEventsCallbacks = () => {
 	/*
 	event NewUser			(bytes32 username, address userAddress);
@@ -367,6 +369,28 @@ const computeFeedbacksAvg	= (feeds) => {
 
 
 
+const type2TypeString	= (intType) => {
+	switch (intType) {
+		case 0:
+			return "song";
+
+		case 1:
+			return "video";
+
+		case 2: 
+			return "photo";
+
+		case 3:
+			return "document";
+
+		default :
+			return "";
+	}
+}
+
+
+
+
 
 
 
@@ -384,15 +408,31 @@ const computeFeedbacksAvg	= (feeds) => {
 // event ContentPublished (bytes32 username, bytes32 contentTitle, address contentAddress);
 // Listener for event 'content published'
 const contentPublishedCallback = async (err, evt) => {
+	const suitableFor	= (array, cnt) => {
+		return (array.length == 0 || array.includes (cnt));
+	}
+
+
 	console.log ("Someone published a content!");
 	/*console.log (evt);
 	console.log (err);*/
 		
 	var tmpInstance	= contracts.baseContent.at (evt.args.contentAddress);
-	var type		= await tmpInstance.getType ({from:user.address, gas:3000000});
+	var type		= await tmpInstance.getType		({from:user.address, gas:3000000});
 	var title		= web3.toUtf8 (evt.args.contentTitle);
+	var author		= web3.toUtf8 (evt.args.username);
+
+	type		= Number (type);
+	var strType	= type2TypeString(type);
+	console.log (type);
+
+	if (!suitableFor(genreFilters, strType) && !suitableFor(authorFilters,author)) {
+		console.log ("genreFilters doesn't contain   " + strType);
+		console.log ("genreFilters doesn't contain   " + author);
+		return ;
+	}
 	
-	mainWindow.webContents.send ('content-published-event', {stringTitle:title, type:type});
+	mainWindow.webContents.send ('content-published-event', {author:author, stringTitle:title, type:type, hexTitle:evt.args.contentTitle});
 		
 	var userInfo	= await getUserInfo (false);
 	mainWindow.webContents.send('user-info', JSON.stringify(userInfo));
@@ -419,7 +459,6 @@ const grantedAccessCallback = (err, evt) => {
 			mainWindow.webContents.send('user-info', JSON.stringify(userInfo));
 		})
 		.catch ((err) => {
-			// Is it possible??
 		})
 	}
 }
@@ -454,7 +493,7 @@ const giftedAccessCallback	= (err, evt) => {
 		var title	= web3.toUtf8 (evt.args.contentTitle);
 		console.log ('User  ' + sender + '  gift to you this content:  ' + title);
 
-		mainWindow.webContents.send ('gifted-content-event', {title:title, sender:sender});
+		mainWindow.webContents.send ('gifted-content-event', {title:title, sender:sender, hexTitle:evt.args.contentTitle});
 	}
 }
 
@@ -476,9 +515,19 @@ const giftedPremiumCallback	= (err, evt) => {
 			mainWindow.webContents.send('init-info', JSON.stringify(userInfo));
 		})
 		.catch ((err) => {
-			// Is it possible??
 		})
 	}
+}
+
+
+
+
+// emit FeedbackActivation (_username, _userAddr);
+const feedbackActivationCallback	= (err, evt) => {
+	console.log (evt.args.targetUsername + ' --> ' + evt.args.contentTitle);
+
+	if (web3.toUtf8 (evt.args.targetUsername) == user.stringName) 
+		mainWindow.webContents.send('feedback-activation-event', {title: web3.toUtf8 (evt.args.contentTitle)});
 }
 
 
@@ -540,9 +589,8 @@ ipcMain.on ('init-info', async (event, arg) => {
 			mainWindow.webContents.send('init-info', JSON.stringify(userInfo));
 		}
 		else {
-			// TODO Handle errors!
 			console.log ("Received address from catalog differs from chosen address: it is an error!");
-			throw "Error!";
+			mainWindow.webContents.send('init-info', JSON.stringify({result:'error', cause:'Received address differs from chosen address.'}));
 		}
 	}
 	else {
@@ -585,6 +633,7 @@ ipcMain.on ('create-content-request', async (event, data) => {
 			result	: 'failure',
 			cause	: 'Content already exists'
 		});
+		console.log ('Error here!');
 		// TODO Destroy created contract
 	}
 })
@@ -647,12 +696,18 @@ ipcMain.on ('buy-content-request', async (evt, arg) => {
 			success	= true;
 		}
 	} catch (err) {
-		// TODO
+		user.isPremium	= false;
+		try {
+			await contracts.catalog.instance.getContent (web3.fromUtf8(tmpTitle), {from:user.address, gas:300000, value:tmpPrice});
+			success	= true;
+		} catch (err) {
+			success	= false;
+		}
 	}
 
 	if (success) {
 		console.log ("Content buyed");
-		mainWindow.webContents.send ('buy-content-reply', {result:'success', title:tmpTitle});
+		mainWindow.webContents.send ('buy-content-reply', {result:'success', title:tmpTitle, hexTitle:web3.fromUtf8(tmpTitle)});
 	}
 	else {
 		console.log ('Content not buyied');
@@ -669,13 +724,24 @@ ipcMain.on ('buy-content-request', async (evt, arg) => {
 ipcMain.on ('consume-content-request', async (evt, arg) => {
 	console.log ('Received reuest to consume content ' + arg.title);
 
-	var tmpAddr			= await (contracts.catalog.instance.getAddressOf (web3.fromUtf8 (arg.title), {from:user.address, gas:3000000}));
+	var tmpAddr			= await (contracts.catalog.instance.getAddressOf (arg.title, {from:user.address, gas:3000000}));
 	var contentInstance	= contracts.baseContent.at(tmpAddr);
 
 	try {
-		await (instance.consumeContent (user.hexName, {from:user.address, gas:3000000}));
+		// Registering to feedback activanion contract's event
+		contentInstance.FeedbackActivation ({from:user.address}, {fromBlock: 'latest', toBlock: 'latest'})
+		.watch ((err, res) => {
+			feedbackActivationCallback (err, res);
+		});
+	} catch (err) {
+		console.log ('Failed to register to event!\n\n');
+		console.log (err);
+	}
+	try {
+		await (contentInstance.consumeContent (user.hexName, {from:user.address, gas:3000000}));
 		mainWindow.webContents.send ('consume-content-reply', {result:'success', title:arg.title});
 	} catch (err) {
+		console.log ('fail to consume content!!');
 		mainWindow.webContents.send ('consume-content-reply', {result:'failure', title:arg.title});
 	}
 
@@ -693,60 +759,23 @@ ipcMain.on ('rating-request', async (evt, arg) => {
 	var tmpInstance;
 	var tmpAddress;
 
-	tmpAddress	= await (contracts.catalog.instance.getAddressOf (web3.fromUtf8 (arg.title), {fom:user.address, gas:200000}));
+	console.log ('new request!');
+
+	tmpAddress	= await (contracts.catalog.instance.getAddressOf (web3.fromUtf8 (arg.title), {fom:user.address, gas:20000000}));
 	tmpInstance	= await (contracts.baseContent.at(tmpAddress));
 	
-	console.log ('1');
-	await (tmpInstance.leaveFeedback (user.hexName, 1, arg['1'], {from:user.address, gas:3000000}));
-	console.log ('2');
-	await (tmpInstance.leaveFeedback (user.hexName, 2, arg['2'], {from:user.address, gas:3000000}));
-	console.log ('3');
-	await (tmpInstance.leaveFeedback (user.hexName, 3, arg['3'], {from:user.address, gas:3000000}));
+	try {
+		await (tmpInstance.leaveFeedback (user.hexName, 1, arg['1'], {from:user.address, gas:3000000}));
+		await (tmpInstance.leaveFeedback (user.hexName, 2, arg['2'], {from:user.address, gas:3000000}));
+		await (tmpInstance.leaveFeedback (user.hexName, 3, arg['3'], {from:user.address, gas:3000000}));
+	} catch (err) {
+		console.log ('Error during feedback..	\n\n\n');
+		console.log (err);
+	}
 	
 	var userInfo = await getUserInfo (false);
 	mainWindow.webContents.send('user-info', JSON.stringify(userInfo));
 });
-
-
-// FIXME Doesn't work
-/*ipcMain.on ('rating-request', (evt, arg) => {
-	console.log (arg);
-
-	var tmpInstance;
-
-	contracts.catalog.instance.getAddressOf (web3.fromUtf8 (arg.title), {fom:user.address, gas:200000})
-	.then ((res) => {
-		console.log (res);
-		return contracts.baseContent.at(res);
-	})
-	.then ((instance) => {
-		tmpInstance	= instance;
-		console.log ('1');
-		return instance.leaveFeedback (user.hexName, 1, arg['1'], {from:user.address, gas:300000000});
-	})
-	.then (() => {
-		console.log ('2');
-		return tmpInstance.leaveFeedback (user.hexName, 2, arg['2'], {from:user.address, gas:300000000});
-	})
-	.then (() => {
-		console.log ('3');
-		return tmpInstance.leaveFeedback (user.hexName, 3, arg['3'], {from:user.address, gas:300000000});
-	})
-	.then (() => {
-		return getUserInfo (false);
-	})
-	.then ((userInfo) => {
-		mainWindow.webContents.send('user-info', JSON.stringify(userInfo));
-		return getUserInfo (false);
-	})
-	.then ((userInfo) => {
-		mainWindow.webContents.send('user-info', JSON.stringify(userInfo));
-	})
-	.catch ((err) => {
-		console.log ('Error leaving feedbacks!');
-		console.log (err);
-	})
-});*/
 
 
 
@@ -762,7 +791,7 @@ ipcMain.on ('gift-content-request', async (evt, arg) => {
 		mainWindow.webContents.send('gift-content-reply', {result:'success'});
 	} catch (err) {
 		console.log ('Gift content fails!');
-		mainWindow.webContents.send('gift-content-reply', {result:'failure', cause:'boh!'});
+		mainWindow.webContents.send('gift-content-reply', {result:'failure'});
 	}
 
 	var userInfo = await getUserInfo (false);
@@ -783,7 +812,7 @@ ipcMain.on ('buy-premium-request', async (evt, arg) => {
 	} catch (err) {
 		console.log ('Error during buy premium')
 		console.log (err);
-		mainWindow.webContents.send('gift-content-reply', {result:'failure', cause:'boh!'});
+		mainWindow.webContents.send('gift-content-reply', {result:'failure'});
 	}
 });
 
@@ -802,7 +831,7 @@ ipcMain.on ('gift-premium-request', async (evt, arg) => {
 		mainWindow.webContents.send('user-info', JSON.stringify(userInfo));
 	}
 	catch (err) {
-		mainWindow.webContents.send('gift-premium-reply', {result:'failure', cause:'boh!'});
+		mainWindow.webContents.send('gift-premium-reply', {result:'failure'});
 	}
 });
 
@@ -821,8 +850,10 @@ ipcMain.on ('get-views-count-request', async (evt, arg) => {
 	var toRet	= [];
 	var i		= 0;
 	
-	if (stats[0].length != stats[1].length)
-			throw ('This is an error!');		// TODO Handle me!
+	if (stats[0].length != stats[1].length) {
+		mainWindow.webContents.send('get-views-count-reply', {result:'failure'});
+		return ;
+	}
 		
 	stats[1].forEach ((el) => {
 		var c	= Number (stats[0][i]);
@@ -855,7 +886,7 @@ ipcMain.on ('get-latest-content-by-author-request', async (evt, arg) => {
 		var cont	= await (contracts.catalog.instance.getLatestByAuthor  (web3.fromUtf8(arg.author), {from:user.address, gas:300000}));
 		mainWindow.webContents.send('get-latest-content-by-author-reply', {result:'success', data:web3.toUtf8 (cont)});
 	} catch (err) {
-		mainWindow.webContents.send('get-latest-content-by-author-reply', {result:'failure', cause:'??'});
+		mainWindow.webContents.send('get-latest-content-by-author-reply', {result:'failure'});
 	}
 })
 
@@ -870,7 +901,7 @@ ipcMain.on ('get-latest-content-by-genre-request', async (evt, arg) => {
 	catch (err) {
 		// TODO Handle errors
 		console.log (err);
-		mainWindow.webContents.send('get-latest-content-by-genre-reply', {result:'failure', cause:'boh!'});
+		mainWindow.webContents.send('get-latest-content-by-genre-reply', {result:'failure'});
 	}
 });
 
@@ -884,7 +915,7 @@ ipcMain.on ('get-most-popular-content-by-author-request', async (evt, arg) => {
 	} catch (err) {
 		// TODO Handle errors
 		console.log (err);
-		mainWindow.webContents.send('get-most-popular-content-by-author-reply', {result:'failure', cause:'boh!'});
+		mainWindow.webContents.send('get-most-popular-content-by-author-reply', {result:'failure'});
 	}
 });
 
@@ -898,7 +929,7 @@ ipcMain.on ('get-most-popular-content-by-genre-request', async (evt, arg) => {
 	} catch (err) {
 		// TODO Handle errors
 		console.log (err);
-		mainWindow.webContents.send('get-most-popular-content-by-genre-reply', {result:'failure', cause:'boh!'});
+		mainWindow.webContents.send('get-most-popular-content-by-genre-reply', {result:'failure'});
 	}
 });
 
@@ -912,7 +943,7 @@ ipcMain.on ('get-most-rated-content-request', async (evt, arg) => {
 	} catch (err) {
 		// TODO Handle errors
 		console.log (err);
-		mainWindow.webContents.send('get-most-rated-content-reply', {result:'failure', cause:'boh!'});
+		mainWindow.webContents.send('get-most-rated-content-reply', {result:'failure'});
 	}
 });
 
@@ -926,7 +957,7 @@ ipcMain.on ('get-most-rated-content-by-genre-request', async (evt, arg) => {
 	} catch (err) {
 		// TODO Handle errors
 		console.log (err);
-		mainWindow.webContents.send('get-most-rated-content-by-genre-reply', {result:'failure', cause:'boh!'});
+		mainWindow.webContents.send('get-most-rated-content-by-genre-reply', {result:'failure'});
 	}
 });
 
@@ -940,6 +971,24 @@ ipcMain.on ('get-most-rated-content-by-author-request', async (evt, arg) => {
 	} catch (err) {
 		// TODO Handle errors
 		console.log (err);
-		mainWindow.webContents.send('get-most-rated-content-by-genre-reply', {result:'failure', cause:'boh!'});
+		mainWindow.webContents.send('get-most-rated-content-by-genre-reply', {result:'failure'});
 	}
 });
+
+
+
+
+ipcMain.on ('apply-filters', (evt, arg) => {
+	var filterAndDecodeString	= (str) => {
+		str= str.replace(/ /g,'');		// Removing all whitespaces
+		return str.split(',');
+	}
+	console.log ('Authors:  ' + arg.authors);
+	console.log ('Genres:   ' + arg.genres);
+
+	authorFilters	= filterAndDecodeString(arg.authors);
+	genreFilters	= filterAndDecodeString(arg.genres);
+
+	console.log (authorFilters);
+	console.log (genreFilters);
+})

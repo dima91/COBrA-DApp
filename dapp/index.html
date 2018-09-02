@@ -31,6 +31,21 @@
 				Fetching data...
 			</div>
 		</div>
+
+
+
+
+		<!-- Modal to notify errors -->
+		<div class="ui tiny modal" id="error-modal">
+			<div class="ui secondary inverted red segment">
+				<div class='ui large centered header'>
+					<i class='ui huge exclamation triangle icon'></i>
+				</div>
+				
+				<div class="ui text container" id='error-text'>
+				</div>
+			</div>
+		</div>
 	
 
 
@@ -131,6 +146,10 @@
 							<div class='item' onclick='prepareGetMostRatedContentByGenre(event)'>Get most rated content by genre</div>
 							<div class='item' onclick='prepareGetMostRatedContentByAuthor(event)'>Get most rated content by author</div>
 						</div>
+					</div>
+
+					<div class='ui item' id='interests-button'>
+						<i class='big cog icon'></i>
 					</div>
 
 					<div class='ui dropdown item' id='notificationsDropdown'>
@@ -235,6 +254,42 @@
 						<div class="ui center aligned basic segment">
 							<button id="query-reply-close-buttton" class="ui red button">Close</button>
 						</div>
+					</div>
+				</div>
+
+
+
+				<!-- Modal to show user interests -->
+				<div class="ui tiny modal" id="interests-modal">
+					<div class="ui clearing form segment" id='interests-form'>
+						
+						<div class='ui medium centered header'>
+								Interests about new contents
+						</div>
+
+						<div class="ui hidden divider"></div>
+
+						<div class="field">
+							<label>Filter by author (leave empty to delete previous filters)</label>
+							<div class="ui left icon input">
+								<input placeholder='author_0, author_1 ...' type='text' id='authors-input'>
+								<i class="users icon"></i>
+							</div>
+							
+						</div>
+
+						<div class='ui hidden divider'></div>
+						
+						<div class="field">
+							<label>Filter by genre (leave empty to delete previous filters)</label>
+							<div class="ui left icon input">
+								<input placeholder='genre_0, genre_1 ...' type='text' id='genres-input'>
+								<i class="play circle icon"></i>
+							</div>
+						</div>
+
+						<button id="interests-apply-button" class="ui left floated primary button">Apply</button>
+						<button id="interests-cancel-button" class="ui right floated red button">Cancel</button>
 					</div>
 				</div>
 			</header>
@@ -462,7 +517,7 @@
 
 								<div class="ui dimmer" id='consume-rate-content-dimmer'>
 									<div class="ui text loader">
-										PErforming request...
+										Performing request...
 									</div>
 								</div>
 							</div>
@@ -626,44 +681,3 @@
 	<script type="text/javascript" src="./render.js"></script>
 </body>
 </html>
-
-<!--
-<div class="two fields">
-	<div class="field">
-		<label>Selection dropdown</label>
-		<div class="ui selection dropdown">
-			<div class="default text">Select</div>
-			<i class="dropdown icon"></i>
-			<input name="hidden-field" value="2" type="hidden">
-			<div class="menu">  
-				<div class="item" data-value="1">Choice 1</div>
-				<div class="item" data-value="2">Choice 2</div>
-			</div>
-		</div>
-	</div>
-	<div class="field">
-		<label>HTML Select</label>
-		<select>
-			<option value="">Select</option>
-			<option value="1">1</option>
-			<option value="2">2</option>
-		</select>
-	</div>
-</div>
-<div class="field">
-	<label>Text Area</label>
-	<textarea></textarea>
-</div>
-<div class="required fields">
-	<div class="field">
-			<div class="ui action input">
-					<input placeholder="Search..." type="text">
-					<button class="ui button">Search</button>
-					</div>
-	</div>
-	<div class="field">
-		<label>ID</label>
-		<input placeholder="Text Input" type="text">
-	</div>
-</div>
--->
