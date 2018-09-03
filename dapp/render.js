@@ -11,7 +11,7 @@ var ADDRESSES		= [];
 var currentRating	= "";
 
 
-const ___TEST___	= true;
+const ___TEST___	= false;
 
 
 

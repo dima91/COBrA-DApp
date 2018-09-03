@@ -97,6 +97,12 @@ contract CatalogSmartContract is Ownable {
         require (isPremium(_username) == true);
         _;
     }
+
+	// Check that the address '_sender' corresponds to content with title '_title'
+	modifier onlyRegisteredContent (bytes32 _title, address _sender) {
+		require (contentsMapping[_title].contractAddress == _sender);
+		_;
+	}
     
     // To check if "_msgValue" is equal to "_price"
     modifier equalTo (uint _msgValue, uint _price) {
@@ -327,7 +333,7 @@ contract CatalogSmartContract is Ownable {
     // Function to notify new view from another content manager
     // FIXME Update payment to author
     // FIXME Check correspondance between msg.sender and saved contentAddress
-    function notifyNewView (bytes32 _contentTitle, bytes32 _username) alreadyPublishedM (_contentTitle)
+    function notifyNewView (bytes32 _contentTitle, bytes32 _username) alreadyPublishedM (_contentTitle) onlyRegisteredContent (_contentTitle, msg.sender)
 	userExistsM (_username) userAllowed (_username, _contentTitle) public {
         BaseContentManagementContract remoteContract	= BaseContentManagementContract (msg.sender);
         uint count										= remoteContract.getViewsCount ();

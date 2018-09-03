@@ -81,7 +81,9 @@ var user	= {
 	stringName		: {}
 }
 
-const premiumCost		= web3.toWei (44000, 'szabo');
+const premiumCost	= web3.toWei (44000, 'szabo');
+
+const upperBoundGas	= 10000000;
 
 contracts.catalog.address	= process.argv[2];
 
@@ -418,7 +420,7 @@ const contentPublishedCallback = async (err, evt) => {
 	console.log (err);*/
 		
 	var tmpInstance	= contracts.baseContent.at (evt.args.contentAddress);
-	var type		= await tmpInstance.getType		({from:user.address, gas:3000000});
+	var type		= await tmpInstance.getType		({from:user.address, gas:upperBoundGas});
 	var title		= web3.toUtf8 (evt.args.contentTitle);
 	var author		= web3.toUtf8 (evt.args.username);
 
@@ -595,7 +597,7 @@ ipcMain.on ('init-info', async (event, arg) => {
 	}
 	else {
 		console.log ("User doesn't exist!");
-		await contracts.catalog.instance.registerMe (user.hexName, {from:user.address, gas:1000000000});
+		await contracts.catalog.instance.registerMe (user.hexName, {from:user.address, gas:upperBoundGas});
 		userInfo	= await getUserInfo (false);
 		mainWindow.webContents.send('init-info', JSON.stringify(userInfo));
 	}
@@ -612,13 +614,13 @@ ipcMain.on ('create-content-request', async (event, data) => {
 	var thisContract		= contracts.extendedContents[data.type];
 	var newInstance			= await thisContract.new (web3.fromUtf8(data.title), contracts.catalog.address, {	from: user.address,
 																												data:thisContract.bytecode,
-																												gas:10000000});
+																												gas:upperBoundGas});
 	var instanceAddress		= newInstance.address;
 	
 	try {
 		await contracts.catalog.instance.publishContent ( user.hexName, web3.fromUtf8(data.title),
 						  								  web3.toWei (priceOfNextContent, "milliether"), instanceAddress,
-														  {from: user.address, gas:1000000});
+														  {from: user.address, gas:upperBoundGas});
 		mainWindow.webContents.send('create-content-reply', {
 			result: 'success',
 			type: data.type,
@@ -645,7 +647,7 @@ ipcMain.on ('create-content-request', async (event, data) => {
 ipcMain.on ('contents-list-request', async (evt, arg) => {
 	console.log ('Received a contents list update request');
 
-	var contentsList	= await contracts.catalog.instance.getContentList ({from:user.address, gas:300000})
+	var contentsList	= await contracts.catalog.instance.getContentList ({from:user.address, gas:upperBoundGas})
 	var toSend			= [];
 	
 	contentsList.forEach ((el) => {
@@ -661,7 +663,7 @@ ipcMain.on ('contents-list-request', async (evt, arg) => {
 ipcMain.on ('more-info-request', async (evt, arg) => {
 	console.log ('Received more-info-request for '+ arg.title);
 	
-	var infoOf	= await (contracts.catalog.instance.getInfoOf (web3.fromUtf8 (arg.title), {from:user.address, gas:300000}));
+	var infoOf	= await (contracts.catalog.instance.getInfoOf (web3.fromUtf8 (arg.title), {from:user.address, gas:upperBoundGas}));
 	var toSend	= {
 		title	: arg.title,
 		rating	: computeFeedbacksAvg (infoOf[0]),
@@ -682,23 +684,23 @@ ipcMain.on ('buy-content-request', async (evt, arg) => {
 	var tmpPrice	= 0;
 	var success		= false;
 
-	tmpPrice	= await (contracts.catalog.instance.getPriceOf (web3.fromUtf8(tmpTitle), {from:user.address, gas:300000}));
+	tmpPrice	= await (contracts.catalog.instance.getPriceOf (web3.fromUtf8(tmpTitle), {from:user.address, gas:upperBoundGas}));
 
 	try {
 		if (user.isPremium) {
 			console.log ('buying by premium!');
-			await contracts.catalog.instance.getContentPremium (web3.fromUtf8(tmpTitle), {from:user.address, gas:300000});
+			await contracts.catalog.instance.getContentPremium (web3.fromUtf8(tmpTitle), {from:user.address, gas:upperBoundGas});
 			success	= true;
 		}
 		else {
 			console.log ("Buying by a mortal man");
-			await contracts.catalog.instance.getContent (web3.fromUtf8(tmpTitle), {from:user.address, gas:300000, value:tmpPrice});
+			await contracts.catalog.instance.getContent (web3.fromUtf8(tmpTitle), {from:user.address, gas:upperBoundGas, value:tmpPrice});
 			success	= true;
 		}
 	} catch (err) {
 		user.isPremium	= false;
 		try {
-			await contracts.catalog.instance.getContent (web3.fromUtf8(tmpTitle), {from:user.address, gas:300000, value:tmpPrice});
+			await contracts.catalog.instance.getContent (web3.fromUtf8(tmpTitle), {from:user.address, gas:upperBoundGas, value:tmpPrice});
 			success	= true;
 		} catch (err) {
 			success	= false;
@@ -724,7 +726,7 @@ ipcMain.on ('buy-content-request', async (evt, arg) => {
 ipcMain.on ('consume-content-request', async (evt, arg) => {
 	console.log ('Received reuest to consume content ' + arg.title);
 
-	var tmpAddr			= await (contracts.catalog.instance.getAddressOf (arg.title, {from:user.address, gas:3000000}));
+	var tmpAddr			= await (contracts.catalog.instance.getAddressOf (arg.title, {from:user.address, gas:upperBoundGas}));
 	var contentInstance	= contracts.baseContent.at(tmpAddr);
 
 	try {
@@ -738,7 +740,7 @@ ipcMain.on ('consume-content-request', async (evt, arg) => {
 		console.log (err);
 	}
 	try {
-		await (contentInstance.consumeContent (user.hexName, {from:user.address, gas:3000000}));
+		await (contentInstance.consumeContent (user.hexName, {from:user.address, gas:upperBoundGas}));
 		mainWindow.webContents.send ('consume-content-reply', {result:'success', title:arg.title});
 	} catch (err) {
 		console.log ('fail to consume content!!');
@@ -761,13 +763,13 @@ ipcMain.on ('rating-request', async (evt, arg) => {
 
 	console.log ('new request!');
 
-	tmpAddress	= await (contracts.catalog.instance.getAddressOf (web3.fromUtf8 (arg.title), {fom:user.address, gas:20000000}));
+	tmpAddress	= await (contracts.catalog.instance.getAddressOf (web3.fromUtf8 (arg.title), {fom:user.address, gas:upperBoundGas}));
 	tmpInstance	= await (contracts.baseContent.at(tmpAddress));
 	
 	try {
-		await (tmpInstance.leaveFeedback (user.hexName, 1, arg['1'], {from:user.address, gas:3000000}));
-		await (tmpInstance.leaveFeedback (user.hexName, 2, arg['2'], {from:user.address, gas:3000000}));
-		await (tmpInstance.leaveFeedback (user.hexName, 3, arg['3'], {from:user.address, gas:3000000}));
+		await (tmpInstance.leaveFeedback (user.hexName, 1, arg['1'], {from:user.address, gas:upperBoundGas}));
+		await (tmpInstance.leaveFeedback (user.hexName, 2, arg['2'], {from:user.address, gas:upperBoundGas}));
+		await (tmpInstance.leaveFeedback (user.hexName, 3, arg['3'], {from:user.address, gas:upperBoundGas}));
 	} catch (err) {
 		console.log ('Error during feedback..	\n\n\n');
 		console.log (err);
@@ -786,8 +788,8 @@ ipcMain.on ('gift-content-request', async (evt, arg) => {
 	var tmpPrice;
 
 	try {
-		tmpPrice	= await (contracts.catalog.instance.getPriceOf (web3.fromUtf8(arg.title), {from:user.address, gas:300000}));
-		await contracts.catalog.instance.giftContent (web3.fromUtf8(arg.title), web3.fromUtf8(arg.user), {from:user.address, gas:1000000, value:tmpPrice})
+		tmpPrice	= await (contracts.catalog.instance.getPriceOf (web3.fromUtf8(arg.title), {from:user.address, gas:upperBoundGas}));
+		await contracts.catalog.instance.giftContent (web3.fromUtf8(arg.title), web3.fromUtf8(arg.user), {from:user.address, gas:upperBoundGas, value:tmpPrice})
 		mainWindow.webContents.send('gift-content-reply', {result:'success'});
 	} catch (err) {
 		console.log ('Gift content fails!');
@@ -803,7 +805,7 @@ ipcMain.on ('gift-content-request', async (evt, arg) => {
 
 ipcMain.on ('buy-premium-request', async (evt, arg) => {
 	try {
-		await (contracts.catalog.instance.buyPremium ({from:user.address, gas:3000000, value:premiumCost}));
+		await (contracts.catalog.instance.buyPremium ({from:user.address, gas:upperBoundGas, value:premiumCost}));
 		console.log ("Premium account buyed");
 		mainWindow.webContents.send('buy-premium-reply', {result:'success'});
 
@@ -823,7 +825,7 @@ ipcMain.on ('gift-premium-request', async (evt, arg) => {
 	console.log ('Performing request..');
 
 	try {
-		await (contracts.catalog.instance.giftPremium (web3.fromAscii(arg.user), {from:user.address, gas:100000, value:premiumCost}));
+		await (contracts.catalog.instance.giftPremium (web3.fromAscii(arg.user), {from:user.address, gas:upperBoundGas, value:premiumCost}));
 		console.log ("Gifted!!!!");
 		mainWindow.webContents.send('gift-premium-reply', {result:'success'});
 		
@@ -846,7 +848,7 @@ ipcMain.on ('gift-premium-request', async (evt, arg) => {
 
 ipcMain.on ('get-views-count-request', async (evt, arg) => {
 	
-	var stats	= await (contracts.catalog.instance.getStatistics ({from:user.address, gas:300000}));
+	var stats	= await (contracts.catalog.instance.getStatistics ({from:user.address, gas:upperBoundGas}));
 	var toRet	= [];
 	var i		= 0;
 	
@@ -869,7 +871,7 @@ ipcMain.on ('get-views-count-request', async (evt, arg) => {
 
 ipcMain.on ('get-newest-content-list-request', async (evt, arg) => {
 
-	var list	= await (contracts.catalog.instance.getNewContentList  (arg.count, {from:user.address, gas:300000}));
+	var list	= await (contracts.catalog.instance.getNewContentList  (arg.count, {from:user.address, gas:upperBoundGas}));
 	var toRet	= [];
 
 	list.forEach ((el) => {
@@ -883,7 +885,7 @@ ipcMain.on ('get-newest-content-list-request', async (evt, arg) => {
 
 ipcMain.on ('get-latest-content-by-author-request', async (evt, arg) => {
 	try {
-		var cont	= await (contracts.catalog.instance.getLatestByAuthor  (web3.fromUtf8(arg.author), {from:user.address, gas:300000}));
+		var cont	= await (contracts.catalog.instance.getLatestByAuthor  (web3.fromUtf8(arg.author), {from:user.address, gas:upperBoundGas}));
 		mainWindow.webContents.send('get-latest-content-by-author-reply', {result:'success', data:web3.toUtf8 (cont)});
 	} catch (err) {
 		mainWindow.webContents.send('get-latest-content-by-author-reply', {result:'failure'});
@@ -895,7 +897,7 @@ ipcMain.on ('get-latest-content-by-author-request', async (evt, arg) => {
 
 ipcMain.on ('get-latest-content-by-genre-request', async (evt, arg) => {
 	try {
-		var cont	= await (contracts.catalog.instance.getLatestByGenre  (arg.genre, {from:user.address, gas:300000}));
+		var cont	= await (contracts.catalog.instance.getLatestByGenre  (arg.genre, {from:user.address, gas:upperBoundGas}));
 		mainWindow.webContents.send('get-latest-content-by-genre-reply', {result:'success', data:web3.toUtf8 (cont)});
 	}
 	catch (err) {
@@ -910,7 +912,7 @@ ipcMain.on ('get-latest-content-by-genre-request', async (evt, arg) => {
 
 ipcMain.on ('get-most-popular-content-by-author-request', async (evt, arg) => {
 	try {
-		var cont	= await contracts.catalog.instance.getMostPopularByAuthor  (web3.fromUtf8(arg.author), {from:user.address, gas:300000})
+		var cont	= await contracts.catalog.instance.getMostPopularByAuthor  (web3.fromUtf8(arg.author), {from:user.address, gas:upperBoundGas})
 		mainWindow.webContents.send('get-most-popular-content-by-author-reply', {result:'success', data:web3.toUtf8 (cont)});
 	} catch (err) {
 		// TODO Handle errors
@@ -924,7 +926,7 @@ ipcMain.on ('get-most-popular-content-by-author-request', async (evt, arg) => {
 
 ipcMain.on ('get-most-popular-content-by-genre-request', async (evt, arg) => {
 	try {
-		var cont	= await (contracts.catalog.instance.getMostPopularByGenre  (arg.genre, {from:user.address, gas:300000}));
+		var cont	= await (contracts.catalog.instance.getMostPopularByGenre  (arg.genre, {from:user.address, gas:upperBoundGas}));
 		mainWindow.webContents.send('get-most-popular-content-by-genre-reply', {result:'success', data:web3.toUtf8 (cont)});
 	} catch (err) {
 		// TODO Handle errors
@@ -938,7 +940,7 @@ ipcMain.on ('get-most-popular-content-by-genre-request', async (evt, arg) => {
 
 ipcMain.on ('get-most-rated-content-request', async (evt, arg) => {
 	try {
-		var cont	= await (contracts.catalog.instance.getMostRated  (arg.category, {from:user.address, gas:300000}));
+		var cont	= await (contracts.catalog.instance.getMostRated  (arg.category, {from:user.address, gas:upperBoundGas}));
 		mainWindow.webContents.send('get-most-rated-content-reply', {result:'success', data:web3.toUtf8 (cont)});
 	} catch (err) {
 		// TODO Handle errors
@@ -952,7 +954,7 @@ ipcMain.on ('get-most-rated-content-request', async (evt, arg) => {
 
 ipcMain.on ('get-most-rated-content-by-genre-request', async (evt, arg) => {
 	try {
-		var cont	= await (contracts.catalog.instance.getMostRatedByGenre  (arg.genre, arg.category, {from:user.address, gas:300000}));
+		var cont	= await (contracts.catalog.instance.getMostRatedByGenre  (arg.genre, arg.category, {from:user.address, gas:upperBoundGas}));
 		mainWindow.webContents.send('get-most-rated-content-by-genre-reply', {result:'success', data:web3.toUtf8 (cont)});
 	} catch (err) {
 		// TODO Handle errors
@@ -966,7 +968,7 @@ ipcMain.on ('get-most-rated-content-by-genre-request', async (evt, arg) => {
 
 ipcMain.on ('get-most-rated-content-by-author-request', async (evt, arg) => {
 	try {
-		var cont	= await (contracts.catalog.instance.getMostRatedByAuthor  (arg.author, arg.category, {from:user.address, gas:300000}));
+		var cont	= await (contracts.catalog.instance.getMostRatedByAuthor  (arg.author, arg.category, {from:user.address, gas:upperBoundGas}));
 		mainWindow.webContents.send('get-most-rated-content-by-genre-reply', {result:'success', data:web3.toUtf8 (cont)});
 	} catch (err) {
 		// TODO Handle errors
