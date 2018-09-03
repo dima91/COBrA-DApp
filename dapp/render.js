@@ -11,7 +11,7 @@ var ADDRESSES		= [];
 var currentRating	= "";
 
 
-const ___TEST___	= false;
+const ___TEST___	= true;
 
 
 
@@ -180,11 +180,12 @@ ipcr.on ('more-info-reply', ((evt, arg) => {
 
 
 ipcr.on ('buy-content-reply', (evt, arg) => {
+	console.log ('Received reply');
 	if (arg.result == 'error') {
 		if (arg.cause != undefined && arg.cause != '')
 			error ('Error buying content: ' + arg.cause);
 		else
-			error ('Error buying content. Have you enough money?');
+			error ('Error buying content. Have you enough money and is title correct?');
 	}
 	else {
 		$('#consumable-contents-list').append (newBuyedItem (arg.title, arg.hexTitle));
@@ -531,7 +532,7 @@ ipcr.on ('feedback-activation-event', (evt, arg) => {
 	console.log ("Received new feedback activation");
 	console.log (arg);
 
-	$('#button-' + arg.title).removeClass ('disabled');
+	$('#button-' + arg.hexTitle).removeClass ('disabled');
 	showModal ('rating-question-modal');
 	currentRating	= arg.title;
 });
@@ -868,7 +869,7 @@ const error	= (text, time) => {
 		var t	= Number (time);
 	}
 	else {
-		var t	= 2000;
+		var t	= 4000;
 	}
 	setTimeout(() => {
 		hideModal ('error-modal');
@@ -1409,7 +1410,7 @@ window.onload = () => {
 		
 		// Timeout to create new notification
 		setTimeout(() => {
-			//newNotification({ name: "notifica di test" });
+			newNotification({ name: "notifica di test" });
 
 			//error ('Errore di prova', 3000);
 
@@ -1421,6 +1422,7 @@ window.onload = () => {
 			//ipcr.send ('get-views-count-request', {});
 			//ipcr.send ('rating-request', {'1': 5, '2': 4, '3': 3, title: 'a1' });
 			//ipcr.send ('apply-filters' , {authors:'andre, b', genres:'photo'});
+			//ipcr.send ('buy-content-request', {title:'hello'})
 
 		}, 5000);
 	}

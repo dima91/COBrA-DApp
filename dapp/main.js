@@ -529,7 +529,9 @@ const feedbackActivationCallback	= (err, evt) => {
 	console.log (evt.args.targetUsername + ' --> ' + evt.args.contentTitle);
 
 	if (web3.toUtf8 (evt.args.targetUsername) == user.stringName) 
-		mainWindow.webContents.send('feedback-activation-event', {title: web3.toUtf8 (evt.args.contentTitle)});
+		mainWindow.webContents.send('feedback-activation-event', {
+																	title: web3.toUtf8 (evt.args.contentTitle),
+																	hexTitle:web3.toHex(web3.toUtf8 (evt.args.contentTitle))});
 }
 
 
@@ -684,9 +686,9 @@ ipcMain.on ('buy-content-request', async (evt, arg) => {
 	var tmpPrice	= 0;
 	var success		= false;
 
-	tmpPrice	= await (contracts.catalog.instance.getPriceOf (web3.fromUtf8(tmpTitle), {from:user.address, gas:upperBoundGas}));
-
 	try {
+		tmpPrice	= await (contracts.catalog.instance.getPriceOf (web3.fromUtf8(tmpTitle), {from:user.address, gas:upperBoundGas}));
+
 		if (user.isPremium) {
 			console.log ('buying by premium!');
 			await contracts.catalog.instance.getContentPremium (web3.fromUtf8(tmpTitle), {from:user.address, gas:upperBoundGas});
@@ -716,7 +718,7 @@ ipcMain.on ('buy-content-request', async (evt, arg) => {
 		mainWindow.webContents.send ('buy-content-reply', {result:'error'});
 	}
 
-	var userInfo	= getUserInfo (false);
+	var userInfo	= await getUserInfo (false);
 	mainWindow.webContents.send('user-info', JSON.stringify(userInfo));
 })
 
@@ -747,7 +749,7 @@ ipcMain.on ('consume-content-request', async (evt, arg) => {
 		mainWindow.webContents.send ('consume-content-reply', {result:'failure', title:arg.title});
 	}
 
-	var userInfo	= getUserInfo (false);
+	var userInfo	= await getUserInfo (false);
 	mainWindow.webContents.send('user-info', JSON.stringify(userInfo));
 });
 
