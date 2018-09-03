@@ -7,8 +7,8 @@ const ipcr = ipcRenderer;
 
 var username;
 var userAddress;
-var ADDRESSES		= [];
-var currentRating	= "";
+var ADDRESSES			= [];
+var currentRating		= "";
 
 
 const ___TEST___	= true;
@@ -94,7 +94,6 @@ ipcr.on ('user-info', (evt, arg) => {
 // Event handler for incoming user information
 ipcr.on('init-info', (event, arg) => {
 	jsonP = JSON.parse(arg);
-	//console.log(jsonP);
 
 	if (jsonP['result'] == 'error') {
 		var cause	= '';
@@ -534,8 +533,20 @@ ipcr.on ('feedback-activation-event', (evt, arg) => {
 
 	$('#button-' + arg.hexTitle).removeClass ('disabled');
 	showModal ('rating-question-modal');
-	currentRating	= arg.title;
+	currentRating	= arg.hexTitle;
 });
+
+
+
+
+ipcr.on ('catalog-died-event', (evt, arg) => {
+	error ('Catalo contract is died! Application will be closed', 3000);
+
+	
+	setTimeout(() => {
+		ipcr.send ('quitDapp', {});
+	},  2500);
+})
 
 
 

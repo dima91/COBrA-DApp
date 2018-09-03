@@ -26,6 +26,7 @@ library SharedTypes {
         uint expirationTime;                    // Expiration time (calculated in block.size). Valid only for premium account
         bytes32 latestContent;                  // Title of latest content published by current user
 		uint publishedContentsCount;			// Number of contents published by this user
+		uint totalViews;						// Number of views reached by its contents (used at catalog destroy)
     }
     
     // Struct to hold reference of BaseContentManagementContracts with its author

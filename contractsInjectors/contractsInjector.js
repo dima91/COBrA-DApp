@@ -167,8 +167,8 @@ web3.eth.getAccounts (function (err, res) {
 
 
 
-	/****** Check type of content
-	let contentAbi		= (readContract (baseContentContractPath)).abi;
+	/****** Check type of content */
+	var contentAbi		= (readContract (baseContentContractPath)).abi;
 	(new web3.eth.Contract (contentAbi, tmpInstance)
 	.methods
 	.getType()
@@ -179,7 +179,7 @@ web3.eth.getAccounts (function (err, res) {
 	//*/
 
 
-	/****** Check feedbacks */
+	/****** Check feedbacks
 	let contentAbi		= (readContract (baseContentContractPath)).abi;
 	(new web3.eth.Contract (contentAbi, tmpInstance)
 	.methods

@@ -122,7 +122,7 @@ contract BaseContentManagementContract {
     // *****                  ***** //
     // ***** Public functions ***** //
     
-    // Function which kills current contract. It is callable only from contract's owner
+    // Function which kills current contract
     // FIXME
     function killMe () public {
         selfdestruct (owner);

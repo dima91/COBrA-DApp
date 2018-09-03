@@ -74,11 +74,12 @@ var contracts	= {
 var availableAddresses	= [];		// List of available addresses
 
 var user	= {
-	balance			: {},
-	address			: {},
-	addressIndex	: {},
-	hexName			: {},
-	stringName		: {}
+	balance				: {},
+	address				: {},
+	addressIndex		: {},
+	hexName				: {},
+	stringName			: {},
+	publishedContents	: []
 }
 
 const premiumCost	= web3.toWei (44000, 'szabo');
@@ -256,6 +257,10 @@ const setupEventsCallbacks = () => {
 
 
 	// event CatalogDied		();
+	contracts.catalog.instance.CatalogDied ({form:user.address}, {fromBlock: initBlock, toBlock: 'latest'})
+	.watch ((err, res) => {
+		catalogDiedCallback (err, res);
+	})
 }
 
 
@@ -296,6 +301,9 @@ const getUserInfo	= (getContentList) => {
 		};
 	};
 
+	console.log ('Published contents:');
+	console.log (user.publishedContents);
+
 
 	return new Promise ((resolve, reject) => {
 		web3.eth.getBalance (user.address, (err, res) => {
@@ -311,6 +319,11 @@ const getUserInfo	= (getContentList) => {
 					console.log ('\nQuerying content list for ' + user.hexName);
 					contracts.catalog.instance.getContentsListByAuthor (user.hexName)
 					.then((res) => {
+						// Saving addresses o user.publishedContents
+						res[2].forEach (addr => {
+							user.publishedContents.push (addr);
+						})
+
 						console.log (res)
 						var conList	= buildCompleteContentsList (res);
 						var payload	= constructPayload (conList, user.isPremium);
@@ -514,7 +527,7 @@ const giftedPremiumCallback	= (err, evt) => {
 		getUserInfo (false)
 		.then ((userInfo) => {
 			mainWindow.webContents.send('gifted-premium-event', {sender:sender});
-			mainWindow.webContents.send('init-info', JSON.stringify(userInfo));
+			mainWindow.webContents.send('user-info', JSON.stringify(userInfo));
 		})
 		.catch ((err) => {
 		})
@@ -526,12 +539,28 @@ const giftedPremiumCallback	= (err, evt) => {
 
 // emit FeedbackActivation (_username, _userAddr);
 const feedbackActivationCallback	= (err, evt) => {
-	console.log (evt.args.targetUsername + ' --> ' + evt.args.contentTitle);
-
+	console.log (evt.args);
+	console.log (web3.toUtf8(evt.args.contentTitle));
+	console.log (web3.fromUtf8(web3.toUtf8(evt.args.contentTitle)));
 	if (web3.toUtf8 (evt.args.targetUsername) == user.stringName) 
 		mainWindow.webContents.send('feedback-activation-event', {
 																	title: web3.toUtf8 (evt.args.contentTitle),
-																	hexTitle:web3.toHex(web3.toUtf8 (evt.args.contentTitle))});
+																	hexTitle:web3.fromUtf8(web3.toUtf8(evt.args.contentTitle))});
+}
+
+
+
+
+const catalogDiedCallback	= (err, evt) => {
+	user.publishedContents.forEach (async el => {
+		console.log (el);
+		try {
+			await contracts.baseContent.at(el).killMe({from:user.address, gas:upperBoundGas});
+		} catch (err) {
+			console.log (err);
+		}
+	})
+	mainWindow.webContents.send('catalog-died-event', {});
 }
 
 
@@ -629,6 +658,9 @@ ipcMain.on ('create-content-request', async (event, data) => {
 			title: data.title,
 			address: instanceAddress
 		});
+
+		user.publishedContents.push (instanceAddress);
+
 		var userInfo	= await getUserInfo (false);
 		mainWindow.webContents.send('user-info', JSON.stringify(userInfo));
 
@@ -763,9 +795,7 @@ ipcMain.on ('rating-request', async (evt, arg) => {
 	var tmpInstance;
 	var tmpAddress;
 
-	console.log ('new request!');
-
-	tmpAddress	= await (contracts.catalog.instance.getAddressOf (web3.fromUtf8 (arg.title), {fom:user.address, gas:upperBoundGas}));
+	tmpAddress	= await (contracts.catalog.instance.getAddressOf (arg.title, {fom:user.address, gas:upperBoundGas}));
 	tmpInstance	= await (contracts.baseContent.at(tmpAddress));
 	
 	try {

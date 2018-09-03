@@ -3,27 +3,58 @@ const fs= require('fs')
 const Web3= require ("web3");
 
 const folderPrefix	= '../solidity/build/contracts/'
-const baseContentContractPath	= folderPrefix + 'BaseContentManagementContract.json'
 const catalogSmartContractPath	= folderPrefix + 'CatalogSmartContract.json'
-const documentContractPath		= folderPrefix + 'DocumentManagementContract.json'
-const photoContractPath			= folderPrefix + 'PhotoManagementContract.json'
-const videoContractPath			= folderPrefix + 'VideoManagementContract.json'
+
 
 let web3;
 
 let addresses= [];
-let catalogAddress	= process.argv[2];
-let tmpInstance		= process.argv[3];
 
-var lucaHex	= '0x6c756361';
+var catalogInstance;
 
 
-var redis	= require("redis"),
-	client	= redis.createClient();
-	client.on("error", function (err) {
-		console.log("Error " + err);
+
+
+process.on ('SIGTERM', () => {
+	console.log ("Received sigterm");
+	atExit ();
+});
+
+
+process.on ('SIGINT', () => {
+	console.log ("Received sigint");
+	atExit ();
+});
+
+
+const redis			= require("redis");
+const redisClient	= redis.createClient();
+
+
+
+
+const atExit	= () => {
+	catalogInstance
+	.methods
+	.killMe ()
+	.send ({from : addresses[0], gas:30000000}, (err, res) => {
+		if (err) console.log (err);
+	})
+	.then (() => {
+		console.log ('Catalog estroyed!');
+		process.exit ();
+	}).catch ((err) => {
+		console.log ('\n\nERROR ON CATALOG DESTROY');
+		console.log (err);
 		process.exit ();
 	});
+}
+
+redisClient.on("error", (err) => {
+	console.log("Error " + err);
+	process.exit ();
+});
+
 
 
 let readContract	= (contractPath) => {
@@ -59,19 +90,15 @@ web3.eth.getAccounts (function (err, res) {
 		console.log (res);
 	})
 	.on('error', (error) => {
-		console.log (error)
-	})
-	.on('transactionHash', (transactionHash) => {
-		console.log ('transaction hash: ' + transactionHash)
+		console.log (error);
+		process.exit ();
 	})
 	.on('receipt', (receipt) => {
-	   console.log("Contract address: " + receipt.contractAddress) // contains the new contract address
-	   client.set("catAddr", receipt.contractAddress, redis.print);
-	})
-	.on('confirmation', (confirmationNumber, receipt) => {
-
+	   console.log("Contract address: " + receipt.contractAddress);
+	   redisClient.set("catAddr", receipt.contractAddress, redis.print);
 	})
 	.then ((newContractnstance) => {
+		catalogInstance	= newContractnstance;
 		console.log ('Deployed!');
 	});
 })

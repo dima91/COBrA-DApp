@@ -279,26 +279,33 @@ contract CatalogSmartContract is Ownable {
     function killMe () public onlyOwner() {
         
         // First of all, it distrubutes payments amog authors
-        uint i=0;
-        uint sumViews= 0;
-        for (i=0; i<usersCount; i++) {
-            // FIXME
-            BaseContentManagementContract remoteContract= BaseContentManagementContract (usersMapping[usersArray[i]].userAddress);
-            uint count= remoteContract.getViewsCount();
+        uint i			= 0;
+        uint sumViews	= 0;
+        for (i=0; i<contentsCount; i++) {
+            BaseContentManagementContract remoteContract	= BaseContentManagementContract (contentsMapping[contentsArray[i]].contractAddress);
+            
+			uint count		= remoteContract.getViewsCount();
+			bytes32 author	= contentsMapping[contentsArray[i]].author;
             
             if ((count % MAX_VIEWS_LIMIT) != 0) {
-                address(remoteContract).transfer ((count % MAX_VIEWS_LIMIT) * PAYOUT_FOR_AUTHOR);
+                address(usersMapping[author].userAddress).transfer ((count % MAX_VIEWS_LIMIT) * PAYOUT_FOR_AUTHOR);
             }
+
+			usersMapping[author].totalViews += count;
             sumViews += count;
         }
         
-        uint unit= address(this).balance / sumViews;
+        if (sumViews > 0) {
+			uint unit= address(this).balance / sumViews;
         
-        // Second, equally distribute current balance to among authors
-        for (i=0; i<usersCount; i++) {
-            uint payment= unit * BaseContentManagementContract (usersMapping[usersArray[i]].userAddress).getViewsCount ();
-            address (usersMapping[usersArray[i]].userAddress).transfer (payment);
-        }
+			// Second, equally distribute current balance among authors
+			for (i=0; i<usersCount; i++) {
+				if (usersMapping[usersArray[i]].totalViews > 0) {
+					uint payment= unit * usersMapping[usersArray[i]].totalViews;
+					address (usersMapping[usersArray[i]].userAddress).transfer (payment);
+				}
+			}
+		}
         
         emit CatalogDied ();
         
