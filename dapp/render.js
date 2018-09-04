@@ -167,7 +167,8 @@ ipcr.on ('more-info-reply', ((evt, arg) => {
 	$('#info-title').text (arg.title);
 	$('#info-author').text (arg.author);
 	$('#info-price').text (arg.price + ' (milliether)');
-	$('#info-rating').text (arg.rating)
+	$('#info-rating').text (arg.rating);
+	$('#info-type').text (type2TypeString (arg.type));
 
 
 	hideLoader ('loaderDiv');
@@ -957,6 +958,29 @@ const stringCategory2Int	= (typeStr) => {
 		return 2;
 	if (typeStr == 'availability time')
 		return 3;
+}
+
+
+
+
+const type2TypeString	= (intType) => {
+	console.log ("type is -->     " + intType)
+	switch (intType) {
+		case 0:
+			return "song";
+
+		case 1:
+			return "video";
+
+		case 2: 
+			return "photo";
+
+		case 3:
+			return "document";
+
+		default :
+			return "";
+	}
 }
 
 

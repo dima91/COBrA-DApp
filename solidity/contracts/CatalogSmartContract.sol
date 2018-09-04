@@ -395,11 +395,11 @@ contract CatalogSmartContract is Ownable {
 
 
 	// Functions which returns (feedbacks + price + author) of content with title '_title'
-    function getInfoOf (bytes32 _title) alreadyPublishedM (_title) public view returns (uint[3], uint, bytes32) {
+    function getInfoOf (bytes32 _title) alreadyPublishedM (_title) public view returns (uint[3], uint, bytes32, SharedTypes.contentType) {
 		SharedTypes.ExtendedContent memory localContent	= contentsMapping[_title];
         BaseContentManagementContract remoteContent	= BaseContentManagementContract (localContent.contractAddress);
 		
-		return (remoteContent.getFeedbacksAverages(), localContent.contentPrice, localContent.author);
+		return (remoteContent.getFeedbacksAverages(), localContent.contentPrice, localContent.author, remoteContent.getType());
     }
 
 

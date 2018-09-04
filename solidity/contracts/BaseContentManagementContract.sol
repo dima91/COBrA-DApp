@@ -5,7 +5,7 @@ import "./CatalogSmartContract.sol";
 import "./Ownable.sol";
 
 
-contract BaseContentManagementContract {
+contract BaseContentManagementContract is Ownable {
 
 	// Event to notify to user taht is possible to leave feedbacks
 	event FeedbackActivation	(bytes32 targetUsername, bytes32 contentTitle);
@@ -27,7 +27,7 @@ contract BaseContentManagementContract {
     uint[3] private feedbacksSums;		// contentAppreciation, priceFairness, suitableForChildren
     uint8[3] private feedbacksCount;	// Number of feedbacks given for each category
 
-    address private owner;                              // Address of author (owner of content)
+    //address private owner;                              // Address of author (owner of content)
     address private catalogAddress;                     // Address of catalog to check if determined functions are called only by catalog
     SharedTypes.contentType private typeOfContent;      // Tpe of content which this contract contains
     
@@ -124,7 +124,7 @@ contract BaseContentManagementContract {
     
     // Function which kills current contract
     // FIXME
-    function killMe () public {
+    function killMe () public onlyOwner() {
         selfdestruct (owner);
     }
     

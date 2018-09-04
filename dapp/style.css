@@ -30,6 +30,11 @@ html, body {
 }
 
 
+#more-info-grid {
+	padding-left: 3.5em;
+}
+
+
 #modalHeader,
 #infoModalHeader {
 	margin-top: 1em;

@@ -698,11 +698,13 @@ ipcMain.on ('more-info-request', async (evt, arg) => {
 	console.log ('Received more-info-request for '+ arg.title);
 	
 	var infoOf	= await (contracts.catalog.instance.getInfoOf (web3.fromUtf8 (arg.title), {from:user.address, gas:upperBoundGas}));
+	console.log (infoOf);
 	var toSend	= {
 		title	: arg.title,
 		rating	: computeFeedbacksAvg (infoOf[0]),
 		price	: web3.fromWei(infoOf['1'], 'milliether').toString(),
-		author	: web3.toUtf8 (infoOf['2'])
+		author	: web3.toUtf8 (infoOf['2']),
+		type	: Number(infoOf[3])
 	};
 
 	mainWindow.webContents.send ('more-info-reply', toSend);
