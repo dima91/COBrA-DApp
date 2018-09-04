@@ -75,7 +75,7 @@ const buyAndConsume	= (u, c) => {
 		.send ({from:u.address, gas:30000000, value:web3.utils.toWei ("6300", "szabo")}, (err, res) => {
 			if (err) console.log (err);
 			//console.log (res);*/
-			new web3.eth.Contract (contr[c.type].abi, c.addr, (err, res) => {
+			new web3.eth.Contract (baseContract.abi, c.addr, (err, res) => {
 				if (err) console.log (err);
 				//console.log (res);*/
 			})

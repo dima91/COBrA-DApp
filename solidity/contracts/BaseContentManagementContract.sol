@@ -104,7 +104,7 @@ contract BaseContentManagementContract is Ownable {
     /* This function allows subContracts of this contract to retrieve content if and only if user
      * with addrs _userAddr is into "allowedUsers" map
      */
-    function retrieveContent (bytes32 _username) internal isAllowedUser(_username, msg.sender) toBeConsumedBy (_username) {
+    function consumeContent (bytes32 _username) public isAllowedUser(_username, msg.sender) toBeConsumedBy (_username) {
         bool isStandard= allowedUsers[_username].accessType == AccessType.standardAccess;
         if (isStandard) {
             numberOfViews++;
@@ -217,7 +217,7 @@ contract BaseContentManagementContract is Ownable {
     // *****                     ***** //
     // ***** Abastract functions ***** //
     
-    function consumeContent (bytes32 _username) public;
+    function getGenre () public view returns (bytes32);
 }
 
 

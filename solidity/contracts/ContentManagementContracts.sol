@@ -9,11 +9,11 @@ import "./CatalogSmartContract.sol";        // FIXME Remove me!!!!!
 contract SongManagementContract is BaseContentManagementContract {
     
     constructor (bytes32 _title, address _catAddr)
-            BaseContentManagementContract(SharedTypes.contentType.song, _title, _catAddr) public {
+		BaseContentManagementContract(SharedTypes.contentType.song, _title, _catAddr) public {
     }
     
-    function consumeContent (bytes32 _username) public {
-        retrieveContent (_username);
+    function getGenre () public view returns (bytes32) {
+		return 'song';
     }
 }
 
@@ -29,11 +29,11 @@ contract SongManagementContract is BaseContentManagementContract {
 
 contract VideoManagementContract is BaseContentManagementContract {
     constructor (bytes32 _title, address _catAddr)
-            BaseContentManagementContract(SharedTypes.contentType.video, _title, _catAddr) public {
+		BaseContentManagementContract(SharedTypes.contentType.video, _title, _catAddr) public {
     }
     
-    function consumeContent (bytes32 _username) public {
-        retrieveContent (_username);
+    function getGenre () public view returns (bytes32) {
+		return 'video';
     }
 }
 
@@ -49,11 +49,11 @@ contract VideoManagementContract is BaseContentManagementContract {
 
 contract PhotoManagementContract is BaseContentManagementContract {
     constructor (bytes32 _title, address _catAddr)
-            BaseContentManagementContract(SharedTypes.contentType.photo, _title, _catAddr) public {
+        BaseContentManagementContract(SharedTypes.contentType.photo, _title, _catAddr) public {
     }
     
-    function consumeContent (bytes32 _username) public {
-        retrieveContent (_username);
+    function getGenre () public view returns (bytes32) {
+		return 'photo';
     }
 }
 
@@ -69,11 +69,11 @@ contract PhotoManagementContract is BaseContentManagementContract {
 
 contract DocumentManagementContract is BaseContentManagementContract {
     constructor (bytes32 _title, address _catAddr)
-            BaseContentManagementContract(SharedTypes.contentType.document, _title, _catAddr) public {
+        BaseContentManagementContract(SharedTypes.contentType.document, _title, _catAddr) public {
     }
     
-    function consumeContent (bytes32 _username) public {
-        retrieveContent (_username);
+    function getGenre () public view returns (bytes32) {
+		return 'document';
     }
 }
 

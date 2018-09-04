@@ -406,6 +406,28 @@ const type2TypeString	= (intType) => {
 
 
 
+const type2HexGenre	= (intType) => {
+	switch (intType) {
+		case 0:
+			return "0x736f6e67";
+
+		case 1:
+			return "0x766964656f";
+
+		case 2: 
+			return "0x70686f746f";
+
+		case 3:
+			return "0x646f63756d656e74";
+
+		default :
+			return "";
+	}
+}
+
+
+
+
 
 
 
@@ -482,7 +504,6 @@ const grantedAccessCallback = (err, evt) => {
 
 
 // event GrantedPremium (bytes32 username, address user.address);
-// TODO Listener for event 'granted premium'
 const grantedPremiumCallback = (err, evt) => {
 	var rcvUser	= web3.toUtf8 (evt.args.username);
 
@@ -677,7 +698,6 @@ ipcMain.on ('create-content-request', async (event, data) => {
 
 
 
-// TODO Require also type of contents
 ipcMain.on ('contents-list-request', async (evt, arg) => {
 	console.log ('Received a contents list update request');
 
@@ -931,7 +951,10 @@ ipcMain.on ('get-latest-content-by-author-request', async (evt, arg) => {
 
 ipcMain.on ('get-latest-content-by-genre-request', async (evt, arg) => {
 	try {
-		var cont	= await (contracts.catalog.instance.getLatestByGenre  (arg.genre, {from:user.address, gas:upperBoundGas}));
+		var genre	= type2HexGenre (arg.genre);
+
+		var cont	= await (contracts.catalog.instance.getLatestByGenre  (genre, {from:user.address, gas:upperBoundGas}));
+		console.log (cont);
 		mainWindow.webContents.send('get-latest-content-by-genre-reply', {result:'success', data:web3.toUtf8 (cont)});
 	}
 	catch (err) {
@@ -960,7 +983,9 @@ ipcMain.on ('get-most-popular-content-by-author-request', async (evt, arg) => {
 
 ipcMain.on ('get-most-popular-content-by-genre-request', async (evt, arg) => {
 	try {
-		var cont	= await (contracts.catalog.instance.getMostPopularByGenre  (arg.genre, {from:user.address, gas:upperBoundGas}));
+		var genre	= type2HexGenre (arg.genre);
+		console.log ('genre       --> '+ genre);
+		var cont	= await (contracts.catalog.instance.getMostPopularByGenre  (genre, {from:user.address, gas:upperBoundGas}));
 		mainWindow.webContents.send('get-most-popular-content-by-genre-reply', {result:'success', data:web3.toUtf8 (cont)});
 	} catch (err) {
 		// TODO Handle errors
@@ -988,7 +1013,9 @@ ipcMain.on ('get-most-rated-content-request', async (evt, arg) => {
 
 ipcMain.on ('get-most-rated-content-by-genre-request', async (evt, arg) => {
 	try {
-		var cont	= await (contracts.catalog.instance.getMostRatedByGenre  (arg.genre, arg.category, {from:user.address, gas:upperBoundGas}));
+		var genre	= type2HexGenre (arg.genre);
+		console.log ('genre--> '+ genre);
+		var cont	= await (contracts.catalog.instance.getMostRatedByGenre  (genre, arg.category, {from:user.address, gas:upperBoundGas}));
 		mainWindow.webContents.send('get-most-rated-content-by-genre-reply', {result:'success', data:web3.toUtf8 (cont)});
 	} catch (err) {
 		// TODO Handle errors
@@ -1003,11 +1030,11 @@ ipcMain.on ('get-most-rated-content-by-genre-request', async (evt, arg) => {
 ipcMain.on ('get-most-rated-content-by-author-request', async (evt, arg) => {
 	try {
 		var cont	= await (contracts.catalog.instance.getMostRatedByAuthor  (arg.author, arg.category, {from:user.address, gas:upperBoundGas}));
-		mainWindow.webContents.send('get-most-rated-content-by-genre-reply', {result:'success', data:web3.toUtf8 (cont)});
+		mainWindow.webContents.send('get-most-rated-content-by-author-reply', {result:'success', data:web3.toUtf8 (cont)});
 	} catch (err) {
 		// TODO Handle errors
 		console.log (err);
-		mainWindow.webContents.send('get-most-rated-content-by-genre-reply', {result:'failure'});
+		mainWindow.webContents.send('get-most-rated-content-by-author-reply', {result:'failure'});
 	}
 });
 

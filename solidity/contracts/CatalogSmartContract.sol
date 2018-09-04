@@ -208,7 +208,7 @@ contract CatalogSmartContract is Ownable {
     }
     
     // This function generalize getMostRated* operations
-    function genericGetMostRated (bool _filterByAuthor, bytes32 _author, bool _filterByGenre, SharedTypes.contentType _type, uint8 _category)
+    function genericGetMostRated (bool _filterByAuthor, bytes32 _author, bool _filterByGenre, bytes32 _genre, uint8 _category)
                                 private view isCorrectCategoryForGetRating(_category) returns (bytes32) {
         require (contentsCount > 0);
         
@@ -221,7 +221,7 @@ contract CatalogSmartContract is Ownable {
             BaseContentManagementContract content  = BaseContentManagementContract (contentsMapping[contentsArray[i]].contractAddress);
             bytes32 currentAuthor                   = contentsMapping[contentsArray[i]].author;
             
-            if (_filterByGenre && content.getType() != _type)
+            if (_filterByGenre && content.getGenre() != _genre)
                 continue;
             if (_filterByAuthor && currentAuthor != _author)
                 continue;
@@ -472,7 +472,7 @@ contract CatalogSmartContract is Ownable {
     
     
     // Returns the most recent content with genre x
-    function getLatestByGenre (SharedTypes.contentType _ct) public view returns (bytes32) {
+    function getLatestByGenre (bytes32 _genre) public view returns (bytes32) {
         uint i= contentsCount;
         bool found= false;
         bytes32 reqStr;
@@ -484,7 +484,7 @@ contract CatalogSmartContract is Ownable {
         while (i != 0 && !found ) {
             i--;
             BaseContentManagementContract cont= BaseContentManagementContract(contentsMapping[contentsArray[i]].contractAddress);
-            if (cont.getType() == _ct) {
+            if (cont.getGenre() == _genre) {
                 found = true;
                 reqStr= cont.getTitle();
             }
@@ -496,7 +496,7 @@ contract CatalogSmartContract is Ownable {
     
     
     // Returns the content with genre x, which has received the maximum number of views
-    function getMostPopularByGenre (SharedTypes.contentType _ct) public view returns (bytes32) {
+    function getMostPopularByGenre (bytes32 _genre) public view returns (bytes32) {
         bytes32 reqStr	= "";
         uint maximum	=0;
         uint i			= contentsCount;
@@ -509,7 +509,7 @@ contract CatalogSmartContract is Ownable {
         while (i != 0) {
             i--;
             BaseContentManagementContract remoteContract= BaseContentManagementContract(contentsMapping[contentsArray[i]].contractAddress);
-            if (remoteContract.getType() == _ct) {
+            if (remoteContract.getGenre() == _genre) {
 				count	= remoteContract.getViewsCount();
                 if (count > maximum) {
 					maximum	= count;
@@ -585,14 +585,14 @@ contract CatalogSmartContract is Ownable {
     // Returns the content with highest rating for feedback category y (or highest average of all ratings if y is not specified)
     // TEST ME
     function getMostRated (uint8 _category) public view isCorrectCategoryForGetRating(_category) returns (bytes32) {
-        return genericGetMostRated (false, 0, false, SharedTypes.contentType.song, _category);
+        return genericGetMostRated (false, 0, false, '', _category);
     }
     
     
     
     /* Returns the content with highest rating for feedback gategory _category
      * (or highest average of all ratings if _category is not specified) with genre _genre */
-    function getMostRatedByGenre (SharedTypes.contentType _genre, uint8 _category) public view returns (bytes32) {
+    function getMostRatedByGenre (bytes32 _genre, uint8 _category) public view returns (bytes32) {
         return genericGetMostRated (false, 0, true, _genre, _category);
     }
     
@@ -601,7 +601,7 @@ contract CatalogSmartContract is Ownable {
     /* Returns the content with highest rating for feedback category _category
      * (or highest average of all ratings it _category is not specified) with author _author */
     function getMostRatedByAuthor (bytes32 _author, uint8 _category) public view returns (bytes32) {
-        return genericGetMostRated (true, _author, false, SharedTypes.contentType.song, _category);
+        return genericGetMostRated (true, _author, false, '', _category);
     }
     
     
