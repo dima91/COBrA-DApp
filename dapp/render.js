@@ -180,7 +180,11 @@ ipcr.on ('more-info-reply', ((evt, arg) => {
 
 
 ipcr.on ('buy-content-reply', (evt, arg) => {
-	console.log ('Received reply');
+	// Disabling previous content's buyed button
+	$('#button-' + arg.hexTitle).addClass ('disabled');
+	$('#button-' + arg.hexTitle).attr("id","newId");
+
+
 	if (arg.result == 'error') {
 		if (arg.cause != undefined && arg.cause != '')
 			error ('Error buying content: ' + arg.cause);

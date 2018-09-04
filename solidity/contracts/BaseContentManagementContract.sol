@@ -123,7 +123,6 @@ contract BaseContentManagementContract is Ownable {
     // ***** Public functions ***** //
     
     // Function which kills current contract
-    // FIXME
     function killMe () public onlyOwner() {
         selfdestruct (owner);
     }
@@ -151,16 +150,16 @@ contract BaseContentManagementContract is Ownable {
         if (allowedUsers[_username].exists == false) {
             allowedUsers[_username].exists              = true;
             allowedUsers[_username].userAddress         = _userAddr;
-            allowedUsers[_username].givenFeedbacks[0]   = false;
-            allowedUsers[_username].givenFeedbacks[1]   = false;
-            allowedUsers[_username].givenFeedbacks[2]   = false;
         }
         
         if (isPremium)
             allowedUsers[_username].accessType= AccessType.premiumAccess;
         else
             allowedUsers[_username].accessType= AccessType.standardAccess;
-        
+
+		allowedUsers[_username].givenFeedbacks[0]   = false;
+		allowedUsers[_username].givenFeedbacks[1]   = false;
+		allowedUsers[_username].givenFeedbacks[2]   = false;
         allowedUsers[_username].toBeConsumed = true;
     }
     

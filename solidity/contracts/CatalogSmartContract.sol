@@ -611,7 +611,7 @@ contract CatalogSmartContract is Ownable {
 	// Pays for access to content x (NOT ACCESS TO CONTENT!)
     function getContent (bytes32 _contentTitle) userExistsM(addr2User[msg.sender]) alreadyPublishedM (_contentTitle)
                                                 equalTo (msg.value, contentsMapping[_contentTitle].contentPrice) public payable {
-        // ******* --> Check preconditions (enough value..) + handle payments <-- *******
+
         bytes32 senderUser= addr2User[msg.sender];
         (BaseContentManagementContract (contentsMapping[_contentTitle].contractAddress)).grantAccessToUser (senderUser, msg.sender, false);
         emit GrantedAccess (senderUser, msg.sender, _contentTitle, contentsMapping[_contentTitle].contractAddress);
