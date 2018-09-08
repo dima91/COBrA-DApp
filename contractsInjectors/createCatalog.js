@@ -103,7 +103,7 @@ if (typeof web3 !== 'undefined') {
 }
 else {
 	if (INFURA_DEPLOY)
-		provider	= new HDWalletProvider (mnemonic, "https://ropsten.infura.io/"+infuraKey);
+		provider	= new HDWalletProvider (mnemonic, "https://ropsten.infura.io/v3"+infuraKey);
 
 	else
 		provider	= new Web3.providers.HttpProvider ("http://localhost:8545");
