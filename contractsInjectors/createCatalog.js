@@ -22,7 +22,7 @@ var web3;
 
 
 process.on ('SIGTERM', () => {
-	console.log ("Received sigterm");
+	console.log ("\nReceived sigterm");
 	atExit ();
 });
 
@@ -30,7 +30,7 @@ process.on ('SIGTERM', () => {
 
 
 process.on ('SIGINT', () => {
-	console.log ("Received sigint");
+	console.log ("\nReceived sigint");
 	atExit ();
 });
 
