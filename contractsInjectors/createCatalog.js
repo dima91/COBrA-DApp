@@ -11,9 +11,9 @@ let addresses			= [];
 var catalogInstance;
 
 const mnemonic			= "";
-const infuraKey			= "";
+const infuraKey			= "3c51b50483cd4eec9119a4a7129bd0a4";
 
-const INFURA_DEPLOY		= false;
+const INFURA_DEPLOY		= true;
 
 var provider;
 var web3;
@@ -37,30 +37,30 @@ process.on ('SIGINT', () => {
 
 
 
-const atExit	= async () => {
-	try {
-		await catalogInstance.killMe ({from: addresses[0]});
-		console.log ('Catalog estroyed!');
-	} catch (err) {
-		console.log ("\n\nRaised this error during 'killMe'");
-		console.log (err);
-	}
-	process.exit ();
-}
-
-
-
-
 redisClient.on("error", (err) => {
 	console.log("Error " + err);
-	process.exit ();
+	atExit ();
 });
 
 
 
 let readContract	= (contractPath) => {
-	content= fs.readFileSync (contractPath);
-	return JSON.parse(content);
+	return JSON.parse (fs.readFileSync (contractPath));
+}
+
+
+
+
+const atExit	= async () => {
+	try {
+		var res	= await catalogInstance.killMe ({from: addresses[0]});
+		console.log ('Catalog estroyed!');
+		console.log ('\tTransaction hash is  ' + res.receipt.transactionHash);
+	} catch (err) {
+		console.log ("\n\nRaised this error during 'killMe'");
+		console.log (err);
+	}
+	process.exit ();
 }
 
 
@@ -77,14 +77,17 @@ const createCatalog	= () => {
 			let catalogContract	= truffle (readContract (catalogPath));
 			catalogContract.setProvider (provider);
 			
-			console.log ('Creating catalog ...');
+			console.log ('Creating catalog from address  ' + addresses[0] + '  ...');
 			catalogInstance		= await catalogContract.new ({ from: addresses[0], data:catalogContract.bytecode, gas:4700000});
 			redisClient.set ("catAddr", catalogInstance.address, redis.print);
-			console.log ('Catalog created! Address is  ' + catalogInstance.address);
+			console.log ('Catalog created!');
+			console.log ('\tCatalog address is   ' + catalogInstance.address);
+			console.log ('\tTransaction hash is  ' + catalogInstance.transactionHash);
+
 		} catch (err) {
 			console.log ("\n\nERROR:");
 			console.log (err);
-			process.exit ();
+			atExit ();
 		}
 	});
 }
