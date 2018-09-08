@@ -1,0 +1,19 @@
+{
+	"name": "cobra-dapp",
+	"version": "1.0.0",
+	"description": "Dapp developed for COBrA project",
+	"main": "electron/main.js",
+	"scripts": {
+		"start": "electron ."
+	},
+	"author": "Luca Di Mauro",
+	"dependencies": {
+		"electron": "^2.0.3",
+		"jquery": "^3.3.1",
+		"redis": "^2.8.0",
+		"solc": "^0.4.24",
+		"truffle-contract": "^3.0.6",
+		"truffle-hdwallet-provider": "0.0.6",
+		"web3": "^0.20.6"
+	}
+}

@@ -10,7 +10,7 @@ const truffle	= require ('truffle-contract');
 
 
 
-const folderPrefix	= '../solidity/build/contracts/'
+const folderPrefix	= './build/contracts/'
 const baseContentContractPath	= folderPrefix + 'BaseContentManagementContract.json'
 const catalogSmartContractPath	= folderPrefix + 'CatalogSmartContract.json'
 const songContractPath			= folderPrefix + 'SongManagementContract.json'
@@ -25,16 +25,11 @@ const videoContractPath			= folderPrefix + 'VideoManagementContract.json'
 var provider;
 var web3;
 var endpoint	= "http://localhost:8545";
+
 //FIXME !!!!!!  Parsing comman line arguments
-/*if (process.argv.length !=3) {
-	endpoint= "http://localhost:8545";
-}
-else {
-	endpoint= process.argv[2];
-}*/
 
 
-if(typeof web3 != 'undefined') {
+if (typeof web3 != 'undefined') {
 	console.log ("I'm here");
 	console.log(web3);
 	provider	= web3.currentProvider;
@@ -84,7 +79,7 @@ var user	= {
 
 const premiumCost	= web3.toWei (44000, 'szabo');
 
-const upperBoundGas	= 10000000;
+const upperBoundGas	= 4712388;
 
 contracts.catalog.address	= process.argv[2];
 
@@ -648,10 +643,15 @@ ipcMain.on ('init-info', async (event, arg) => {
 		}
 	}
 	else {
-		console.log ("User doesn't exist!");
-		await contracts.catalog.instance.registerMe (user.hexName, {from:user.address, gas:upperBoundGas});
-		userInfo	= await getUserInfo (false);
-		mainWindow.webContents.send('init-info', JSON.stringify(userInfo));
+		try {
+			console.log ("User doesn't exist!");
+			await contracts.catalog.instance.registerMe (user.hexName, {from:user.address, gas:upperBoundGas});
+			userInfo	= await getUserInfo (false);
+			mainWindow.webContents.send('init-info', JSON.stringify(userInfo));
+		}
+		catch (err) {
+			mainWindow.webContents.send('init-info', JSON.stringify({'result':'error', 'cause':'Error creating new user'}));
+		}
 	}
 })
   
@@ -755,6 +755,7 @@ ipcMain.on ('buy-content-request', async (evt, arg) => {
 		}
 	} catch (err) {
 		user.isPremium	= false;
+		console.log (err);
 		try {
 			await contracts.catalog.instance.getContent (web3.fromUtf8(tmpTitle), {from:user.address, gas:upperBoundGas, value:tmpPrice});
 			success	= true;
