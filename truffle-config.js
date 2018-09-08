@@ -1,7 +1,7 @@
 
 const HDWalletProvider	= require ("truffle-hdwallet-provider");
-const mnemonic			= "";
-const infuraKey			= "";
+const mnemonic			= "virus pig security rabbit census judge boost exhibit desert try eyebrow hard";
+const infuraKey			= "3c51b50483cd4eec9119a4a7129bd0a4";
 const accountIndex		= 0;
 
 

@@ -3,10 +3,10 @@
 
 
 const {app, BrowserWindow, ipcMain} = require('electron');
-const path		= require ('path');
-const Web3		= require ("web3");
-const fs		= require ('fs');
-const truffle	= require ('truffle-contract');
+const path				= require ('path');
+const Web3				= require ("web3");
+const fs				= require ('fs');
+const truffle			= require ('truffle-contract');
 
 
 
@@ -18,26 +18,22 @@ const documentContractPath		= folderPrefix + 'DocumentManagementContract.json'
 const photoContractPath			= folderPrefix + 'PhotoManagementContract.json'
 const videoContractPath			= folderPrefix + 'VideoManagementContract.json'
 
-
-
-
-
+const infuraKey			= "3c51b50483cd4eec9119a4a7129bd0a4";
 var provider;
 var web3;
-var endpoint	= "http://localhost:8545";
 
 //FIXME !!!!!!  Parsing comman line arguments
 
 
 if (typeof web3 != 'undefined') {
-	console.log ("I'm here");
-	console.log(web3);
+	console.log ("\n\nweb3 is already defined!!!");
 	provider	= web3.currentProvider;
-	web3 		= new Web3 (provider);
 } else {
-	provider	= new Web3.providers.HttpProvider(endpoint);
-	web3		= new Web3(provider);
+	//provider	= new Web3.providers.HttpProvider ("https://ropsten.infura.io/"+infuraKey);
+	provider	= new Web3.providers.HttpProvider ("http://localhost:8545");
 }
+
+web3 		= new Web3 (provider);
 
 
 
