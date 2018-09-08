@@ -4,21 +4,19 @@ const Web3				= require ("web3");
 const truffle			= require ('truffle-contract');
 const redis				= require("redis");
 const redisClient		= redis.createClient();
-const HDWalletProvider	= require("truffle-hdwallet-provider");
+const HDWalletProvider	= require ("truffle-hdwallet-provider");
 
-const catalogPath	= '../build/contracts/CatalogSmartContract.json';
-const mnemonic		= "shift discover random surround trade trend execute topple casino silver art cart wedding clutch bullet";
-const infuraKey		= "3c51b50483cd4eec9119a4a7129bd0a4";
-let addresses		= [];
+const catalogPath		= '../build/contracts/CatalogSmartContract.json';
+let addresses			= [];
 var catalogInstance;
 
-// set the provider you want from Web3.providers
-//const HDWalletProvider	= require("truffle-hdwallet-provider");
-//const mnemonic			= "intact letter fringe dune payment lunch cabin blossom sister bread remove nest";
-//const provider			= new HDWalletProvider(mnemonic, "https://ropsten.infura.io/v3/3c51b50483cd4eec9119a4a7129bd0a4");
+const mnemonic			= "";
+const infuraKey			= "";
+
+const INFURA_DEPLOY		= false;
+
 var provider;
 var web3;
-var endpoint	= "http://localhost:8545";
 
 
 
@@ -40,8 +38,13 @@ process.on ('SIGINT', () => {
 
 
 const atExit	= async () => {
-	await catalogInstance.killMe ({from: addresses[0]});
-	console.log ('Catalog estroyed!');
+	try {
+		await catalogInstance.killMe ({from: addresses[0]});
+		console.log ('Catalog estroyed!');
+	} catch (err) {
+		console.log ("\n\nRaised this error during 'killMe'");
+		console.log (err);
+	}
 	process.exit ();
 }
 
@@ -63,7 +66,7 @@ let readContract	= (contractPath) => {
 
 
 
-const createContract	= () => {
+const createCatalog	= () => {
 	web3.eth.getAccounts (async (err, res) => {
 		try {
 			addresses	= res;
@@ -75,10 +78,9 @@ const createContract	= () => {
 			catalogContract.setProvider (provider);
 			
 			console.log ('Creating catalog ...');
-			catalogInstance		= await catalogContract.new ({ from: addresses[0], data:catalogContract.bytecode, gas:4962237});
+			catalogInstance		= await catalogContract.new ({ from: addresses[0], data:catalogContract.bytecode, gas:4700000});
 			redisClient.set ("catAddr", catalogInstance.address, redis.print);
-			console.log ('Catalog created!');
-
+			console.log ('Catalog created! Address is  ' + catalogInstance.address);
 		} catch (err) {
 			console.log ("\n\nERROR:");
 			console.log (err);
@@ -92,20 +94,19 @@ const createContract	= () => {
 
 
 
-/*if (typeof web3 != 'undefined') {
-	console.log ("I'm here");
-
+if (typeof web3 !== 'undefined') {
 	provider	= web3.currentProvider;
 	web3 		= new Web3 (provider);
-} else {
-	provider	= new Web3.providers.HttpProvider(endpoint);
-	web3		= new Web3(provider);
-}*/
+}
+else {
+	if (INFURA_DEPLOY)
+		provider	= new HDWalletProvider (mnemonic, "https://ropsten.infura.io/"+infuraKey);
 
-//provider	= new HDWalletProvider (mnemonic, "https://ropsten.infura.io/"+infuraKey);
-provider	= new Web3.providers.HttpProvider(endpoint);
-web3		= new Web3 (provider);
+	else
+		provider	= new Web3.providers.HttpProvider ("http://localhost:8545");
+}
 
+web3		= new Web3(provider);
 
-createContract ();
+createCatalog ();
 
