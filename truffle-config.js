@@ -1,6 +1,6 @@
 
 const HDWalletProvider	= require ("truffle-hdwallet-provider");
-const mnemonic			= "virus pig security rabbit census judge boost exhibit desert try eyebrow hard";
+const mnemonic			= "";
 const infuraKey			= "3c51b50483cd4eec9119a4a7129bd0a4";
 const accountIndex		= 0;
 
@@ -24,13 +24,11 @@ module.exports = {
 
 		infura: {
 			provider: () => {
-				return new HDWalletProvider (mnemonic, "https://ropsten.infura.io/"+infuraKey, accountIndex);
+				return new HDWalletProvider (mnemonic, "https://ropsten.infura.io/v3/"+infuraKey, accountIndex);
 			},
 			network_id: 3,
 			host: "127.0.0.1",
 			port:  8545
-			//,gas:   6721975
-			//,gasPrice: 30000000000
 		}
 	},
 
