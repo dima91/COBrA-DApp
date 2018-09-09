@@ -7,7 +7,8 @@ const path				= require ('path');
 const Web3				= require ("web3");
 const fs				= require ('fs');
 const truffle			= require ('truffle-contract');
-
+const HDWalletProvider	= require ("truffle-hdwallet-provider");
+const commandLineArgs	= require ("command-line-args");
 
 
 const folderPrefix	= '../truffle/build/contracts/'
@@ -18,19 +19,43 @@ const documentContractPath		= folderPrefix + 'DocumentManagementContract.json'
 const photoContractPath			= folderPrefix + 'PhotoManagementContract.json'
 const videoContractPath			= folderPrefix + 'VideoManagementContract.json'
 
-const infuraKey			= "3c51b50483cd4eec9119a4a7129bd0a4";
+
+// FIXME Insert correct catalog default address
+var catalogAddress	= "0x9a6e2ea7f61d320fe16b664d65eda48489d0e6ce";
+var infuraKey		= "";
 var provider;
 var web3;
 
-//FIXME !!!!!!  Parsing comman line arguments
+
+
+// Parsing comman line arguments
+const optionDefinitions = [
+	{ name: 'catalog-address', type: String },
+	{ name: 'infura-key', type: String }
+]
+
+  const options = commandLineArgs (optionDefinitions);
+console.log ("\n\n==============================");
+
+if (options["catalog-address"] != undefined) {
+	catalogAddress	= options["catalog-address"];
+}
+console.log ("\n---  Using   " + catalogAddress + "   as catalog address");
 
 
 if (typeof web3 != 'undefined') {
 	console.log ("\n\nweb3 is already defined!!!");
 	provider	= web3.currentProvider;
 } else {
-	//provider	= new Web3.providers.HttpProvider ("https://ropsten.infura.io/"+infuraKey);
-	provider	= new Web3.providers.HttpProvider ("http://localhost:8545");
+	if (options["infura-key"] != undefined) {
+		infuraKey	= options["infura-key"];
+		provider	= new HDWalletProvider ("https://ropsten.infura.io/v3/"+infuraKey);
+		console.log ("\n---  Using Infura provider with key  " + infuraKey);
+	}
+	else {
+		provider	= new Web3.providers.HttpProvider ("http://localhost:8545");
+		console.log ("\n---  Using local ethereum client")
+	}
 }
 
 web3 		= new Web3 (provider);
@@ -39,8 +64,10 @@ web3 		= new Web3 (provider);
 
 
 app.on('ready', () => {
-	console.log (provider);
+	//console.log (provider);
 	loadAddresses ();
+
+	ipcMain.setMaxListeners (50);
 });
 
 
@@ -73,11 +100,9 @@ var user	= {
 	publishedContents	: []
 }
 
-const premiumCost	= web3.toWei (44000, 'szabo');
-
-const upperBoundGas	= 4712388;
-
-contracts.catalog.address	= process.argv[2];
+const premiumCost			= web3.toWei (44000, 'szabo');
+const upperBoundGas			= 4712388;
+contracts.catalog.address	= catalogAddress;
 
 
 // Lists used to filter notifications, which are sent to user, about new contents

@@ -11,7 +11,7 @@ var ADDRESSES			= [];
 var currentRating		= "";
 
 
-const ___TEST___	= true;
+const ___TEST___	= false;
 
 
 
@@ -1411,7 +1411,8 @@ $("#body").keyup((evt) => {
 
 // Getting addresses
 window.onload = () => {
-	ipcr.send('getAddresses', {})
+	
+	ipcr.setMaxListeners (50);
 
 	$('#error-modal').modal	({closable:false});
 	$('#loginModal').modal	({closable:false});
@@ -1433,6 +1434,8 @@ window.onload = () => {
 
 	$('#more-info-modal').modal('hide');
 
+	ipcr.send('getAddresses', {});
+
 	if (___TEST___) {
 
 		// Timeout to automatically access with first address of array
@@ -1445,25 +1448,6 @@ window.onload = () => {
 			showLoader('loaderDiv')
 			ipcr.send('init-info', payload);
 		}, 100);
-
-		
-		// Timeout to create new notification
-		setTimeout(() => {
-			newNotification({ name: "notifica di test" });
-
-			//error ('Errore di prova', 3000);
-
-			// =========================  Test requests  =========================
-			//ipcr.send ('create-content-request', {type:0, title:'a beautiful song', price:10000});
-			//showModal ('rating-modal');
-			//showModal ('rating-question-modal');
-			//ipcr.send ('rating-request', { '0': 5, '1': 3, '2': 2, title: '44' });
-			//ipcr.send ('get-views-count-request', {});
-			//ipcr.send ('rating-request', {'1': 5, '2': 4, '3': 3, title: 'a1' });
-			//ipcr.send ('apply-filters' , {authors:'andre, b', genres:'photo'});
-			//ipcr.send ('buy-content-request', {title:'hello'})
-
-		}, 5000);
 	}
 }
 

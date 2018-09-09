@@ -9,11 +9,12 @@ const HDWalletProvider	= require ("truffle-hdwallet-provider");
 const catalogPath		= 'build/contracts/CatalogSmartContract.json';
 let addresses			= [];
 var catalogInstance;
+var catalogOwner;
 
 const mnemonic			= "";
 const infuraKey			= "3c51b50483cd4eec9119a4a7129bd0a4";
 
-const INFURA_DEPLOY		= true;
+const INFURA_DEPLOY		= false;
 
 var provider;
 var web3;
@@ -51,6 +52,21 @@ let readContract	= (contractPath) => {
 
 
 
+const getBalance	= (address) => {
+	return new Promise ((resolve, reject) => {
+		web3.eth.getBalance(catalogOwner, (err, res) => {
+			if (err)
+				reject (err);
+
+			resolve (res);
+		});
+		
+	});
+}
+
+
+
+
 const atExit	= async () => {
 	if (catalogInstance == undefined) {
 		console.log ("\nCatalog is undefined!");
@@ -82,9 +98,14 @@ const createCatalog	= () => {
 			
 			let catalogContract	= truffle (readContract (catalogPath));
 			catalogContract.setProvider (provider);
+
+			catalogOwner	= addresses[0];
+
+			var balance	= await getBalance (catalogOwner);
+			balance		= web3.toDecimal(balance);
 			
-			console.log ('Creating catalog from address  ' + addresses[0] + '  ...');
-			catalogInstance		= await catalogContract.new ({ from: addresses[0], data:catalogContract.bytecode, gas:4000000});
+			console.log ('Creating catalog from address  ' + catalogOwner + '  which has balance  ' + balance +  '...');
+			catalogInstance		= await catalogContract.new ({ from: catalogOwner, data:catalogContract.bytecode, gas:4000000});
 			redisClient.set ("catAddr", catalogInstance.address, redis.print);
 			console.log ('Catalog created!');
 			console.log ('\tCatalog address is   ' + catalogInstance.address);
@@ -101,17 +122,23 @@ const createCatalog	= () => {
 
 
 
-
+console.log (web3); 
 if (typeof web3 !== 'undefined') {
+	console.log ("Provider already defined!");
+
 	provider	= web3.currentProvider;
 	web3 		= new Web3 (provider);
 }
 else {
-	if (INFURA_DEPLOY)
-		provider	= new HDWalletProvider (mnemonic, "https://ropsten.infura.io/v3"+infuraKey);
+	if (INFURA_DEPLOY) {
+		console.log ("Deploying with infura provider\n");
+		provider	= new HDWalletProvider (mnemonic, "https://ropsten.infura.io/v3/"+infuraKey);
+	}
 
-	else
+	else {
+		console.log ("Deploying with http provider\n");
 		provider	= new Web3.providers.HttpProvider ("http://localhost:8545");
+	}
 }
 
 web3		= new Web3(provider);

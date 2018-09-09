@@ -4,15 +4,19 @@
 	"description": "Dapp developed for COBrA project",
 	"main": "js/main.js",
 	"scripts": {
-		"start": "electron ."
+		"start": "electron .",
+		"rebuild": "electron-rebuild -f"
 	},
 	"author": "Luca Di Mauro",
 	"dependencies": {
+		"command-line-args": "^5.0.2",
 		"electron": "^2.0.3",
+		"electron-rebuild": "^1.8.2",
 		"jquery": "^3.3.1",
 		"redis": "^2.8.0",
 		"truffle": "^4.1.14",
 		"truffle-contract": "^3.0.6",
+		"truffle-hdwallet-provider": "0.0.6",
 		"web3": "^0.20.6"
 	}
 }

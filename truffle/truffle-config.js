@@ -23,12 +23,8 @@ module.exports = {
 
 
 		infura: {
-			provider: () => {
-				return new HDWalletProvider (mnemonic, "https://ropsten.infura.io/v3/"+infuraKey, accountIndex);
-			},
-			network_id: 3,
-			host: "127.0.0.1",
-			port:  8545
+			provider: new HDWalletProvider (mnemonic, "https://ropsten.infura.io/"+infuraKey, accountIndex),
+			network_id: 3
 		}
 	},
 
