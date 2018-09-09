@@ -1,0 +1,17 @@
+{
+  "name": "",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Luca Di Mauro",
+  "license": "ISC",
+  "dependencies": {
+    "redis": "^2.8.0",
+    "truffle": "^4.1.14",
+    "truffle-contract": "^3.0.6",
+    "truffle-hdwallet-provider": "0.0.6",
+    "web3": "^0.20.7"
+  }
+}

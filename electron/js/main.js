@@ -10,7 +10,7 @@ const truffle			= require ('truffle-contract');
 
 
 
-const folderPrefix	= './build/contracts/'
+const folderPrefix	= '../truffle/build/contracts/'
 const baseContentContractPath	= folderPrefix + 'BaseContentManagementContract.json'
 const catalogSmartContractPath	= folderPrefix + 'CatalogSmartContract.json'
 const songContractPath			= folderPrefix + 'SongManagementContract.json'
@@ -116,11 +116,11 @@ const createWindow= () => {
 		process.exit ();
 	}
 	mainWindow = new BrowserWindow({
-		icon: path.join(__dirname, 'cobra.png'),
+		icon: path.join(__dirname, 'img/cobra.png'),
 		show:false,
 	})
 	
-	mainWindow.loadURL(`file://${__dirname}/index.html`)
+	mainWindow.loadURL(`file://${__dirname}/../index.html`)
 
 
 	mainWindow.once ('ready-to-show', () => {
