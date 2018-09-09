@@ -1,0 +1,881 @@
+{
+  "contractName": "SharedTypes",
+  "abi": [],
+  "bytecode": "0x604c602c600b82828239805160001a60731460008114601c57601e565bfe5b5030600052607381538281f30073000000000000000000000000000000000000000030146080604052600080fd00a165627a7a723058202539d0575567788cc9d30274a2399c1d88f319df93dd082b606fa9916aff9ca10029",
+  "deployedBytecode": "0x73000000000000000000000000000000000000000030146080604052600080fd00a165627a7a723058202539d0575567788cc9d30274a2399c1d88f319df93dd082b606fa9916aff9ca10029",
+  "sourceMap": "67:2072:5:-;;132:2:-1;166:7;155:9;146:7;137:37;252:7;246:14;243:1;238:23;232:4;229:33;270:1;265:20;;;;222:63;;265:20;274:9;222:63;;298:9;295:1;288:20;328:4;319:7;311:22;352:7;343;336:24",
+  "deployedSourceMap": "67:2072:5:-;;;;;;;;",
+  "source": "pragma solidity ^0.4.24;\n\n\n// Library Containing types definitions\nlibrary SharedTypes {\n    \n    // Kind of content\n    enum contentType {song, video, photo, document}\n    \n    // Kind of account\n    enum accountType {standard, premium}\n    \n    /* Kind of feedback\n     * contentAppreciation  : how much the customer enjoyed the content\n     * priceFairness        : how fair the requested price is considered compared to the content\n     * suitableForChildren  : how much the content is suitable for guys\n     */\n    enum feedbackType {contentAppreciation, priceFairness, suitableForChildren}\n    \n    // Type for registered users, both authors or customers. This struct is stored in the catalog\n    // Username is the identifier of content\n    struct User {\n        address userAddress;                    // Address of user (key value is the name)\n        bool exists;                            // To check if an user exists in the system\n        accountType accType;                    // Type of current account (default standard)\n        uint expirationTime;                    // Expiration time (calculated in block.size). Valid only for premium account\n        bytes32 latestContent;                  // Title of latest content published by current user\n\t\tuint publishedContentsCount;\t\t\t// Number of contents published by this user\n\t\tuint totalViews;\t\t\t\t\t\t// Number of views reached by its contents (used at catalog destroy)\n    }\n    \n    // Struct to hold reference of BaseContentManagementContracts with its author\n    // Title of content (a bytes32) is the identifier of content\n    struct ExtendedContent {\n        uint contentPrice;                      // Price of conent, defined by the author\n        bool exists;                            // To check if a content exists in the system\n        address contractAddress;                // Contract's address associated to current content\n        bytes32 author;                         // Name of owner of content\n\n        // Others informations, about views and users which are granted to access to current content, are stored in BaseContentManagementContracts\n    }\n}",
+  "sourcePath": "/home/luca/Università/Progetti/P2PBC/COBrA-DApp/truffle/contracts/SharedTypes.sol",
+  "ast": {
+    "absolutePath": "/home/luca/Università/Progetti/P2PBC/COBrA-DApp/truffle/contracts/SharedTypes.sol",
+    "exportedSymbols": {
+      "SharedTypes": [
+        2997
+      ]
+    },
+    "id": 2998,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 2960,
+        "literals": [
+          "solidity",
+          "^",
+          "0.4",
+          ".24"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:24:5"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "library",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 2997,
+        "linearizedBaseContracts": [
+          2997
+        ],
+        "name": "SharedTypes",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "SharedTypes.contentType",
+            "id": 2965,
+            "members": [
+              {
+                "id": 2961,
+                "name": "song",
+                "nodeType": "EnumValue",
+                "src": "139:4:5"
+              },
+              {
+                "id": 2962,
+                "name": "video",
+                "nodeType": "EnumValue",
+                "src": "145:5:5"
+              },
+              {
+                "id": 2963,
+                "name": "photo",
+                "nodeType": "EnumValue",
+                "src": "152:5:5"
+              },
+              {
+                "id": 2964,
+                "name": "document",
+                "nodeType": "EnumValue",
+                "src": "159:8:5"
+              }
+            ],
+            "name": "contentType",
+            "nodeType": "EnumDefinition",
+            "src": "121:47:5"
+          },
+          {
+            "canonicalName": "SharedTypes.accountType",
+            "id": 2968,
+            "members": [
+              {
+                "id": 2966,
+                "name": "standard",
+                "nodeType": "EnumValue",
+                "src": "219:8:5"
+              },
+              {
+                "id": 2967,
+                "name": "premium",
+                "nodeType": "EnumValue",
+                "src": "229:7:5"
+              }
+            ],
+            "name": "accountType",
+            "nodeType": "EnumDefinition",
+            "src": "201:36:5"
+          },
+          {
+            "canonicalName": "SharedTypes.feedbackType",
+            "id": 2972,
+            "members": [
+              {
+                "id": 2969,
+                "name": "contentAppreciation",
+                "nodeType": "EnumValue",
+                "src": "539:19:5"
+              },
+              {
+                "id": 2970,
+                "name": "priceFairness",
+                "nodeType": "EnumValue",
+                "src": "560:13:5"
+              },
+              {
+                "id": 2971,
+                "name": "suitableForChildren",
+                "nodeType": "EnumValue",
+                "src": "575:19:5"
+              }
+            ],
+            "name": "feedbackType",
+            "nodeType": "EnumDefinition",
+            "src": "520:75:5"
+          },
+          {
+            "canonicalName": "SharedTypes.User",
+            "id": 2987,
+            "members": [
+              {
+                "constant": false,
+                "id": 2974,
+                "name": "userAddress",
+                "nodeType": "VariableDeclaration",
+                "scope": 2987,
+                "src": "770:19:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 2973,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "770:7:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2976,
+                "name": "exists",
+                "nodeType": "VariableDeclaration",
+                "scope": 2987,
+                "src": "861:11:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 2975,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "861:4:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2978,
+                "name": "accType",
+                "nodeType": "VariableDeclaration",
+                "scope": 2987,
+                "src": "953:19:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_enum$_accountType_$2968",
+                  "typeString": "enum SharedTypes.accountType"
+                },
+                "typeName": {
+                  "contractScope": null,
+                  "id": 2977,
+                  "name": "accountType",
+                  "nodeType": "UserDefinedTypeName",
+                  "referencedDeclaration": 2968,
+                  "src": "953:11:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_enum$_accountType_$2968",
+                    "typeString": "enum SharedTypes.accountType"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2980,
+                "name": "expirationTime",
+                "nodeType": "VariableDeclaration",
+                "scope": 2987,
+                "src": "1047:19:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2979,
+                  "name": "uint",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1047:4:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2982,
+                "name": "latestContent",
+                "nodeType": "VariableDeclaration",
+                "scope": 2987,
+                "src": "1173:21:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                },
+                "typeName": {
+                  "id": 2981,
+                  "name": "bytes32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1173:7:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2984,
+                "name": "publishedContentsCount",
+                "nodeType": "VariableDeclaration",
+                "scope": 2987,
+                "src": "1268:27:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2983,
+                  "name": "uint",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1268:4:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2986,
+                "name": "totalViews",
+                "nodeType": "VariableDeclaration",
+                "scope": 2987,
+                "src": "1346:15:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2985,
+                  "name": "uint",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1346:4:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "User",
+            "nodeType": "StructDefinition",
+            "scope": 2997,
+            "src": "748:694:5",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "SharedTypes.ExtendedContent",
+            "id": 2996,
+            "members": [
+              {
+                "constant": false,
+                "id": 2989,
+                "name": "contentPrice",
+                "nodeType": "VariableDeclaration",
+                "scope": 2996,
+                "src": "1632:17:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2988,
+                  "name": "uint",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1632:4:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2991,
+                "name": "exists",
+                "nodeType": "VariableDeclaration",
+                "scope": 2996,
+                "src": "1722:11:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 2990,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1722:4:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2993,
+                "name": "contractAddress",
+                "nodeType": "VariableDeclaration",
+                "scope": 2996,
+                "src": "1816:23:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 2992,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1816:7:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2995,
+                "name": "author",
+                "nodeType": "VariableDeclaration",
+                "scope": 2996,
+                "src": "1916:14:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                },
+                "typeName": {
+                  "id": 2994,
+                  "name": "bytes32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1916:7:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "ExtendedContent",
+            "nodeType": "StructDefinition",
+            "scope": 2997,
+            "src": "1599:538:5",
+            "visibility": "public"
+          }
+        ],
+        "scope": 2998,
+        "src": "67:2072:5"
+      }
+    ],
+    "src": "0:2139:5"
+  },
+  "legacyAST": {
+    "absolutePath": "/home/luca/Università/Progetti/P2PBC/COBrA-DApp/truffle/contracts/SharedTypes.sol",
+    "exportedSymbols": {
+      "SharedTypes": [
+        2997
+      ]
+    },
+    "id": 2998,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 2960,
+        "literals": [
+          "solidity",
+          "^",
+          "0.4",
+          ".24"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:24:5"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "library",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 2997,
+        "linearizedBaseContracts": [
+          2997
+        ],
+        "name": "SharedTypes",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "SharedTypes.contentType",
+            "id": 2965,
+            "members": [
+              {
+                "id": 2961,
+                "name": "song",
+                "nodeType": "EnumValue",
+                "src": "139:4:5"
+              },
+              {
+                "id": 2962,
+                "name": "video",
+                "nodeType": "EnumValue",
+                "src": "145:5:5"
+              },
+              {
+                "id": 2963,
+                "name": "photo",
+                "nodeType": "EnumValue",
+                "src": "152:5:5"
+              },
+              {
+                "id": 2964,
+                "name": "document",
+                "nodeType": "EnumValue",
+                "src": "159:8:5"
+              }
+            ],
+            "name": "contentType",
+            "nodeType": "EnumDefinition",
+            "src": "121:47:5"
+          },
+          {
+            "canonicalName": "SharedTypes.accountType",
+            "id": 2968,
+            "members": [
+              {
+                "id": 2966,
+                "name": "standard",
+                "nodeType": "EnumValue",
+                "src": "219:8:5"
+              },
+              {
+                "id": 2967,
+                "name": "premium",
+                "nodeType": "EnumValue",
+                "src": "229:7:5"
+              }
+            ],
+            "name": "accountType",
+            "nodeType": "EnumDefinition",
+            "src": "201:36:5"
+          },
+          {
+            "canonicalName": "SharedTypes.feedbackType",
+            "id": 2972,
+            "members": [
+              {
+                "id": 2969,
+                "name": "contentAppreciation",
+                "nodeType": "EnumValue",
+                "src": "539:19:5"
+              },
+              {
+                "id": 2970,
+                "name": "priceFairness",
+                "nodeType": "EnumValue",
+                "src": "560:13:5"
+              },
+              {
+                "id": 2971,
+                "name": "suitableForChildren",
+                "nodeType": "EnumValue",
+                "src": "575:19:5"
+              }
+            ],
+            "name": "feedbackType",
+            "nodeType": "EnumDefinition",
+            "src": "520:75:5"
+          },
+          {
+            "canonicalName": "SharedTypes.User",
+            "id": 2987,
+            "members": [
+              {
+                "constant": false,
+                "id": 2974,
+                "name": "userAddress",
+                "nodeType": "VariableDeclaration",
+                "scope": 2987,
+                "src": "770:19:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 2973,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "770:7:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2976,
+                "name": "exists",
+                "nodeType": "VariableDeclaration",
+                "scope": 2987,
+                "src": "861:11:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 2975,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "861:4:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2978,
+                "name": "accType",
+                "nodeType": "VariableDeclaration",
+                "scope": 2987,
+                "src": "953:19:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_enum$_accountType_$2968",
+                  "typeString": "enum SharedTypes.accountType"
+                },
+                "typeName": {
+                  "contractScope": null,
+                  "id": 2977,
+                  "name": "accountType",
+                  "nodeType": "UserDefinedTypeName",
+                  "referencedDeclaration": 2968,
+                  "src": "953:11:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_enum$_accountType_$2968",
+                    "typeString": "enum SharedTypes.accountType"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2980,
+                "name": "expirationTime",
+                "nodeType": "VariableDeclaration",
+                "scope": 2987,
+                "src": "1047:19:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2979,
+                  "name": "uint",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1047:4:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2982,
+                "name": "latestContent",
+                "nodeType": "VariableDeclaration",
+                "scope": 2987,
+                "src": "1173:21:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                },
+                "typeName": {
+                  "id": 2981,
+                  "name": "bytes32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1173:7:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2984,
+                "name": "publishedContentsCount",
+                "nodeType": "VariableDeclaration",
+                "scope": 2987,
+                "src": "1268:27:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2983,
+                  "name": "uint",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1268:4:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2986,
+                "name": "totalViews",
+                "nodeType": "VariableDeclaration",
+                "scope": 2987,
+                "src": "1346:15:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2985,
+                  "name": "uint",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1346:4:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "User",
+            "nodeType": "StructDefinition",
+            "scope": 2997,
+            "src": "748:694:5",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "SharedTypes.ExtendedContent",
+            "id": 2996,
+            "members": [
+              {
+                "constant": false,
+                "id": 2989,
+                "name": "contentPrice",
+                "nodeType": "VariableDeclaration",
+                "scope": 2996,
+                "src": "1632:17:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2988,
+                  "name": "uint",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1632:4:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2991,
+                "name": "exists",
+                "nodeType": "VariableDeclaration",
+                "scope": 2996,
+                "src": "1722:11:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 2990,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1722:4:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2993,
+                "name": "contractAddress",
+                "nodeType": "VariableDeclaration",
+                "scope": 2996,
+                "src": "1816:23:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 2992,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1816:7:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2995,
+                "name": "author",
+                "nodeType": "VariableDeclaration",
+                "scope": 2996,
+                "src": "1916:14:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                },
+                "typeName": {
+                  "id": 2994,
+                  "name": "bytes32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1916:7:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "ExtendedContent",
+            "nodeType": "StructDefinition",
+            "scope": 2997,
+            "src": "1599:538:5",
+            "visibility": "public"
+          }
+        ],
+        "scope": 2998,
+        "src": "67:2072:5"
+      }
+    ],
+    "src": "0:2139:5"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.4.24+commit.e67f0147.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2018-09-09T09:40:30.468Z"
+}

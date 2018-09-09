@@ -1,0 +1,2792 @@
+{
+  "contractName": "PhotoManagementContract",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getType",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_username",
+          "type": "bytes32"
+        },
+        {
+          "name": "_c",
+          "type": "uint8"
+        },
+        {
+          "name": "_v",
+          "type": "uint8"
+        }
+      ],
+      "name": "leaveFeedback",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getFeedbacksCount",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256[3]"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_username",
+          "type": "bytes32"
+        }
+      ],
+      "name": "isAllowed",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_username",
+          "type": "bytes32"
+        }
+      ],
+      "name": "consumeContent",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "killMe",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getCatalogAddress",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getViewsCount",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_username",
+          "type": "bytes32"
+        },
+        {
+          "name": "_userAddr",
+          "type": "address"
+        },
+        {
+          "name": "isPremium",
+          "type": "bool"
+        }
+      ],
+      "name": "grantAccessToUser",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getFeedbacksAverages",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256[3]"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getTitle",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "name": "_title",
+          "type": "bytes32"
+        },
+        {
+          "name": "_catAddr",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "targetUsername",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "name": "contentTitle",
+          "type": "bytes32"
+        }
+      ],
+      "name": "FeedbackActivation",
+      "type": "event"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getGenre",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x608060405234801561001057600080fd5b50604051604080610a2083398101604052805160209091015160008054600160a060020a03199081163317825560058054600784905560069590955560a060020a60ff0219909416740200000000000000000000000000000000000000001716600160a060020a03909216919091179091556001819055600281905560038190556004805462ffffff191690556109739081906100ad90396000f3006080604052600436106100b95763ffffffff7c010000000000000000000000000000000000000000000000000000000060003504166315dae03e81146100be57806320fe84f1146100f75780632f88d7a91461011e57806336ee0cb9146101445780637875529514610191578063a74bc4f9146101bd578063b603cd80146101d5578063bdac0763146101ea578063bdb578c71461021b578063da9376f214610230578063fbeb2fc414610259578063ff3c1a8f1461026e575b600080fd5b3480156100ca57600080fd5b506100d3610283565b604051808260038111156100e357fe5b60ff16815260200191505060405180910390f35b34801561010357600080fd5b5061010c610293565b60408051918252519081900360200190f35b34801561012a57600080fd5b5061014260043560ff602435811690604435166102b7565b005b34801561015057600080fd5b50610159610465565b6040518082606080838360005b8381101561017e578181015183820152602001610166565b5050505090500191505060405180910390f35b34801561019d57600080fd5b506101a96004356104c3565b604080519115158252519081900360200190f35b3480156101c957600080fd5b506101426004356104f2565b3480156101e157600080fd5b50610142610693565b3480156101f657600080fd5b506101ff6106b8565b60408051600160a060020a039092168252519081900360200190f35b34801561022757600080fd5b5061010c6106c7565b34801561023c57600080fd5b50610142600435600160a060020a036024351660443515156106cd565b34801561026557600080fd5b5061015961085d565b34801561027a57600080fd5b5061010c610922565b60055460a060020a900460ff1690565b7f70686f746f00000000000000000000000000000000000000000000000000000090565b6000838152600860205260408120548490339060ff60b060020a82041690600160a060020a031682148180156102ea5750805b15156102f557600080fd5b8660038160ff161115801561030e575060018160ff1610155b151561031957600080fd5b8660058160ff1611158015610331575060008160ff16115b151561033c57600080fd5b60008a81526008602052604090206000198a01908b9060010160ff83166003811061036357fe5b602081049091015460ff601f9092166101000a9004161561038357600080fd5b8b6000808281526008602052604090205460a060020a900460ff1660028111156103a957fe5b146103b357600080fd5b60018c0399508a60ff1660018b60ff166003811015156103cf57fe5b01805490910190556001600460ff8c16600381106103e957fe5b6020808204909201805460ff601f9093166101000a80820484169095018316850294830219169390931790925560008f8152600890915260409020600191908201908c166003811061043757fe5b602091828204019190066101000a81548160ff02191690831515021790555050505050505050505050505050565b61046d610928565b610475610928565b60005b60038110156104bd576004816003811061048e57fe5b602081049091015460ff601f9092166101000a9004168282600381106104b057fe5b6020020152600101610478565b50919050565b60008060008381526008602052604090205460a060020a900460ff1660028111156104ea57fe5b141592915050565b6000818152600860205260408120548290339060ff60b060020a82041690600160a060020a031682148180156105255750805b151561053057600080fd5b856000808281526008602052604090205460a060020a900460ff16600281111561055657fe5b141561056157600080fd5b600160008881526008602052604090205460a060020a900460ff16600281111561058757fe5b149550851561062257600780546001019055600554600654604080517fe173b0fc0000000000000000000000000000000000000000000000000000000081526004810192909252602482018a905251600160a060020a039092169163e173b0fc9160448082019260009290919082900301818387803b15801561060957600080fd5b505af115801561061d573d6000803e3d6000fd5b505050505b600087815260086020908152604091829020805475ffff00000000000000000000000000000000000000001916905560065482518a81529182015281517f852dafa23d660c18b6ebc3e8dd162d42554dc305dd64d6977414b586a6d58f74929181900390910190a150505050505050565b600054600160a060020a031633146106aa57600080fd5b600054600160a060020a0316ff5b600554600160a060020a031690565b60075490565b600554600160a060020a031633146106e457600080fd5b826000808281526008602052604090205460a060020a900460ff16600281111561070a57fe5b1461071457600080fd5b60008481526008602052604090205460b060020a900460ff16151561078a576000848152600860205260409020805460b060020a76ff00000000000000000000000000000000000000000000199091161773ffffffffffffffffffffffffffffffffffffffff1916600160a060020a0385161790555b81156107d6576000848152600860205260409020805474ff0000000000000000000000000000000000000000191674020000000000000000000000000000000000000000179055610807565b6000848152600860205260409020805474ff0000000000000000000000000000000000000000191660a060020a1790555b505050600090815260086020526040902060018101805462ffffff19169055805475ff00000000000000000000000000000000000000000019167501000000000000000000000000000000000000000000179055565b610865610928565b61086d610928565b60005b60038160ff1610156104bd57600460ff82166003811061088c57fe5b602081049091015460ff601f9092166101000a9004161561090357600460ff8216600381106108b757fe5b602081049091015460ff601f9092166101000a90048116906001908316600381106108de57fe5b01548115156108e957fe5b048260ff8316600381106108f957fe5b602002015261091a565b60008260ff83166003811061091457fe5b60200201525b600101610870565b60065490565b60606040519081016040528060039060208202803883395091929150505600a165627a7a723058203e9a51c21c1deebe38e2a155d78b9944d47c4a1e32a01af02928be6f4c68a3430029",
+  "deployedBytecode": "0x6080604052600436106100b95763ffffffff7c010000000000000000000000000000000000000000000000000000000060003504166315dae03e81146100be57806320fe84f1146100f75780632f88d7a91461011e57806336ee0cb9146101445780637875529514610191578063a74bc4f9146101bd578063b603cd80146101d5578063bdac0763146101ea578063bdb578c71461021b578063da9376f214610230578063fbeb2fc414610259578063ff3c1a8f1461026e575b600080fd5b3480156100ca57600080fd5b506100d3610283565b604051808260038111156100e357fe5b60ff16815260200191505060405180910390f35b34801561010357600080fd5b5061010c610293565b60408051918252519081900360200190f35b34801561012a57600080fd5b5061014260043560ff602435811690604435166102b7565b005b34801561015057600080fd5b50610159610465565b6040518082606080838360005b8381101561017e578181015183820152602001610166565b5050505090500191505060405180910390f35b34801561019d57600080fd5b506101a96004356104c3565b604080519115158252519081900360200190f35b3480156101c957600080fd5b506101426004356104f2565b3480156101e157600080fd5b50610142610693565b3480156101f657600080fd5b506101ff6106b8565b60408051600160a060020a039092168252519081900360200190f35b34801561022757600080fd5b5061010c6106c7565b34801561023c57600080fd5b50610142600435600160a060020a036024351660443515156106cd565b34801561026557600080fd5b5061015961085d565b34801561027a57600080fd5b5061010c610922565b60055460a060020a900460ff1690565b7f70686f746f00000000000000000000000000000000000000000000000000000090565b6000838152600860205260408120548490339060ff60b060020a82041690600160a060020a031682148180156102ea5750805b15156102f557600080fd5b8660038160ff161115801561030e575060018160ff1610155b151561031957600080fd5b8660058160ff1611158015610331575060008160ff16115b151561033c57600080fd5b60008a81526008602052604090206000198a01908b9060010160ff83166003811061036357fe5b602081049091015460ff601f9092166101000a9004161561038357600080fd5b8b6000808281526008602052604090205460a060020a900460ff1660028111156103a957fe5b146103b357600080fd5b60018c0399508a60ff1660018b60ff166003811015156103cf57fe5b01805490910190556001600460ff8c16600381106103e957fe5b6020808204909201805460ff601f9093166101000a80820484169095018316850294830219169390931790925560008f8152600890915260409020600191908201908c166003811061043757fe5b602091828204019190066101000a81548160ff02191690831515021790555050505050505050505050505050565b61046d610928565b610475610928565b60005b60038110156104bd576004816003811061048e57fe5b602081049091015460ff601f9092166101000a9004168282600381106104b057fe5b6020020152600101610478565b50919050565b60008060008381526008602052604090205460a060020a900460ff1660028111156104ea57fe5b141592915050565b6000818152600860205260408120548290339060ff60b060020a82041690600160a060020a031682148180156105255750805b151561053057600080fd5b856000808281526008602052604090205460a060020a900460ff16600281111561055657fe5b141561056157600080fd5b600160008881526008602052604090205460a060020a900460ff16600281111561058757fe5b149550851561062257600780546001019055600554600654604080517fe173b0fc0000000000000000000000000000000000000000000000000000000081526004810192909252602482018a905251600160a060020a039092169163e173b0fc9160448082019260009290919082900301818387803b15801561060957600080fd5b505af115801561061d573d6000803e3d6000fd5b505050505b600087815260086020908152604091829020805475ffff00000000000000000000000000000000000000001916905560065482518a81529182015281517f852dafa23d660c18b6ebc3e8dd162d42554dc305dd64d6977414b586a6d58f74929181900390910190a150505050505050565b600054600160a060020a031633146106aa57600080fd5b600054600160a060020a0316ff5b600554600160a060020a031690565b60075490565b600554600160a060020a031633146106e457600080fd5b826000808281526008602052604090205460a060020a900460ff16600281111561070a57fe5b1461071457600080fd5b60008481526008602052604090205460b060020a900460ff16151561078a576000848152600860205260409020805460b060020a76ff00000000000000000000000000000000000000000000199091161773ffffffffffffffffffffffffffffffffffffffff1916600160a060020a0385161790555b81156107d6576000848152600860205260409020805474ff0000000000000000000000000000000000000000191674020000000000000000000000000000000000000000179055610807565b6000848152600860205260409020805474ff0000000000000000000000000000000000000000191660a060020a1790555b505050600090815260086020526040902060018101805462ffffff19169055805475ff00000000000000000000000000000000000000000019167501000000000000000000000000000000000000000000179055565b610865610928565b61086d610928565b60005b60038160ff1610156104bd57600460ff82166003811061088c57fe5b602081049091015460ff601f9092166101000a9004161561090357600460ff8216600381106108b757fe5b602081049091015460ff601f9092166101000a90048116906001908316600381106108de57fe5b01548115156108e957fe5b048260ff8316600381106108f957fe5b602002015261091a565b60008260ff83166003811061091457fe5b60200201525b600101610870565b60065490565b60606040519081016040528060039060208202803883395091929150505600a165627a7a723058203e9a51c21c1deebe38e2a155d78b9944d47c4a1e32a01af02928be6f4c68a3430029",
+  "sourceMap": "1080:308:2:-;;;1152:148;8:9:-1;5:2;;;30:1;27;20:12;5:2;1152:148:2;;;;;;;;;;;;;;;;;;;106:5:4;:18;;-1:-1:-1;;;;;;106:18:4;;;114:10;106:18;;;2004:13:0;:26;;2040:13;:19;;;2069:12;:27;;;;-1:-1:-1;;;;;;2004:26:0;;;;;2106:30;-1:-1:-1;;;;;2106:30:0;;;;;;;;;;-1:-1:-1;2155:23:0;;;-1:-1:-1;2188:23:0;;;-1:-1:-1;2221:23:0;;;-1:-1:-1;2254:23:0;;-1:-1:-1;;2320:23:0;;;1080:308:2;;;;;;;;",
+  "deployedSourceMap": "1080:308:2:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;5093:103:0;;8:9:-1;5:2;;;30:1;27;20:12;5:2;5093:103:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1310:76:2;;8:9:-1;5:2;;;30:1;27;20:12;5:2;1310:76:2;;;;;;;;;;;;;;;;;;;;6618:382:0;;8:9:-1;5:2;;;30:1;27;20:12;5:2;-1:-1;6618:382:0;;;;;;;;;;;;;;;;7387:254;;8:9:-1;5:2;;;30:1;27;20:12;5:2;7387:254:0;;;;;;;;;;;;;23:1:-1;8:100;33:3;30:1;27:10;8:100;;;90:11;;;84:18;71:11;;;64:39;52:2;45:10;8:100;;;12:14;7387:254:0;;;;;;;;;;;;;;;;6153:149;;8:9:-1;5:2;;;30:1;27;20:12;5:2;-1:-1;6153:149:0;;;;;;;;;;;;;;;;;;;;;;;3896:559;;8:9:-1;5:2;;;30:1;27;20:12;5:2;-1:-1;3896:559:0;;;;;4603:75;;8:9:-1;5:2;;;30:1;27;20:12;5:2;4603:75:0;;;;4788:98;;8:9:-1;5:2;;;30:1;27;20:12;5:2;4788:98:0;;;;;;;;-1:-1:-1;;;;;4788:98:0;;;;;;;;;;;;;;4896:90;;8:9:-1;5:2;;;30:1;27;20:12;5:2;4896:90:0;;;;5307:752;;8:9:-1;5:2;;;30:1;27;20:12;5:2;-1:-1;5307:752:0;;;-1:-1:-1;;;;;5307:752:0;;;;;;;;;7020:352;;8:9:-1;5:2;;;30:1;27;20:12;5:2;7020:352:0;;;;4996:87;;8:9:-1;5:2;;;30:1;27;20:12;5:2;4996:87:0;;;;5093:103;5176:13;;-1:-1:-1;;;5176:13:0;;;;;5093:103::o;1310:76:2:-;1365:14;1310:76;:::o;6618:382:0:-;6844:8;2633:23;;;:12;:23;;;;;:30;6702:9;;6713:10;;2633:30;-1:-1:-1;;;2633:30:0;;;;-1:-1:-1;;;;;2699:35:0;:53;;2633:30;2775:27;;;;;2785:17;2775:27;2766:37;;;;;;;;6743:2;3387:1;3376:9;:12;;;;3375:32;;;;;3405:1;3394:9;:12;;;;3375:32;3366:42;;;;;;;;6763:2;3268:1;3260:4;:9;;;;3259:23;;;;;3280:1;3275:4;:6;;;3259:23;3250:33;;;;;;;;3521:23;;;;:12;:23;;;;;-1:-1:-1;;6787:4:0;;;6793:9;;6790:1;3521:38;:49;;;;;;;;;;;;;;;;;;;;;;;;;;;:58;3512:68;;;;;;6823:9;2935:21;2897:23;;;;:12;:23;;;;;:34;-1:-1:-1;;;2897:34:0;;;;:59;;;;;;;;;2888:69;;;;;;6857:1;6854:2;:4;6844:14;;6900:2;6877:25;;:13;6891:2;6877:17;;;;;;;;;;;;:25;;;;;;;-1:-1:-1;6912:14:0;:18;;;;;;;;;;;;;;;;;:23;;;:18;;;;:23;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;6945:23:0;;;:12;:23;;;;;;-1:-1:-1;;6945:38:0;;;;:42;;;;;;;;;;;;;;;;;;:48;;;;;;;;;;;;;;;;;;3590:1;3293;;3418;2813;6618:382;;;;;;;;:::o;7387:254::-;7438:7;;:::i;:::-;7457:25;;:::i;:::-;7492:6;7521:78;7533:1;7531;:3;7521:78;;;7571:14;7586:1;7571:17;;;;;;;;;;;;;;;;;;;;;;;;7555:10;7566:1;7555:13;;;;;;;;;;:33;7536:3;;7521:78;;;-1:-1:-1;7624:10:0;7387:254;-1:-1:-1;7387:254:0:o;6153:149::-;6213:4;;6236:23;;;;:12;:23;;;;;:34;-1:-1:-1;;;6236:34:0;;;;:59;;;;;;;;;;;6153:149;-1:-1:-1;;6153:149:0:o;3896:559::-;4021:15;2633:23;;;:12;:23;;;;;:30;3961:9;;3972:10;;2633:30;-1:-1:-1;;;2633:30:0;;;;-1:-1:-1;;;;;2699:35:0;:53;;2633:30;2775:27;;;;;2785:17;2775:27;2766:37;;;;;;;;4000:9;3152:21;3114:23;;;;:12;:23;;;;;:34;-1:-1:-1;;;3114:34:0;;;;:59;;;;;;;;;;3105:69;;;;;;4076:25;4038:23;;;;:12;:23;;;;;:34;-1:-1:-1;;;4038:34:0;;;;:63;;;;;;;;;4021:80;;4115:10;4111:149;;;4141:13;:15;;;;;;4193:14;;4225:12;;4170:79;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;4193:14:0;;;;4170:53;;:79;;;;;4141:13;;4170:79;;;;;;;;4141:13;4193:14;4170:79;;;5:2:-1;;;;30:1;27;20:12;5:2;4170:79:0;;;;8:9:-1;5:2;;;45:16;42:1;39;24:38;77:16;74:1;67:27;5:2;4170:79:0;;;;4111:149;4316:21;4274:23;;;:12;:23;;;;;;;;;:63;;-1:-1:-1;;4347:47:0;;;4435:12;;4404:44;;;;;;;;;;;;;;;;;;;;;;2813:1;3896:559;;;;;;:::o;4603:75::-;196:5:4;;-1:-1:-1;;;;;196:5:4;182:10;:19;173:29;;;;;;4665:5:0;;-1:-1:-1;;;;;4665:5:0;4651:20;4788:98;4865:14;;-1:-1:-1;;;;;4865:14:0;4788:98;:::o;4896:90::-;4966:13;;4896:90;:::o;5307:752::-;2496:14;;-1:-1:-1;;;;;2496:14:0;2482:10;:28;2473:38;;;;;;5430:9;2935:21;2897:23;;;;:12;:23;;;;;:34;-1:-1:-1;;;2897:34:0;;;;:59;;;;;;;;;2888:69;;;;;;5455:23;;;;:12;:23;;;;;:30;-1:-1:-1;;;5455:30:0;;;;:39;;5451:189;;5510:23;;;;:12;:23;;;;;:50;;-1:-1:-1;;;;;5510:50:0;;;;-1:-1:-1;;5574:55:0;-1:-1:-1;;;;;5574:55:0;;;;;5451:189;5662:9;5658:175;;;5685:23;;;;:12;:23;;;;;:60;;-1:-1:-1;;5685:60:0;;;;;5658:175;;;5772:23;;;;:12;:23;;;;;:61;;-1:-1:-1;;5772:61:0;-1:-1:-1;;;5772:61:0;;;5658:175;-1:-1:-1;;;5884:5:0;5838:23;;;:12;:23;;;;;:38;;;:51;;-1:-1:-1;;5948:51:0;;;6009:43;;-1:-1:-1;;6009:43:0;;;;;5307:752::o;7020:352::-;7074:7;;:::i;:::-;7093:20;;:::i;:::-;7123:7;7151:184;7163:1;7161;:3;;;7151:184;;;7189:14;:17;;;;;;;;;;;;;;;;;;;;;;;;;;;:22;7185:139;;7259:14;:17;;;;;;;;;;;;;;;;;;;;;;;;;;;;;7240:13;;:16;;;;;;;;;;;:36;;;;;;;;7229:5;:8;;;;;;;;;;;;;:47;7185:139;;;7323:1;7312:5;:8;;;;;;;;;;;;;:12;7185:139;7166:3;;7151:184;;4996:87;5064:12;;4996:87;:::o;1080:308:2:-;;;;;;;;;;;;29:2:-1;21:6;17:15;117:4;105:10;97:6;88:34;-1:-1;1080:308:2;;;-1:-1:-1;;1080:308:2:o",
+  "source": "pragma solidity ^0.4.24;\n\nimport \"./BaseContentManagementContract.sol\";\nimport \"./CatalogSmartContract.sol\";        // FIXME Remove me!!!!!\n\n\n\n\ncontract SongManagementContract is BaseContentManagementContract {\n    \n    constructor (bytes32 _title, address _catAddr)\n\t\tBaseContentManagementContract(SharedTypes.contentType.song, _title, _catAddr) public {\n    }\n    \n    function getGenre () public view returns (bytes32) {\n\t\treturn 'song';\n    }\n}\n\n\n\n\n/* ********************************************* */\n/* ********************************************* */\n/* ********************************************* */\n\n\n\n\ncontract VideoManagementContract is BaseContentManagementContract {\n    constructor (bytes32 _title, address _catAddr)\n\t\tBaseContentManagementContract(SharedTypes.contentType.video, _title, _catAddr) public {\n    }\n    \n    function getGenre () public view returns (bytes32) {\n\t\treturn 'video';\n    }\n}\n\n\n\n\n/* ********************************************* */\n/* ********************************************* */\n/* ********************************************* */\n\n\n\n\ncontract PhotoManagementContract is BaseContentManagementContract {\n    constructor (bytes32 _title, address _catAddr)\n        BaseContentManagementContract(SharedTypes.contentType.photo, _title, _catAddr) public {\n    }\n    \n    function getGenre () public view returns (bytes32) {\n\t\treturn 'photo';\n    }\n}\n\n\n\n\n/* ********************************************* */\n/* ********************************************* */\n/* ********************************************* */\n\n\n\n\ncontract DocumentManagementContract is BaseContentManagementContract {\n    constructor (bytes32 _title, address _catAddr)\n        BaseContentManagementContract(SharedTypes.contentType.document, _title, _catAddr) public {\n    }\n    \n    function getGenre () public view returns (bytes32) {\n\t\treturn 'document';\n    }\n}\n\n\n",
+  "sourcePath": "/home/luca/Università/Progetti/P2PBC/COBrA-DApp/truffle/contracts/ContentManagementContracts.sol",
+  "ast": {
+    "absolutePath": "/home/luca/Università/Progetti/P2PBC/COBrA-DApp/truffle/contracts/ContentManagementContracts.sol",
+    "exportedSymbols": {
+      "DocumentManagementContract": [
+        2876
+      ],
+      "PhotoManagementContract": [
+        2850
+      ],
+      "SongManagementContract": [
+        2798
+      ],
+      "VideoManagementContract": [
+        2824
+      ]
+    },
+    "id": 2877,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 2770,
+        "literals": [
+          "solidity",
+          "^",
+          "0.4",
+          ".24"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:24:2"
+      },
+      {
+        "absolutePath": "/home/luca/Università/Progetti/P2PBC/COBrA-DApp/truffle/contracts/BaseContentManagementContract.sol",
+        "file": "./BaseContentManagementContract.sol",
+        "id": 2771,
+        "nodeType": "ImportDirective",
+        "scope": 2877,
+        "sourceUnit": 606,
+        "src": "26:45:2",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "/home/luca/Università/Progetti/P2PBC/COBrA-DApp/truffle/contracts/CatalogSmartContract.sol",
+        "file": "./CatalogSmartContract.sol",
+        "id": 2772,
+        "nodeType": "ImportDirective",
+        "scope": 2877,
+        "sourceUnit": 2769,
+        "src": "72:36:2",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [
+          {
+            "arguments": null,
+            "baseName": {
+              "contractScope": null,
+              "id": 2773,
+              "name": "BaseContentManagementContract",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 605,
+              "src": "179:29:2",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_BaseContentManagementContract_$605",
+                "typeString": "contract BaseContentManagementContract"
+              }
+            },
+            "id": 2774,
+            "nodeType": "InheritanceSpecifier",
+            "src": "179:29:2"
+          }
+        ],
+        "contractDependencies": [
+          605,
+          2958
+        ],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 2798,
+        "linearizedBaseContracts": [
+          2798,
+          605,
+          2958
+        ],
+        "name": "SongManagementContract",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 2788,
+              "nodeType": "Block",
+              "src": "354:7:2",
+              "statements": []
+            },
+            "documentation": null,
+            "id": 2789,
+            "implemented": true,
+            "isConstructor": true,
+            "isDeclaredConst": false,
+            "modifiers": [
+              {
+                "arguments": [
+                  {
+                    "argumentTypes": null,
+                    "expression": {
+                      "argumentTypes": null,
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 2781,
+                        "name": "SharedTypes",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2997,
+                        "src": "299:11:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_contract$_SharedTypes_$2997_$",
+                          "typeString": "type(library SharedTypes)"
+                        }
+                      },
+                      "id": 2782,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "contentType",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 2965,
+                      "src": "299:23:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_type$_t_enum$_contentType_$2965_$",
+                        "typeString": "type(enum SharedTypes.contentType)"
+                      }
+                    },
+                    "id": 2783,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "lValueRequested": false,
+                    "memberName": "song",
+                    "nodeType": "MemberAccess",
+                    "referencedDeclaration": null,
+                    "src": "299:28:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_enum$_contentType_$2965",
+                      "typeString": "enum SharedTypes.contentType"
+                    }
+                  },
+                  {
+                    "argumentTypes": null,
+                    "id": 2784,
+                    "name": "_title",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 2776,
+                    "src": "329:6:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  {
+                    "argumentTypes": null,
+                    "id": 2785,
+                    "name": "_catAddr",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 2778,
+                    "src": "337:8:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  }
+                ],
+                "id": 2786,
+                "modifierName": {
+                  "argumentTypes": null,
+                  "id": 2780,
+                  "name": "BaseContentManagementContract",
+                  "nodeType": "Identifier",
+                  "overloadedDeclarations": [],
+                  "referencedDeclaration": 605,
+                  "src": "269:29:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_type$_t_contract$_BaseContentManagementContract_$605_$",
+                    "typeString": "type(contract BaseContentManagementContract)"
+                  }
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "269:77:2"
+              }
+            ],
+            "name": "",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2779,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2776,
+                  "name": "_title",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2789,
+                  "src": "233:14:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 2775,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "233:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2778,
+                  "name": "_catAddr",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2789,
+                  "src": "249:16:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 2777,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "249:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "232:34:2"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 2787,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "354:0:2"
+            },
+            "scope": 2798,
+            "src": "220:141:2",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 2796,
+              "nodeType": "Block",
+              "src": "422:24:2",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "hexValue": "736f6e67",
+                    "id": 2794,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "kind": "string",
+                    "lValueRequested": false,
+                    "nodeType": "Literal",
+                    "src": "433:6:2",
+                    "subdenomination": null,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_stringliteral_4f51b569179770979ec23a2bfc3a740422bc29a29c2ae9d1564ede4081039546",
+                      "typeString": "literal_string \"song\""
+                    },
+                    "value": "song"
+                  },
+                  "functionReturnParameters": 2793,
+                  "id": 2795,
+                  "nodeType": "Return",
+                  "src": "426:13:2"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 2797,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": true,
+            "modifiers": [],
+            "name": "getGenre",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2790,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "389:2:2"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 2793,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2792,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2797,
+                  "src": "413:7:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 2791,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "413:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "412:9:2"
+            },
+            "scope": 2798,
+            "src": "371:75:2",
+            "stateMutability": "view",
+            "superFunction": 604,
+            "visibility": "public"
+          }
+        ],
+        "scope": 2877,
+        "src": "144:304:2"
+      },
+      {
+        "baseContracts": [
+          {
+            "arguments": null,
+            "baseName": {
+              "contractScope": null,
+              "id": 2799,
+              "name": "BaseContentManagementContract",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 605,
+              "src": "649:29:2",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_BaseContentManagementContract_$605",
+                "typeString": "contract BaseContentManagementContract"
+              }
+            },
+            "id": 2800,
+            "nodeType": "InheritanceSpecifier",
+            "src": "649:29:2"
+          }
+        ],
+        "contractDependencies": [
+          605,
+          2958
+        ],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 2824,
+        "linearizedBaseContracts": [
+          2824,
+          605,
+          2958
+        ],
+        "name": "VideoManagementContract",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 2814,
+              "nodeType": "Block",
+              "src": "820:7:2",
+              "statements": []
+            },
+            "documentation": null,
+            "id": 2815,
+            "implemented": true,
+            "isConstructor": true,
+            "isDeclaredConst": false,
+            "modifiers": [
+              {
+                "arguments": [
+                  {
+                    "argumentTypes": null,
+                    "expression": {
+                      "argumentTypes": null,
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 2807,
+                        "name": "SharedTypes",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2997,
+                        "src": "764:11:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_contract$_SharedTypes_$2997_$",
+                          "typeString": "type(library SharedTypes)"
+                        }
+                      },
+                      "id": 2808,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "contentType",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 2965,
+                      "src": "764:23:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_type$_t_enum$_contentType_$2965_$",
+                        "typeString": "type(enum SharedTypes.contentType)"
+                      }
+                    },
+                    "id": 2809,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "lValueRequested": false,
+                    "memberName": "video",
+                    "nodeType": "MemberAccess",
+                    "referencedDeclaration": null,
+                    "src": "764:29:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_enum$_contentType_$2965",
+                      "typeString": "enum SharedTypes.contentType"
+                    }
+                  },
+                  {
+                    "argumentTypes": null,
+                    "id": 2810,
+                    "name": "_title",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 2802,
+                    "src": "795:6:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  {
+                    "argumentTypes": null,
+                    "id": 2811,
+                    "name": "_catAddr",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 2804,
+                    "src": "803:8:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  }
+                ],
+                "id": 2812,
+                "modifierName": {
+                  "argumentTypes": null,
+                  "id": 2806,
+                  "name": "BaseContentManagementContract",
+                  "nodeType": "Identifier",
+                  "overloadedDeclarations": [],
+                  "referencedDeclaration": 605,
+                  "src": "734:29:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_type$_t_contract$_BaseContentManagementContract_$605_$",
+                    "typeString": "type(contract BaseContentManagementContract)"
+                  }
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "734:78:2"
+              }
+            ],
+            "name": "",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2805,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2802,
+                  "name": "_title",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2815,
+                  "src": "698:14:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 2801,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "698:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2804,
+                  "name": "_catAddr",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2815,
+                  "src": "714:16:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 2803,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "714:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "697:34:2"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 2813,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "820:0:2"
+            },
+            "scope": 2824,
+            "src": "685:142:2",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 2822,
+              "nodeType": "Block",
+              "src": "888:25:2",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "hexValue": "766964656f",
+                    "id": 2820,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "kind": "string",
+                    "lValueRequested": false,
+                    "nodeType": "Literal",
+                    "src": "899:7:2",
+                    "subdenomination": null,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_stringliteral_b57dd00b0a8b2aad812b2c5318e4e11f83447e0eef3e5eeef5d971fd155cdbbf",
+                      "typeString": "literal_string \"video\""
+                    },
+                    "value": "video"
+                  },
+                  "functionReturnParameters": 2819,
+                  "id": 2821,
+                  "nodeType": "Return",
+                  "src": "892:14:2"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 2823,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": true,
+            "modifiers": [],
+            "name": "getGenre",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2816,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "855:2:2"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 2819,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2818,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2823,
+                  "src": "879:7:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 2817,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "879:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "878:9:2"
+            },
+            "scope": 2824,
+            "src": "837:76:2",
+            "stateMutability": "view",
+            "superFunction": 604,
+            "visibility": "public"
+          }
+        ],
+        "scope": 2877,
+        "src": "613:302:2"
+      },
+      {
+        "baseContracts": [
+          {
+            "arguments": null,
+            "baseName": {
+              "contractScope": null,
+              "id": 2825,
+              "name": "BaseContentManagementContract",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 605,
+              "src": "1116:29:2",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_BaseContentManagementContract_$605",
+                "typeString": "contract BaseContentManagementContract"
+              }
+            },
+            "id": 2826,
+            "nodeType": "InheritanceSpecifier",
+            "src": "1116:29:2"
+          }
+        ],
+        "contractDependencies": [
+          605,
+          2958
+        ],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 2850,
+        "linearizedBaseContracts": [
+          2850,
+          605,
+          2958
+        ],
+        "name": "PhotoManagementContract",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 2840,
+              "nodeType": "Block",
+              "src": "1293:7:2",
+              "statements": []
+            },
+            "documentation": null,
+            "id": 2841,
+            "implemented": true,
+            "isConstructor": true,
+            "isDeclaredConst": false,
+            "modifiers": [
+              {
+                "arguments": [
+                  {
+                    "argumentTypes": null,
+                    "expression": {
+                      "argumentTypes": null,
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 2833,
+                        "name": "SharedTypes",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2997,
+                        "src": "1237:11:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_contract$_SharedTypes_$2997_$",
+                          "typeString": "type(library SharedTypes)"
+                        }
+                      },
+                      "id": 2834,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "contentType",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 2965,
+                      "src": "1237:23:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_type$_t_enum$_contentType_$2965_$",
+                        "typeString": "type(enum SharedTypes.contentType)"
+                      }
+                    },
+                    "id": 2835,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "lValueRequested": false,
+                    "memberName": "photo",
+                    "nodeType": "MemberAccess",
+                    "referencedDeclaration": null,
+                    "src": "1237:29:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_enum$_contentType_$2965",
+                      "typeString": "enum SharedTypes.contentType"
+                    }
+                  },
+                  {
+                    "argumentTypes": null,
+                    "id": 2836,
+                    "name": "_title",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 2828,
+                    "src": "1268:6:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  {
+                    "argumentTypes": null,
+                    "id": 2837,
+                    "name": "_catAddr",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 2830,
+                    "src": "1276:8:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  }
+                ],
+                "id": 2838,
+                "modifierName": {
+                  "argumentTypes": null,
+                  "id": 2832,
+                  "name": "BaseContentManagementContract",
+                  "nodeType": "Identifier",
+                  "overloadedDeclarations": [],
+                  "referencedDeclaration": 605,
+                  "src": "1207:29:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_type$_t_contract$_BaseContentManagementContract_$605_$",
+                    "typeString": "type(contract BaseContentManagementContract)"
+                  }
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "1207:78:2"
+              }
+            ],
+            "name": "",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2831,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2828,
+                  "name": "_title",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2841,
+                  "src": "1165:14:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 2827,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1165:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2830,
+                  "name": "_catAddr",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2841,
+                  "src": "1181:16:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 2829,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1181:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1164:34:2"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 2839,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1293:0:2"
+            },
+            "scope": 2850,
+            "src": "1152:148:2",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 2848,
+              "nodeType": "Block",
+              "src": "1361:25:2",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "hexValue": "70686f746f",
+                    "id": 2846,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "kind": "string",
+                    "lValueRequested": false,
+                    "nodeType": "Literal",
+                    "src": "1372:7:2",
+                    "subdenomination": null,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_stringliteral_6c910f9470010ccea7fc0236c4e46ee4dda1dc89348fefefef37f36759f0dc0f",
+                      "typeString": "literal_string \"photo\""
+                    },
+                    "value": "photo"
+                  },
+                  "functionReturnParameters": 2845,
+                  "id": 2847,
+                  "nodeType": "Return",
+                  "src": "1365:14:2"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 2849,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": true,
+            "modifiers": [],
+            "name": "getGenre",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2842,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1328:2:2"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 2845,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2844,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2849,
+                  "src": "1352:7:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 2843,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1352:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1351:9:2"
+            },
+            "scope": 2850,
+            "src": "1310:76:2",
+            "stateMutability": "view",
+            "superFunction": 604,
+            "visibility": "public"
+          }
+        ],
+        "scope": 2877,
+        "src": "1080:308:2"
+      },
+      {
+        "baseContracts": [
+          {
+            "arguments": null,
+            "baseName": {
+              "contractScope": null,
+              "id": 2851,
+              "name": "BaseContentManagementContract",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 605,
+              "src": "1592:29:2",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_BaseContentManagementContract_$605",
+                "typeString": "contract BaseContentManagementContract"
+              }
+            },
+            "id": 2852,
+            "nodeType": "InheritanceSpecifier",
+            "src": "1592:29:2"
+          }
+        ],
+        "contractDependencies": [
+          605,
+          2958
+        ],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 2876,
+        "linearizedBaseContracts": [
+          2876,
+          605,
+          2958
+        ],
+        "name": "DocumentManagementContract",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 2866,
+              "nodeType": "Block",
+              "src": "1772:7:2",
+              "statements": []
+            },
+            "documentation": null,
+            "id": 2867,
+            "implemented": true,
+            "isConstructor": true,
+            "isDeclaredConst": false,
+            "modifiers": [
+              {
+                "arguments": [
+                  {
+                    "argumentTypes": null,
+                    "expression": {
+                      "argumentTypes": null,
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 2859,
+                        "name": "SharedTypes",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2997,
+                        "src": "1713:11:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_contract$_SharedTypes_$2997_$",
+                          "typeString": "type(library SharedTypes)"
+                        }
+                      },
+                      "id": 2860,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "contentType",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 2965,
+                      "src": "1713:23:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_type$_t_enum$_contentType_$2965_$",
+                        "typeString": "type(enum SharedTypes.contentType)"
+                      }
+                    },
+                    "id": 2861,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "lValueRequested": false,
+                    "memberName": "document",
+                    "nodeType": "MemberAccess",
+                    "referencedDeclaration": null,
+                    "src": "1713:32:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_enum$_contentType_$2965",
+                      "typeString": "enum SharedTypes.contentType"
+                    }
+                  },
+                  {
+                    "argumentTypes": null,
+                    "id": 2862,
+                    "name": "_title",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 2854,
+                    "src": "1747:6:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  {
+                    "argumentTypes": null,
+                    "id": 2863,
+                    "name": "_catAddr",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 2856,
+                    "src": "1755:8:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  }
+                ],
+                "id": 2864,
+                "modifierName": {
+                  "argumentTypes": null,
+                  "id": 2858,
+                  "name": "BaseContentManagementContract",
+                  "nodeType": "Identifier",
+                  "overloadedDeclarations": [],
+                  "referencedDeclaration": 605,
+                  "src": "1683:29:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_type$_t_contract$_BaseContentManagementContract_$605_$",
+                    "typeString": "type(contract BaseContentManagementContract)"
+                  }
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "1683:81:2"
+              }
+            ],
+            "name": "",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2857,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2854,
+                  "name": "_title",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2867,
+                  "src": "1641:14:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 2853,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1641:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2856,
+                  "name": "_catAddr",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2867,
+                  "src": "1657:16:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 2855,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1657:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1640:34:2"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 2865,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1772:0:2"
+            },
+            "scope": 2876,
+            "src": "1628:151:2",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 2874,
+              "nodeType": "Block",
+              "src": "1840:28:2",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "hexValue": "646f63756d656e74",
+                    "id": 2872,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "kind": "string",
+                    "lValueRequested": false,
+                    "nodeType": "Literal",
+                    "src": "1851:10:2",
+                    "subdenomination": null,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_stringliteral_6ccae752f4a793b8e9b5c6c443c5adb9d6a9f74165198933146f552b2232249c",
+                      "typeString": "literal_string \"document\""
+                    },
+                    "value": "document"
+                  },
+                  "functionReturnParameters": 2871,
+                  "id": 2873,
+                  "nodeType": "Return",
+                  "src": "1844:17:2"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 2875,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": true,
+            "modifiers": [],
+            "name": "getGenre",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2868,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1807:2:2"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 2871,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2870,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2875,
+                  "src": "1831:7:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 2869,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1831:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1830:9:2"
+            },
+            "scope": 2876,
+            "src": "1789:79:2",
+            "stateMutability": "view",
+            "superFunction": 604,
+            "visibility": "public"
+          }
+        ],
+        "scope": 2877,
+        "src": "1553:317:2"
+      }
+    ],
+    "src": "0:1873:2"
+  },
+  "legacyAST": {
+    "absolutePath": "/home/luca/Università/Progetti/P2PBC/COBrA-DApp/truffle/contracts/ContentManagementContracts.sol",
+    "exportedSymbols": {
+      "DocumentManagementContract": [
+        2876
+      ],
+      "PhotoManagementContract": [
+        2850
+      ],
+      "SongManagementContract": [
+        2798
+      ],
+      "VideoManagementContract": [
+        2824
+      ]
+    },
+    "id": 2877,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 2770,
+        "literals": [
+          "solidity",
+          "^",
+          "0.4",
+          ".24"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:24:2"
+      },
+      {
+        "absolutePath": "/home/luca/Università/Progetti/P2PBC/COBrA-DApp/truffle/contracts/BaseContentManagementContract.sol",
+        "file": "./BaseContentManagementContract.sol",
+        "id": 2771,
+        "nodeType": "ImportDirective",
+        "scope": 2877,
+        "sourceUnit": 606,
+        "src": "26:45:2",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "/home/luca/Università/Progetti/P2PBC/COBrA-DApp/truffle/contracts/CatalogSmartContract.sol",
+        "file": "./CatalogSmartContract.sol",
+        "id": 2772,
+        "nodeType": "ImportDirective",
+        "scope": 2877,
+        "sourceUnit": 2769,
+        "src": "72:36:2",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [
+          {
+            "arguments": null,
+            "baseName": {
+              "contractScope": null,
+              "id": 2773,
+              "name": "BaseContentManagementContract",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 605,
+              "src": "179:29:2",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_BaseContentManagementContract_$605",
+                "typeString": "contract BaseContentManagementContract"
+              }
+            },
+            "id": 2774,
+            "nodeType": "InheritanceSpecifier",
+            "src": "179:29:2"
+          }
+        ],
+        "contractDependencies": [
+          605,
+          2958
+        ],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 2798,
+        "linearizedBaseContracts": [
+          2798,
+          605,
+          2958
+        ],
+        "name": "SongManagementContract",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 2788,
+              "nodeType": "Block",
+              "src": "354:7:2",
+              "statements": []
+            },
+            "documentation": null,
+            "id": 2789,
+            "implemented": true,
+            "isConstructor": true,
+            "isDeclaredConst": false,
+            "modifiers": [
+              {
+                "arguments": [
+                  {
+                    "argumentTypes": null,
+                    "expression": {
+                      "argumentTypes": null,
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 2781,
+                        "name": "SharedTypes",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2997,
+                        "src": "299:11:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_contract$_SharedTypes_$2997_$",
+                          "typeString": "type(library SharedTypes)"
+                        }
+                      },
+                      "id": 2782,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "contentType",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 2965,
+                      "src": "299:23:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_type$_t_enum$_contentType_$2965_$",
+                        "typeString": "type(enum SharedTypes.contentType)"
+                      }
+                    },
+                    "id": 2783,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "lValueRequested": false,
+                    "memberName": "song",
+                    "nodeType": "MemberAccess",
+                    "referencedDeclaration": null,
+                    "src": "299:28:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_enum$_contentType_$2965",
+                      "typeString": "enum SharedTypes.contentType"
+                    }
+                  },
+                  {
+                    "argumentTypes": null,
+                    "id": 2784,
+                    "name": "_title",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 2776,
+                    "src": "329:6:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  {
+                    "argumentTypes": null,
+                    "id": 2785,
+                    "name": "_catAddr",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 2778,
+                    "src": "337:8:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  }
+                ],
+                "id": 2786,
+                "modifierName": {
+                  "argumentTypes": null,
+                  "id": 2780,
+                  "name": "BaseContentManagementContract",
+                  "nodeType": "Identifier",
+                  "overloadedDeclarations": [],
+                  "referencedDeclaration": 605,
+                  "src": "269:29:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_type$_t_contract$_BaseContentManagementContract_$605_$",
+                    "typeString": "type(contract BaseContentManagementContract)"
+                  }
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "269:77:2"
+              }
+            ],
+            "name": "",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2779,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2776,
+                  "name": "_title",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2789,
+                  "src": "233:14:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 2775,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "233:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2778,
+                  "name": "_catAddr",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2789,
+                  "src": "249:16:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 2777,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "249:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "232:34:2"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 2787,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "354:0:2"
+            },
+            "scope": 2798,
+            "src": "220:141:2",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 2796,
+              "nodeType": "Block",
+              "src": "422:24:2",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "hexValue": "736f6e67",
+                    "id": 2794,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "kind": "string",
+                    "lValueRequested": false,
+                    "nodeType": "Literal",
+                    "src": "433:6:2",
+                    "subdenomination": null,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_stringliteral_4f51b569179770979ec23a2bfc3a740422bc29a29c2ae9d1564ede4081039546",
+                      "typeString": "literal_string \"song\""
+                    },
+                    "value": "song"
+                  },
+                  "functionReturnParameters": 2793,
+                  "id": 2795,
+                  "nodeType": "Return",
+                  "src": "426:13:2"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 2797,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": true,
+            "modifiers": [],
+            "name": "getGenre",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2790,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "389:2:2"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 2793,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2792,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2797,
+                  "src": "413:7:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 2791,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "413:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "412:9:2"
+            },
+            "scope": 2798,
+            "src": "371:75:2",
+            "stateMutability": "view",
+            "superFunction": 604,
+            "visibility": "public"
+          }
+        ],
+        "scope": 2877,
+        "src": "144:304:2"
+      },
+      {
+        "baseContracts": [
+          {
+            "arguments": null,
+            "baseName": {
+              "contractScope": null,
+              "id": 2799,
+              "name": "BaseContentManagementContract",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 605,
+              "src": "649:29:2",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_BaseContentManagementContract_$605",
+                "typeString": "contract BaseContentManagementContract"
+              }
+            },
+            "id": 2800,
+            "nodeType": "InheritanceSpecifier",
+            "src": "649:29:2"
+          }
+        ],
+        "contractDependencies": [
+          605,
+          2958
+        ],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 2824,
+        "linearizedBaseContracts": [
+          2824,
+          605,
+          2958
+        ],
+        "name": "VideoManagementContract",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 2814,
+              "nodeType": "Block",
+              "src": "820:7:2",
+              "statements": []
+            },
+            "documentation": null,
+            "id": 2815,
+            "implemented": true,
+            "isConstructor": true,
+            "isDeclaredConst": false,
+            "modifiers": [
+              {
+                "arguments": [
+                  {
+                    "argumentTypes": null,
+                    "expression": {
+                      "argumentTypes": null,
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 2807,
+                        "name": "SharedTypes",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2997,
+                        "src": "764:11:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_contract$_SharedTypes_$2997_$",
+                          "typeString": "type(library SharedTypes)"
+                        }
+                      },
+                      "id": 2808,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "contentType",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 2965,
+                      "src": "764:23:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_type$_t_enum$_contentType_$2965_$",
+                        "typeString": "type(enum SharedTypes.contentType)"
+                      }
+                    },
+                    "id": 2809,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "lValueRequested": false,
+                    "memberName": "video",
+                    "nodeType": "MemberAccess",
+                    "referencedDeclaration": null,
+                    "src": "764:29:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_enum$_contentType_$2965",
+                      "typeString": "enum SharedTypes.contentType"
+                    }
+                  },
+                  {
+                    "argumentTypes": null,
+                    "id": 2810,
+                    "name": "_title",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 2802,
+                    "src": "795:6:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  {
+                    "argumentTypes": null,
+                    "id": 2811,
+                    "name": "_catAddr",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 2804,
+                    "src": "803:8:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  }
+                ],
+                "id": 2812,
+                "modifierName": {
+                  "argumentTypes": null,
+                  "id": 2806,
+                  "name": "BaseContentManagementContract",
+                  "nodeType": "Identifier",
+                  "overloadedDeclarations": [],
+                  "referencedDeclaration": 605,
+                  "src": "734:29:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_type$_t_contract$_BaseContentManagementContract_$605_$",
+                    "typeString": "type(contract BaseContentManagementContract)"
+                  }
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "734:78:2"
+              }
+            ],
+            "name": "",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2805,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2802,
+                  "name": "_title",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2815,
+                  "src": "698:14:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 2801,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "698:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2804,
+                  "name": "_catAddr",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2815,
+                  "src": "714:16:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 2803,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "714:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "697:34:2"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 2813,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "820:0:2"
+            },
+            "scope": 2824,
+            "src": "685:142:2",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 2822,
+              "nodeType": "Block",
+              "src": "888:25:2",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "hexValue": "766964656f",
+                    "id": 2820,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "kind": "string",
+                    "lValueRequested": false,
+                    "nodeType": "Literal",
+                    "src": "899:7:2",
+                    "subdenomination": null,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_stringliteral_b57dd00b0a8b2aad812b2c5318e4e11f83447e0eef3e5eeef5d971fd155cdbbf",
+                      "typeString": "literal_string \"video\""
+                    },
+                    "value": "video"
+                  },
+                  "functionReturnParameters": 2819,
+                  "id": 2821,
+                  "nodeType": "Return",
+                  "src": "892:14:2"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 2823,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": true,
+            "modifiers": [],
+            "name": "getGenre",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2816,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "855:2:2"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 2819,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2818,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2823,
+                  "src": "879:7:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 2817,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "879:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "878:9:2"
+            },
+            "scope": 2824,
+            "src": "837:76:2",
+            "stateMutability": "view",
+            "superFunction": 604,
+            "visibility": "public"
+          }
+        ],
+        "scope": 2877,
+        "src": "613:302:2"
+      },
+      {
+        "baseContracts": [
+          {
+            "arguments": null,
+            "baseName": {
+              "contractScope": null,
+              "id": 2825,
+              "name": "BaseContentManagementContract",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 605,
+              "src": "1116:29:2",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_BaseContentManagementContract_$605",
+                "typeString": "contract BaseContentManagementContract"
+              }
+            },
+            "id": 2826,
+            "nodeType": "InheritanceSpecifier",
+            "src": "1116:29:2"
+          }
+        ],
+        "contractDependencies": [
+          605,
+          2958
+        ],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 2850,
+        "linearizedBaseContracts": [
+          2850,
+          605,
+          2958
+        ],
+        "name": "PhotoManagementContract",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 2840,
+              "nodeType": "Block",
+              "src": "1293:7:2",
+              "statements": []
+            },
+            "documentation": null,
+            "id": 2841,
+            "implemented": true,
+            "isConstructor": true,
+            "isDeclaredConst": false,
+            "modifiers": [
+              {
+                "arguments": [
+                  {
+                    "argumentTypes": null,
+                    "expression": {
+                      "argumentTypes": null,
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 2833,
+                        "name": "SharedTypes",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2997,
+                        "src": "1237:11:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_contract$_SharedTypes_$2997_$",
+                          "typeString": "type(library SharedTypes)"
+                        }
+                      },
+                      "id": 2834,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "contentType",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 2965,
+                      "src": "1237:23:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_type$_t_enum$_contentType_$2965_$",
+                        "typeString": "type(enum SharedTypes.contentType)"
+                      }
+                    },
+                    "id": 2835,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "lValueRequested": false,
+                    "memberName": "photo",
+                    "nodeType": "MemberAccess",
+                    "referencedDeclaration": null,
+                    "src": "1237:29:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_enum$_contentType_$2965",
+                      "typeString": "enum SharedTypes.contentType"
+                    }
+                  },
+                  {
+                    "argumentTypes": null,
+                    "id": 2836,
+                    "name": "_title",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 2828,
+                    "src": "1268:6:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  {
+                    "argumentTypes": null,
+                    "id": 2837,
+                    "name": "_catAddr",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 2830,
+                    "src": "1276:8:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  }
+                ],
+                "id": 2838,
+                "modifierName": {
+                  "argumentTypes": null,
+                  "id": 2832,
+                  "name": "BaseContentManagementContract",
+                  "nodeType": "Identifier",
+                  "overloadedDeclarations": [],
+                  "referencedDeclaration": 605,
+                  "src": "1207:29:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_type$_t_contract$_BaseContentManagementContract_$605_$",
+                    "typeString": "type(contract BaseContentManagementContract)"
+                  }
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "1207:78:2"
+              }
+            ],
+            "name": "",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2831,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2828,
+                  "name": "_title",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2841,
+                  "src": "1165:14:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 2827,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1165:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2830,
+                  "name": "_catAddr",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2841,
+                  "src": "1181:16:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 2829,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1181:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1164:34:2"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 2839,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1293:0:2"
+            },
+            "scope": 2850,
+            "src": "1152:148:2",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 2848,
+              "nodeType": "Block",
+              "src": "1361:25:2",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "hexValue": "70686f746f",
+                    "id": 2846,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "kind": "string",
+                    "lValueRequested": false,
+                    "nodeType": "Literal",
+                    "src": "1372:7:2",
+                    "subdenomination": null,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_stringliteral_6c910f9470010ccea7fc0236c4e46ee4dda1dc89348fefefef37f36759f0dc0f",
+                      "typeString": "literal_string \"photo\""
+                    },
+                    "value": "photo"
+                  },
+                  "functionReturnParameters": 2845,
+                  "id": 2847,
+                  "nodeType": "Return",
+                  "src": "1365:14:2"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 2849,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": true,
+            "modifiers": [],
+            "name": "getGenre",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2842,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1328:2:2"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 2845,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2844,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2849,
+                  "src": "1352:7:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 2843,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1352:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1351:9:2"
+            },
+            "scope": 2850,
+            "src": "1310:76:2",
+            "stateMutability": "view",
+            "superFunction": 604,
+            "visibility": "public"
+          }
+        ],
+        "scope": 2877,
+        "src": "1080:308:2"
+      },
+      {
+        "baseContracts": [
+          {
+            "arguments": null,
+            "baseName": {
+              "contractScope": null,
+              "id": 2851,
+              "name": "BaseContentManagementContract",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 605,
+              "src": "1592:29:2",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_BaseContentManagementContract_$605",
+                "typeString": "contract BaseContentManagementContract"
+              }
+            },
+            "id": 2852,
+            "nodeType": "InheritanceSpecifier",
+            "src": "1592:29:2"
+          }
+        ],
+        "contractDependencies": [
+          605,
+          2958
+        ],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 2876,
+        "linearizedBaseContracts": [
+          2876,
+          605,
+          2958
+        ],
+        "name": "DocumentManagementContract",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 2866,
+              "nodeType": "Block",
+              "src": "1772:7:2",
+              "statements": []
+            },
+            "documentation": null,
+            "id": 2867,
+            "implemented": true,
+            "isConstructor": true,
+            "isDeclaredConst": false,
+            "modifiers": [
+              {
+                "arguments": [
+                  {
+                    "argumentTypes": null,
+                    "expression": {
+                      "argumentTypes": null,
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 2859,
+                        "name": "SharedTypes",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2997,
+                        "src": "1713:11:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_contract$_SharedTypes_$2997_$",
+                          "typeString": "type(library SharedTypes)"
+                        }
+                      },
+                      "id": 2860,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "contentType",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 2965,
+                      "src": "1713:23:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_type$_t_enum$_contentType_$2965_$",
+                        "typeString": "type(enum SharedTypes.contentType)"
+                      }
+                    },
+                    "id": 2861,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "lValueRequested": false,
+                    "memberName": "document",
+                    "nodeType": "MemberAccess",
+                    "referencedDeclaration": null,
+                    "src": "1713:32:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_enum$_contentType_$2965",
+                      "typeString": "enum SharedTypes.contentType"
+                    }
+                  },
+                  {
+                    "argumentTypes": null,
+                    "id": 2862,
+                    "name": "_title",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 2854,
+                    "src": "1747:6:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  {
+                    "argumentTypes": null,
+                    "id": 2863,
+                    "name": "_catAddr",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 2856,
+                    "src": "1755:8:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  }
+                ],
+                "id": 2864,
+                "modifierName": {
+                  "argumentTypes": null,
+                  "id": 2858,
+                  "name": "BaseContentManagementContract",
+                  "nodeType": "Identifier",
+                  "overloadedDeclarations": [],
+                  "referencedDeclaration": 605,
+                  "src": "1683:29:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_type$_t_contract$_BaseContentManagementContract_$605_$",
+                    "typeString": "type(contract BaseContentManagementContract)"
+                  }
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "1683:81:2"
+              }
+            ],
+            "name": "",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2857,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2854,
+                  "name": "_title",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2867,
+                  "src": "1641:14:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 2853,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1641:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2856,
+                  "name": "_catAddr",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2867,
+                  "src": "1657:16:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 2855,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1657:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1640:34:2"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 2865,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1772:0:2"
+            },
+            "scope": 2876,
+            "src": "1628:151:2",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 2874,
+              "nodeType": "Block",
+              "src": "1840:28:2",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "hexValue": "646f63756d656e74",
+                    "id": 2872,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "kind": "string",
+                    "lValueRequested": false,
+                    "nodeType": "Literal",
+                    "src": "1851:10:2",
+                    "subdenomination": null,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_stringliteral_6ccae752f4a793b8e9b5c6c443c5adb9d6a9f74165198933146f552b2232249c",
+                      "typeString": "literal_string \"document\""
+                    },
+                    "value": "document"
+                  },
+                  "functionReturnParameters": 2871,
+                  "id": 2873,
+                  "nodeType": "Return",
+                  "src": "1844:17:2"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 2875,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": true,
+            "modifiers": [],
+            "name": "getGenre",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2868,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1807:2:2"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 2871,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2870,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2875,
+                  "src": "1831:7:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 2869,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1831:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1830:9:2"
+            },
+            "scope": 2876,
+            "src": "1789:79:2",
+            "stateMutability": "view",
+            "superFunction": 604,
+            "visibility": "public"
+          }
+        ],
+        "scope": 2877,
+        "src": "1553:317:2"
+      }
+    ],
+    "src": "0:1873:2"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.4.24+commit.e67f0147.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2018-09-09T09:40:30.464Z"
+}

@@ -6,7 +6,7 @@ const redis				= require("redis");
 const redisClient		= redis.createClient();
 const HDWalletProvider	= require ("truffle-hdwallet-provider");
 
-const catalogPath		= '../build/contracts/CatalogSmartContract.json';
+const catalogPath		= 'build/contracts/CatalogSmartContract.json';
 let addresses			= [];
 var catalogInstance;
 
@@ -52,14 +52,20 @@ let readContract	= (contractPath) => {
 
 
 const atExit	= async () => {
-	try {
-		var res	= await catalogInstance.killMe ({from: addresses[0]});
-		console.log ('Catalog estroyed!');
-		console.log ('\tTransaction hash is  ' + res.receipt.transactionHash);
-	} catch (err) {
-		console.log ("\n\nRaised this error during 'killMe'");
-		console.log (err);
+	if (catalogInstance == undefined) {
+		console.log ("\nCatalog is undefined!");
 	}
+	else {
+		try {
+			var res	= await catalogInstance.killMe ({from: addresses[0]});
+			console.log ('Catalog estroyed!');
+			console.log ('\tTransaction hash is  ' + res.receipt.transactionHash);
+		} catch (err) {
+			console.log ("\n\nRaised this error during 'killMe'");
+			console.log (err.message);
+		}
+	}
+
 	process.exit ();
 }
 
@@ -78,15 +84,14 @@ const createCatalog	= () => {
 			catalogContract.setProvider (provider);
 			
 			console.log ('Creating catalog from address  ' + addresses[0] + '  ...');
-			catalogInstance		= await catalogContract.new ({ from: addresses[0], data:catalogContract.bytecode, gas:4700000});
+			catalogInstance		= await catalogContract.new ({ from: addresses[0], data:catalogContract.bytecode, gas:6400000});
 			redisClient.set ("catAddr", catalogInstance.address, redis.print);
 			console.log ('Catalog created!');
 			console.log ('\tCatalog address is   ' + catalogInstance.address);
 			console.log ('\tTransaction hash is  ' + catalogInstance.transactionHash);
 
 		} catch (err) {
-			console.log ("\n\nERROR:");
-			console.log (err);
+			console.log ("\n\nRaised this error during 'createCatalog' :  " + err.message);
 			atExit ();
 		}
 	});
