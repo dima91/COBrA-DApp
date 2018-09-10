@@ -34,7 +34,7 @@ const optionDefinitions = [
 	{ name: 'infura-key', type: String }
 ]
 
-  const options = commandLineArgs (optionDefinitions);
+const options = commandLineArgs (optionDefinitions);
 console.log ("\n\n==============================");
 
 if (options["catalog-address"] != undefined) {
