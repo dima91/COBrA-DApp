@@ -67,6 +67,9 @@ if (typeof web3 != 'undefined') {
 			provider	= new privateKeyProvider (privateKeys, "https://ropsten.infura.io/v3/"+infuraKey);
 		}
 
+		else
+			provider	= new HDWalletProvider	("", "https://ropsten.infura.io/v3/"+infuraKey);
+
 		console.log ("\n---  Using Infura provider with key  " + infuraKey);
 	}
 	else {
