@@ -3,11 +3,13 @@
 
 
 const {app, BrowserWindow, ipcMain} = require('electron');
-const path				= require ('path');
-const Web3				= require ("web3");
-const fs				= require ('fs');
-const truffle			= require ('truffle-contract');
-const HDWalletProvider	= require ("truffle-hdwallet-provider");
+const path					= require ('path');
+const Web3					= require ("web3");
+const fs					= require ('fs');
+const truffle				= require ('truffle-contract');
+const HDWalletProvider		= require ("truffle-hdwallet-provider");
+const privateKeyProvider	= require ("truffle-hdwallet-provider-privkey");
+
 const commandLineArgs	= require ("command-line-args");
 
 
@@ -24,6 +26,7 @@ const videoContractPath			= folderPrefix + 'VideoManagementContract.json'
 var catalogAddress	= "0x9a6e2ea7f61d320fe16b664d65eda48489d0e6ce";
 var infuraKey		= "";			// 3c51b50483cd4eec9119a4a7129bd0a4
 var mnemonic		= "";
+var privateKeys		= [];
 var provider;
 var web3;
 
@@ -31,9 +34,10 @@ var web3;
 
 // Parsing comman line arguments
 const optionDefinitions = [
-	{ name : 'catalog-address',	type: String },
-	{ name : 'infura-key',		type: String },
-	{ name : 'mnemonic',		type: String}
+	{ name : 'catalog-address',	type : String },
+	{ name : 'infura-key',		type : String },
+	{ name : 'mnemonic',		type : String},
+	{ name : 'private-key',		type : String }
 ]
 
 const options = commandLineArgs (optionDefinitions);
@@ -50,13 +54,18 @@ if (typeof web3 != 'undefined') {
 	console.log ("\n\nweb3 is already defined!!!");
 	provider	= web3.currentProvider;
 } else {
-	if (options["mnemonic"] != undefined) {
-		mnemonic	= options["mnemonic"];
-	}
 
 	if (options["infura-key"] != undefined) {
 		infuraKey	= options["infura-key"];
-		provider	= new HDWalletProvider (mnemonic, "https://ropsten.infura.io/v3/"+infuraKey);
+
+		if (options["mnemonic"] != undefined) {
+			mnemonic	= options["mnemonic"];
+			provider	= new HDWalletProvider (mnemonic, "https://ropsten.infura.io/v3/"+infuraKey);
+		}
+		else if (options["private-key"] != undefined) {
+			privateKeys.push (options["private-key"]);
+			provider	= new privateKeyProvider (privateKeys, "https://ropsten.infura.io/v3/"+infuraKey);
+		}
 
 		console.log ("\n---  Using Infura provider with key  " + infuraKey);
 	}
