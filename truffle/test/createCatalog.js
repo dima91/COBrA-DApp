@@ -14,7 +14,7 @@ var catalogOwner;
 const mnemonic			= "";
 const infuraKey			= "3c51b50483cd4eec9119a4a7129bd0a4";
 
-const INFURA_DEPLOY		= false;
+const INFURA_DEPLOY		= true;
 
 var provider;
 var web3;

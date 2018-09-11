@@ -22,7 +22,8 @@ const videoContractPath			= folderPrefix + 'VideoManagementContract.json'
 
 // FIXME Insert correct catalog default address
 var catalogAddress	= "0x9a6e2ea7f61d320fe16b664d65eda48489d0e6ce";
-var infuraKey		= "";
+var infuraKey		= "";			// 3c51b50483cd4eec9119a4a7129bd0a4
+var mnemonic		= "";
 var provider;
 var web3;
 
@@ -30,11 +31,13 @@ var web3;
 
 // Parsing comman line arguments
 const optionDefinitions = [
-	{ name: 'catalog-address', type: String },
-	{ name: 'infura-key', type: String }
+	{ name : 'catalog-address',	type: String },
+	{ name : 'infura-key',		type: String },
+	{ name : 'mnemonic',		type: String}
 ]
 
 const options = commandLineArgs (optionDefinitions);
+console.log (options);
 console.log ("\n\n==============================");
 
 if (options["catalog-address"] != undefined) {
@@ -47,9 +50,14 @@ if (typeof web3 != 'undefined') {
 	console.log ("\n\nweb3 is already defined!!!");
 	provider	= web3.currentProvider;
 } else {
+	if (options["mnemonic"] != undefined) {
+		mnemonic	= options["mnemonic"];
+	}
+
 	if (options["infura-key"] != undefined) {
 		infuraKey	= options["infura-key"];
-		provider	= new HDWalletProvider ("https://ropsten.infura.io/v3/"+infuraKey);
+		provider	= new HDWalletProvider (mnemonic, "https://ropsten.infura.io/v3/"+infuraKey);
+
 		console.log ("\n---  Using Infura provider with key  " + infuraKey);
 	}
 	else {
@@ -159,7 +167,10 @@ const createWindow= () => {
 
 
 const loadAddresses	= () => {
-	web3.eth.getAccounts ((err, res) => {
+	console.log ("getting addresses ..");
+	
+	web3.eth.getAccounts (async (err, res) => {
+		console.log (".. done");
 		if (err)
 			errorAndExit ('Cannot retrieve addresses. Check geth client');
 
@@ -184,6 +195,7 @@ const linkToCatalogInstance	= () => {
 		loadExtendedContents ();
 	})
 	.catch ((err) => {
+		console.log (err.message);
 		errorAndExit ('Cannot find catalog instance!');
 	})
 }

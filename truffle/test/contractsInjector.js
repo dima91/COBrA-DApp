@@ -2,10 +2,11 @@
 'use strict';
 
 
-const fs	= require('fs')
-const Web3	= require ("web3");
+const fs				= require('fs')
+const Web3				= require ("web3");
+const HDWalletProvider	= require ("truffle-hdwallet-provider");
 
-const folderPrefix	= '../solidity/build/contracts/'
+const folderPrefix	= '../build/contracts/'
 const baseContentContractPath	= folderPrefix + 'BaseContentManagementContract.json'
 const catalogSmartContractPath	= folderPrefix + 'CatalogSmartContract.json'
 const songContractPath			= folderPrefix + 'SongManagementContract.json'
@@ -22,29 +23,14 @@ let addresses	= [];
 let catalogAddress	= process.argv[2];
 let tmpInstance		= process.argv[3];
 
-var lucaHex	= '0x6c756361';
+var lucaHex		= '0x6c756361';
+
+const mnemonic	= "";
 
 
 let readContract	= (contractPath) => {
 	var content= fs.readFileSync (contractPath);
 	return JSON.parse(content);
-}
-
-
-
-var createNewCatalog	= () => {
-	let rContract		= readContract (catalogSmartContractPath);
-	let catalogAbi		= rContract.abi;
-	let catalogContract	= new web3.eth.Contract (catalogAbi);
-	let contractData		= rContract.bytecode;
-	
-	catalogContract
-			.deploy ({data:contractData})
-			.send ({from : addresses[0], gas:10000000}, (err, res) => {
-				console.log (err);
-				console.log (res);
-			})
-			.then (() => { process.exit (); });
 }
 
 
@@ -59,24 +45,26 @@ if (typeof web3 !== 'undefined') {
 	web3 = new Web3(web3.currentProvider);
 } else {
 	// set the provider you want from Web3.providers
-	web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+	//web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+	web3= new Web3 (new HDWalletProvider (mnemonic, "https://ropsten.infura.io/v3/3c51b50483cd4eec9119a4a7129bd0a4"));
 }
 
 
 
 
-web3.eth.getAccounts (function (err, res) {
+console.log ("Getting addresses..");
+
+web3.eth.getAccounts (async function (err, res) {
 	addresses= res;
-}).then ( () => {
+	console.log (addresses);
 
 	let catalogAbi	= (readContract (catalogSmartContractPath)).abi;
-	var catalogContract	= new web3.eth.Contract (catalogAbi, catalogAddress);
-
-	//console.log (addresses);
-
+	//var catalogContract	= new web3.eth.Contract (catalogAbi, catalogAddress);
+	var catalogContract = web3.eth.contract (catalogAbi, catalogAddress);
+	console.log (catalogContract.getContentList);
 
 	/****** Get content list */
-	catalogContract.methods.getContentList()
+	await catalogContract.getContentList()
 						   .call ({from : addresses[0], gas:300000}, (err, res) => {
 								console.log (err);
 								console.log (res);
@@ -167,7 +155,7 @@ web3.eth.getAccounts (function (err, res) {
 
 
 
-	/****** Check type of content */
+	/****** Check type of content
 	var contentAbi		= (readContract (baseContentContractPath)).abi;
 	(new web3.eth.Contract (contentAbi, tmpInstance)
 	.methods
