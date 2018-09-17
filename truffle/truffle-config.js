@@ -1,8 +1,7 @@
 
-const HDWalletProvider	= require ("truffle-hdwallet-provider");
-const mnemonic			= "";
-const infuraKey			= "3c51b50483cd4eec9119a4a7129bd0a4";
-const accountIndex		= 0;
+const privateKeyProvider	= require ("truffle-hdwallet-provider-privkey");
+const privateKey			= ["d4f293fe249a5b025361545f253d20e723c61072453e11ccedf92d4253abf167"];
+const infuraKey				= "3c51b50483cd4eec9119a4a7129bd0a4";
 
 
 module.exports = {
@@ -23,7 +22,7 @@ module.exports = {
 
 
 		infura: {
-			provider: new HDWalletProvider (mnemonic, "https://ropsten.infura.io/"+infuraKey, accountIndex),
+			provider: new privateKeyProvider (privateKey, "https://ropsten.infura.io/"+infuraKey),
 			network_id: 3
 		}
 	},

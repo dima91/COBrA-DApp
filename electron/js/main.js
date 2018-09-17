@@ -7,7 +7,7 @@ const path					= require ('path');
 const Web3					= require ("web3");
 const fs					= require ('fs');
 const truffle				= require ('truffle-contract');
-const HDWalletProvider		= require ("truffle-hdwallet-provider");
+const hdWalletProvider		= require ("truffle-hdwallet-provider");
 const privateKeyProvider	= require ("truffle-hdwallet-provider-privkey");
 
 const commandLineArgs	= require ("command-line-args");
@@ -23,73 +23,13 @@ const videoContractPath			= folderPrefix + 'VideoManagementContract.json'
 
 
 // FIXME Insert correct catalog default address
-var catalogAddress	= "0x9a6e2ea7f61d320fe16b664d65eda48489d0e6ce";
-var infuraKey		= "";			// 3c51b50483cd4eec9119a4a7129bd0a4
-var mnemonic		= "";
-var privateKeys		= [];
+var defaultcatalogAddress	= "0x9a6e2ea7f61d320fe16b664d65eda48489d0e6ce";
+var infuraKey				= "3c51b50483cd4eec9119a4a7129bd0a4";
+var mnemonic				= "";
+var privateKeys				= [];
+var endpoint;
 var provider;
 var web3;
-
-
-
-// Parsing comman line arguments
-const optionDefinitions = [
-	{ name : 'catalog-address',	type : String },
-	{ name : 'infura-key',		type : String },
-	{ name : 'mnemonic',		type : String},
-	{ name : 'private-key',		type : String }
-]
-
-const options = commandLineArgs (optionDefinitions);
-console.log (options);
-console.log ("\n\n==============================");
-
-if (options["catalog-address"] != undefined) {
-	catalogAddress	= options["catalog-address"];
-}
-console.log ("\n---  Using   " + catalogAddress + "   as catalog address");
-
-
-if (typeof web3 != 'undefined') {
-	console.log ("\n\nweb3 is already defined!!!");
-	provider	= web3.currentProvider;
-} else {
-
-	if (options["infura-key"] != undefined) {
-		infuraKey	= options["infura-key"];
-
-		if (options["mnemonic"] != undefined) {
-			mnemonic	= options["mnemonic"];
-			provider	= new HDWalletProvider (mnemonic, "https://ropsten.infura.io/v3/"+infuraKey);
-		}
-		else if (options["private-key"] != undefined) {
-			privateKeys.push (options["private-key"]);
-			provider	= new privateKeyProvider (privateKeys, "https://ropsten.infura.io/v3/"+infuraKey);
-		}
-
-		else
-			provider	= new HDWalletProvider	("", "https://ropsten.infura.io/v3/"+infuraKey);
-
-		console.log ("\n---  Using Infura provider with key  " + infuraKey);
-	}
-	else {
-		provider	= new Web3.providers.HttpProvider ("http://localhost:8545");
-		console.log ("\n---  Using local ethereum client")
-	}
-}
-
-web3 		= new Web3 (provider);
-
-
-
-
-app.on('ready', () => {
-	//console.log (provider);
-	loadAddresses ();
-
-	ipcMain.setMaxListeners (50);
-});
-
 
 
 
@@ -120,9 +60,8 @@ var user	= {
 	publishedContents	: []
 }
 
-const premiumCost			= web3.toWei (44000, 'szabo');
+const premiumCost			= 44000000000000000;	// =  (44000 szabo)  =  (44000 szabo)  ~  (8 €)
 const upperBoundGas			= 4712388;
-contracts.catalog.address	= catalogAddress;
 
 
 // Lists used to filter notifications, which are sent to user, about new contents
@@ -148,8 +87,65 @@ genreFilters	= [];
 
 
 const errorAndExit	= (err) => {
-	console.log ('\n\n' + '==============================\n' + err + '\n');
+	console.log ('\n\n' + '==============================\n[ERROR]   ' + err + '\n');
 	process.exit ();
+}
+
+
+
+
+// Function to parse comman line arguments which describe provider and account
+const parseArgs		= (args) => {
+	
+	const optionDefinitions = [
+		{ name : 'catalog-address',	type : String },
+		{ name : 'infura',			type : Boolean },
+		{ name : 'infura-key',		type : String },
+		{ name : 'mnemonic',		type : String},
+		{ name : 'private-key',		type : String }
+	]
+
+	const options = commandLineArgs (optionDefinitions);
+	console.log ("\n\n==============================");
+
+	if (options["catalog-address"] != undefined)
+		contracts.catalog.address	= options["catalog-address"];
+	else
+		contracts.catalog.address	=defaultcatalogAddress;
+
+	console.log ("\n---  Using  " + contracts.catalog.address + "  as catalog address");
+
+	// ==============================
+
+	if (options["infura"] == true) {
+		// Do nothing: using default infura key
+		endpoint	= "https://ropsten.infura.io/v3/"+ infuraKey;
+		console.log ("---  Using  " + infuraKey + "  as infura key");
+	}
+	else if (options["infura-key"] != undefined) {
+		endpoint	= "https://ropsten.infura.io/v3/"+ options["infura-key"];
+		console.log ("---  Using  " + options["infura-key"] + "  as infura key");
+	}
+	else {
+		provider	= new Web3.providers.HttpProvider ("http://localhost:8545");
+		console.log ("---  Using local ethereum client");
+	}
+
+	// ==============================
+
+	if (options["mnemonic"] != undefined) {
+		mnemonic	= options["mnemonic"];
+		provider	= new hdWalletProvider (mnemonic, endpoint);
+	}
+	else if (options["private-key"] != undefined) {
+		privateKeys.push (options["private-key"]);
+		provider	= new privateKeyProvider (privateKeys, endpoint);
+	}
+
+	else {
+		console.log ("[WARNING] No private key or mnemonic words given!");
+		provider	= new hdWalletProvider	("", endpoint);
+	}
 }
 
 
@@ -179,10 +175,7 @@ const createWindow= () => {
 
 
 const loadAddresses	= () => {
-	console.log ("getting addresses ..");
-	
 	web3.eth.getAccounts (async (err, res) => {
-		console.log (".. done");
 		if (err)
 			errorAndExit ('Cannot retrieve addresses. Check geth client');
 
@@ -199,7 +192,7 @@ const linkToCatalogInstance	= () => {
 	contracts.catalog.contract	= truffle (jsonContract);
 	
 	contracts.catalog.contract.setProvider (provider);
-	
+
 	contracts.catalog.contract
 	.at (contracts.catalog.address)
 	.then ((instance) => {
@@ -1101,3 +1094,26 @@ ipcMain.on ('apply-filters', (evt, arg) => {
 	console.log (authorFilters);
 	console.log (genreFilters);
 })
+
+
+
+
+
+
+
+
+if (typeof web3 !== 'undefined') {
+	provider	= web3.currentProvider;
+}
+else {
+	parseArgs ();
+	web3 		= new Web3 (provider);
+}
+
+
+
+
+app.on('ready', () => {
+	loadAddresses ();
+	ipcMain.setMaxListeners (50);
+});

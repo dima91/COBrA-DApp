@@ -2,8 +2,6 @@
 const fs				= require('fs')
 const Web3				= require ("web3");
 const truffle			= require ('truffle-contract');
-const redis				= require("redis");
-const redisClient		= redis.createClient();
 const HDWalletProvider	= require ("truffle-hdwallet-provider");
 
 const catalogPath		= 'build/contracts/CatalogSmartContract.json';
@@ -32,14 +30,6 @@ process.on ('SIGTERM', () => {
 
 process.on ('SIGINT', () => {
 	console.log ("\nReceived sigint");
-	atExit ();
-});
-
-
-
-
-redisClient.on("error", (err) => {
-	console.log("Error " + err);
 	atExit ();
 });
 
@@ -105,11 +95,10 @@ const createCatalog	= () => {
 			balance		= web3.toDecimal(balance);
 			
 			console.log ('Creating catalog from address  ' + catalogOwner + '  which has balance  ' + balance +  '...');
-			catalogInstance		= await catalogContract.new ({ from: catalogOwner, data:catalogContract.bytecode, gas:4000000});
-			redisClient.set ("catAddr", catalogInstance.address, redis.print);
+			/*catalogInstance		= await catalogContract.new ({ from: catalogOwner, data:catalogContract.bytecode, gas:4000000});
 			console.log ('Catalog created!');
 			console.log ('\tCatalog address is   ' + catalogInstance.address);
-			console.log ('\tTransaction hash is  ' + catalogInstance.transactionHash);
+			console.log ('\tTransaction hash is  ' + catalogInstance.transactionHash);*/
 
 		} catch (err) {
 			console.log ("\n\nRaised this error during 'createCatalog' :  " + err.message);
