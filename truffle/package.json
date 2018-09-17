@@ -8,6 +8,7 @@
   "author": "Luca Di Mauro",
   "license": "ISC",
   "dependencies": {
+    "command-line-args": "^5.0.2",
     "redis": "^2.8.0",
     "truffle": "^4.1.14",
     "truffle-contract": "^3.0.6",

@@ -99,7 +99,7 @@ const parseArgs		= (args) => {
 	
 	const optionDefinitions = [
 		{ name : 'catalog-address',	type : String },
-		{ name : 'infura',			type : Boolean },
+		{ name : 'infura',			type : Boolean, defaultOption: false },
 		{ name : 'infura-key',		type : String },
 		{ name : 'mnemonic',		type : String},
 		{ name : 'private-key',		type : String }
@@ -127,7 +127,7 @@ const parseArgs		= (args) => {
 		console.log ("---  Using  " + options["infura-key"] + "  as infura key");
 	}
 	else {
-		provider	= new Web3.providers.HttpProvider ("http://localhost:8545");
+		endpoint 	= "http://127.0.0.1:8545";
 		console.log ("---  Using local ethereum client");
 	}
 

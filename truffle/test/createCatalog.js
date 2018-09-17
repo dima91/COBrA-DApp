@@ -1,21 +1,44 @@
 
-const fs				= require('fs')
-const Web3				= require ("web3");
-const truffle			= require ('truffle-contract');
-const HDWalletProvider	= require ("truffle-hdwallet-provider");
+const fs					= require ('fs')
+const Web3					= require ("web3");
+const truffle				= require ('truffle-contract');
+const hdWalletProvider		= require ("truffle-hdwallet-provider");
+const privateKeyProvider	= require ("truffle-hdwallet-provider-privkey");
 
-const catalogPath		= 'build/contracts/CatalogSmartContract.json';
-let addresses			= [];
+const commandLineArgs		= require ("command-line-args");
+
+const catalogPath			= 'build/contracts/CatalogSmartContract.json';
+let addresses				= [];
 var catalogInstance;
 var catalogOwner;
 
-const mnemonic			= "";
-const infuraKey			= "3c51b50483cd4eec9119a4a7129bd0a4";
+var privateKeys				= [];
+var mnemonic				= "";
+var infuraKey				= "3c51b50483cd4eec9119a4a7129bd0a4";
 
-const INFURA_DEPLOY		= true;
-
+var endpoint;
 var provider;
 var web3;
+
+
+
+
+const atExit	= async () => {
+	if (catalogInstance == undefined) {
+		console.log ("\nCatalog is undefined!");
+	}
+	else {
+		try {
+			var res	= await catalogInstance.killMe ({from: addresses[0], gas:4000000});
+			console.log ('Catalog estroyed!');
+		} catch (err) {
+			console.log ("\n\nRaised this error during 'killMe'");
+			console.log (err.message);
+		}
+	}
+
+	process.exit ();
+}
 
 
 
@@ -35,12 +58,6 @@ process.on ('SIGINT', () => {
 
 
 
-let readContract	= (contractPath) => {
-	return JSON.parse (fs.readFileSync (contractPath));
-}
-
-
-
 
 const getBalance	= (address) => {
 	return new Promise ((resolve, reject) => {
@@ -57,49 +74,22 @@ const getBalance	= (address) => {
 
 
 
-const atExit	= async () => {
-	if (catalogInstance == undefined) {
-		console.log ("\nCatalog is undefined!");
-	}
-	else {
-		try {
-			var res	= await catalogInstance.killMe ({from: addresses[0]});
-			console.log ('Catalog estroyed!');
-			console.log ('\tTransaction hash is  ' + res.receipt.transactionHash);
-		} catch (err) {
-			console.log ("\n\nRaised this error during 'killMe'");
-			console.log (err.message);
-		}
-	}
-
-	process.exit ();
-}
-
-
-
-
 const createCatalog	= () => {
 	web3.eth.getAccounts (async (err, res) => {
 		try {
-			addresses	= res;
-			console.log ('Accounts:');
-			console.log (addresses);
-			console.log ('');
-			
-			let catalogContract	= truffle (readContract (catalogPath));
+			let catalogContract	= truffle (JSON.parse (fs.readFileSync (contractPath)));
 			catalogContract.setProvider (provider);
 
-			catalogOwner	= addresses[0];
+			catalogOwner	= res[0];
 
 			var balance	= await getBalance (catalogOwner);
 			balance		= web3.toDecimal(balance);
 			
 			console.log ('Creating catalog from address  ' + catalogOwner + '  which has balance  ' + balance +  '...');
-			/*catalogInstance		= await catalogContract.new ({ from: catalogOwner, data:catalogContract.bytecode, gas:4000000});
+			catalogInstance		= await catalogContract.new ({ from: catalogOwner, data:catalogContract.bytecode, gas:4000000});
 			console.log ('Catalog created!');
 			console.log ('\tCatalog address is   ' + catalogInstance.address);
-			console.log ('\tTransaction hash is  ' + catalogInstance.transactionHash);*/
-
+			
 		} catch (err) {
 			console.log ("\n\nRaised this error during 'createCatalog' :  " + err.message);
 			atExit ();
@@ -107,6 +97,52 @@ const createCatalog	= () => {
 	});
 }
 
+
+
+
+// Function to parse comman line arguments which describe provider and account
+const parseArgs		= (args) => {
+	
+	const optionDefinitions = [
+		{ name : 'infura',			type : Boolean },
+		{ name : 'infura-key',		type : String },
+		{ name : 'mnemonic',		type : String},
+		{ name : 'private-key',		type : String }
+	]
+
+	const options = commandLineArgs (optionDefinitions);
+	console.log ("\n\n==============================");
+
+	if (options["infura"] == true) {
+		// Do nothing: using default infura key
+		endpoint	= "https://ropsten.infura.io/v3/"+ infuraKey;
+		console.log ("---  Using  " + infuraKey + "  as infura key");
+	}
+	else if (options["infura-key"] != undefined) {
+		endpoint	= "https://ropsten.infura.io/v3/"+ options["infura-key"];
+		console.log ("---  Using  " + options["infura-key"] + "  as infura key");
+	}
+	else {
+		endpoint	= "http://127.0.0.1:8545";
+		console.log ("---  Using local ethereum client");
+	}
+
+	// ==============================
+
+	if (options["mnemonic"] != undefined) {
+		mnemonic	= options["mnemonic"];
+		provider	= new hdWalletProvider (mnemonic, endpoint);
+	}
+	else if (options["private-key"] != undefined) {
+		privateKeys.push (options["private-key"]);
+		provider	= new privateKeyProvider (privateKeys, endpoint);
+	}
+
+	else {
+		console.log ("[WARNING] No private key or mnemonic words given!");
+		provider	= new hdWalletProvider	("", endpoint);
+	}
+}
 
 
 
@@ -119,17 +155,8 @@ if (typeof web3 !== 'undefined') {
 	web3 		= new Web3 (provider);
 }
 else {
-	if (INFURA_DEPLOY) {
-		console.log ("Deploying with infura provider\n");
-		provider	= new HDWalletProvider (mnemonic, "https://ropsten.infura.io/v3/"+infuraKey);
-	}
-
-	else {
-		console.log ("Deploying with http provider\n");
-		provider	= new Web3.providers.HttpProvider ("http://localhost:8545");
-	}
+	parseArgs ();
 }
-
 web3		= new Web3(provider);
 
 createCatalog ();
