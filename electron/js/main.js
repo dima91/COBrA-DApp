@@ -94,19 +94,44 @@ const errorAndExit	= (err) => {
 
 
 
+const printHelp		= () => {
+	console.log ("\n");
+	console.log(	"Usage :   npm start [-- options]\n"+
+					"Runs COBrA client\n\n" +
+					"Options :\n" +
+					"\t--catalog-address <addr>\t Use given address for catalog contract address\n" +
+					"\t--infura                \t Use the default Infura node as ethereum provider (api key: " + infuraKey + ")\n" +
+					"\t--infura-key <key>      \t write me\n" +
+					"\t--mnemonic <words>      \t write me\n" +
+					"\t--private-key <key>     \t write me\n" +
+					"\t--help                  \t This help message will shown\n" +
+					"\n" +
+					"Example : npm start -- --infura --private-key d4f293fe249a5b025361545f253d20e723c61072453e11ccedf92d4253abf167");
+	console.log ("\n");
+}
+
+
+
+
 // Function to parse comman line arguments which describe provider and account
 const parseArgs		= (args) => {
 	
 	const optionDefinitions = [
 		{ name : 'catalog-address',	type : String },
-		{ name : 'infura',			type : Boolean, defaultOption: false },
+		{ name : 'infura',			type : Boolean},
 		{ name : 'infura-key',		type : String },
 		{ name : 'mnemonic',		type : String},
-		{ name : 'private-key',		type : String }
+		{ name : 'private-key',		type : String },
+		{ name : 'help',			type : Boolean}
 	]
 
 	const options = commandLineArgs (optionDefinitions);
 	console.log ("\n\n==============================");
+
+	if (options["help"] == true) {
+		printHelp ();
+		process.exit ();
+	}
 
 	if (options["catalog-address"] != undefined)
 		contracts.catalog.address	= options["catalog-address"];

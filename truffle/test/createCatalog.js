@@ -8,7 +8,6 @@ const privateKeyProvider	= require ("truffle-hdwallet-provider-privkey");
 const commandLineArgs		= require ("command-line-args");
 
 const catalogPath			= 'build/contracts/CatalogSmartContract.json';
-let addresses				= [];
 var catalogInstance;
 var catalogOwner;
 
@@ -29,7 +28,7 @@ const atExit	= async () => {
 	}
 	else {
 		try {
-			var res	= await catalogInstance.killMe ({from: addresses[0], gas:4000000});
+			var res	= await catalogInstance.killMe ({from: catalogOwner, gas:4000000});
 			console.log ('Catalog estroyed!');
 		} catch (err) {
 			console.log ("\n\nRaised this error during 'killMe'");
@@ -38,6 +37,23 @@ const atExit	= async () => {
 	}
 
 	process.exit ();
+}
+
+
+
+
+const printHelp		= () => {
+	console.log(	"\nUsage :   nodejs createCatalog.js [options]\n"+
+					"Runs COBrA client\n\n" +
+					"Options :\n" +
+					"\t--infura                \t Use the default Infura node as ethereum provider (api key: " + infuraKey + ")\n" +
+					"\t--infura-key <key>      \t write me\n" +
+					"\t--mnemonic <words>      \t write me\n" +
+					"\t--private-key <key>     \t write me\n" +
+					"\t--help                  \t This help message will shown\n" +
+					"\n" +
+					"Example : nodejs createCatalog.js --infura --private-key d4f293fe249a5b025361545f253d20e723c61072453e11ccedf92d4253abf167");
+	console.log ("\n");
 }
 
 
@@ -77,7 +93,7 @@ const getBalance	= (address) => {
 const createCatalog	= () => {
 	web3.eth.getAccounts (async (err, res) => {
 		try {
-			let catalogContract	= truffle (JSON.parse (fs.readFileSync (contractPath)));
+			let catalogContract	= truffle (JSON.parse (fs.readFileSync (catalogPath)));
 			catalogContract.setProvider (provider);
 
 			catalogOwner	= res[0];
@@ -107,12 +123,19 @@ const parseArgs		= (args) => {
 		{ name : 'infura',			type : Boolean },
 		{ name : 'infura-key',		type : String },
 		{ name : 'mnemonic',		type : String},
-		{ name : 'private-key',		type : String }
+		{ name : 'private-key',		type : String },
+		{ name : "help",			type : Boolean }
 	]
 
 	const options = commandLineArgs (optionDefinitions);
-	console.log ("\n\n==============================");
 
+	if (options["help"] == true) {
+		printHelp ();
+		process.exit ();
+	}
+	
+	console.log ("\n\n==============================");
+	
 	if (options["infura"] == true) {
 		// Do nothing: using default infura key
 		endpoint	= "https://ropsten.infura.io/v3/"+ infuraKey;
@@ -147,7 +170,6 @@ const parseArgs		= (args) => {
 
 
 
-console.log (web3); 
 if (typeof web3 !== 'undefined') {
 	console.log ("Provider already defined!");
 
