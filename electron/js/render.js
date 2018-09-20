@@ -27,8 +27,8 @@ const ___TEST___	= false;
 
 
 
-// ============================
-// ===== ELECTRON EVENTS  =====
+// ==============================
+// =====  EVENTS FROM MAIN  =====
 
 // Event handler for incoming addresses
 ipcr.on('addresses', (event, arg) => {
@@ -133,7 +133,7 @@ ipcr.on('create-content-reply', ((evt, arg) => {
 
 	if (arg.result == 'success') {
 		htmlText = newContentItem (arg.address, arg.type, arg.title);
-		$('#published-contents-list').append (htmlText);
+		//$('#published-contents-list').append (htmlText);
 	}
 	else {
 		if (arg.cause != undefined && arg.cause != '')
@@ -303,10 +303,15 @@ ipcr.on ('get-views-count-reply', (evt, arg) => {
 		$('#query-reply-title').text ('Count of contents views');
 		$('#query-reply-list').empty ();
 
-		arg.data.forEach(el => {
-			//console.log (el);
-			$('#query-reply-list').append (newQueryItem (el.title + ' : ' + el.count));
-		});
+		if (arg.data.length == 0) {
+			$('#query-reply-list').append ("No content publihed");
+		}
+
+		else
+			arg.data.forEach(el => {
+				//console.log (el);
+				$('#query-reply-list').append (newQueryItem (el.title + ' : ' + el.count));
+			});
 
 		showModal ('query-reply-modal');
 	}
@@ -326,10 +331,15 @@ ipcr.on ('get-newest-content-list-reply', (evt, arg) => {
 		$('#query-reply-title').text ('Newest published contents');
 		$('#query-reply-list').empty ();
 
-		arg.data.forEach(el => {
-			console.log (el);
-			$('#query-reply-list').append (newQueryItem (el));
-		});
+		if (arg.data.length == 0) {
+			$('#query-reply-list').append ("No content publihed");
+		}
+
+		else
+			arg.data.forEach(el => {
+				console.log (el);
+				$('#query-reply-list').append (newQueryItem (el));
+			});
 
 		showModal ('query-reply-modal');
 	}
@@ -348,7 +358,10 @@ ipcr.on ('get-latest-content-by-author-reply', (evt, arg) => {
 		$('#query-reply-title').text ('Latest content');
 		$('#query-reply-list').empty ();
 
-		$('#query-reply-list').append (newQueryItem (arg.data));
+		if (arg.data == undefined || arg.data == "" )
+			$('#query-reply-list').append ("No content published");
+		else
+			$('#query-reply-list').append (newQueryItem (arg.data));
 
 		showModal ('query-reply-modal');
 	}
@@ -367,7 +380,10 @@ ipcr.on ('get-latest-content-by-genre-reply', (evt, arg) => {
 		$('#query-reply-title').text ('Latest content');
 		$('#query-reply-list').empty ();
 
-		$('#query-reply-list').append (newQueryItem (arg.data));
+		if (arg.data == undefined || arg.data == "" )
+			$('#query-reply-list').append ("No content published");
+		else
+			$('#query-reply-list').append (newQueryItem (arg.data));
 
 		showModal ('query-reply-modal');
 	}
@@ -386,7 +402,10 @@ ipcr.on ('get-most-popular-content-by-author-reply', (evt, arg) => {
 		$('#query-reply-title').text ('Most popular content');
 		$('#query-reply-list').empty ();
 
-		$('#query-reply-list').append (newQueryItem (arg.data));
+		if (arg.data == undefined || arg.data == "" )
+			$('#query-reply-list').append ("No content published");
+		else
+			$('#query-reply-list').append (newQueryItem (arg.data));
 
 		showModal ('query-reply-modal');
 	}
@@ -405,7 +424,10 @@ ipcr.on ('get-most-popular-content-by-genre-reply', (evt, arg) => {
 		$('#query-reply-title').text ('Most popular content');
 		$('#query-reply-list').empty ();
 
-		$('#query-reply-list').append (newQueryItem (arg.data));
+		if (arg.data == undefined || arg.data == "" )
+			$('#query-reply-list').append ("No content published");
+		else
+			$('#query-reply-list').append (newQueryItem (arg.data));
 
 		showModal ('query-reply-modal');
 	}
@@ -424,7 +446,10 @@ ipcr.on ('get-most-rated-content-reply', (evt, arg) => {
 		$('#query-reply-title').text ('Most rated content');
 		$('#query-reply-list').empty ();
 
-		$('#query-reply-list').append (newQueryItem (arg.data));
+		if (arg.data == undefined || arg.data == "" )
+			$('#query-reply-list').append ("No content published");
+		else
+			$('#query-reply-list').append (newQueryItem (arg.data));
 
 		showModal ('query-reply-modal');
 	}
@@ -443,7 +468,10 @@ ipcr.on ('get-most-rated-content-by-genre-reply', (evt, arg) => {
 		$('#query-reply-title').text ('Most rated content');
 		$('#query-reply-list').empty ();
 
-		$('#query-reply-list').append (newQueryItem (arg.data));
+		if (arg.data == undefined || arg.data == "" )
+			$('#query-reply-list').append ("No content published");
+		else
+			$('#query-reply-list').append (newQueryItem (arg.data));
 
 		showModal ('query-reply-modal');
 	}
@@ -462,7 +490,10 @@ ipcr.on ('get-most-rated-content-by-author-reply', (evt, arg) => {
 		$('#query-reply-title').text ('Most rated content');
 		$('#query-reply-list').empty ();
 
-		$('#query-reply-list').append (newQueryItem (arg.data));
+		if (arg.data == undefined || arg.data == "" )
+			$('#query-reply-list').append ("No content published");
+		else
+			$('#query-reply-list').append (newQueryItem (arg.data));
 
 		showModal ('query-reply-modal');
 	}
@@ -479,6 +510,10 @@ ipcr.on ('get-most-rated-content-by-author-reply', (evt, arg) => {
 
 
 
+
+// ===========================
+// =====  CATALOG EVENTS  ====
+// ===========================
 
 ipcr.on ('content-published-event', (evt, arg) => {
 	// TODO Type of content is present
@@ -597,7 +632,11 @@ const prepareNewestContentList	= (evt) => {
 	
 	$('#prepare-query-send-buttton').click ((evt) => {
 		count	= Number ($('#first-input').val ());
-		if (count != 0 && count != NaN ) {
+
+		if (count == NaN) {
+			error ("Wrong input!");
+		}
+		else {
 			showLoader ('loaderDiv');
 			ipcr.send ('get-newest-content-list-request', {count:count});
 		}
@@ -658,6 +697,9 @@ const prepareLatestContentByGenre	= (evt) => {
 			showLoader ('loaderDiv');
 			ipcr.send ('get-latest-content-by-genre-request', {genre:genre});
 		}
+		else {
+			error ("Genre not defined");
+		}
 
 		hideModal ('prepare-query-modal');
 		$('#genre-item').dropdown('restore defaults');
@@ -715,6 +757,9 @@ const prepareMostPopularContentByGenre	= (evt) => {
 		if (genre != undefined) {
 			showLoader ('loaderDiv');
 			ipcr.send ('get-most-popular-content-by-genre-request', {genre:genre});
+		}
+		else {
+			error ("Genre not defined");
 		}
 
 		hideModal ('prepare-query-modal');
@@ -776,6 +821,9 @@ const prepareGetMostRatedContentByGenre	= (evt, arg) => {
 			showLoader ('loaderDiv');
 			ipcr.send ('get-most-rated-content-by-genre-request', {category:category, genre:genre});
 		}
+		else {
+			error ("Genre not defined");
+		}
 
 		hideModal ('prepare-query-modal');
 		$('#category-item').dropdown('restore defaults');
@@ -811,6 +859,9 @@ const prepareGetMostRatedContentByAuthor	= (evt, arg) => {
 		if (author != undefined && author != '') {
 			showLoader ('loaderDiv');
 			ipcr.send ('get-most-rated-content-by-author-request', {category:category, author:author});
+		}
+		else {
+			error ("Author not defined");
 		}
 
 		hideModal ('prepare-query-modal');

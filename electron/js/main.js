@@ -99,11 +99,11 @@ const printHelp		= () => {
 	console.log(	"Usage :   npm start [-- options]\n"+
 					"Runs COBrA client\n\n" +
 					"Options :\n" +
-					"\t--catalog-address <addr>\t Use given address for catalog contract address\n" +
-					"\t--infura                \t Use the default Infura node as ethereum provider (api key: " + infuraKey + ")\n" +
-					"\t--infura-key <key>      \t write me\n" +
-					"\t--mnemonic <words>      \t write me\n" +
-					"\t--private-key <key>     \t write me\n" +
+					"\t--catalog-address <addr>\t Uses given address for catalog contract address\n" +
+					"\t--infura                \t Uses the default Infura node as ethereum provider (API key: " + infuraKey + ")\n" +
+					"\t--infura-key <key>      \t Uses given string as API key for infura Node\n" +
+					"\t--mnemonic <words>      \t Uses given words to identify the Ethereum account\n" +
+					"\t--private-key <key>     \t Uses given string to identify the Ethereum account\n" +
 					"\t--help                  \t This help message will shown\n" +
 					"\n" +
 					"Example : npm start -- --infura --private-key d4f293fe249a5b025361545f253d20e723c61072453e11ccedf92d4253abf167");
