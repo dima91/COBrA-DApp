@@ -46,6 +46,7 @@ const printHelp		= () => {
 	console.log(	"\nUsage :   nodejs createCatalog.js [options]\n"+
 					"Runs COBrA client\n\n" +
 					"Options :\n" +
+					"\t--testnet               \t Write me\n" +
 					"\t--infura                \t Use the default Infura node as ethereum provider (api key: " + infuraKey + ")\n" +
 					"\t--infura-key <key>      \t write me\n" +
 					"\t--mnemonic <words>      \t write me\n" +
@@ -124,6 +125,7 @@ const parseArgs		= (args) => {
 		{ name : 'infura-key',		type : String },
 		{ name : 'mnemonic',		type : String},
 		{ name : 'private-key',		type : String },
+		{ name : "testnet",			type : Boolean },
 		{ name : "help",			type : Boolean }
 	]
 
@@ -133,8 +135,19 @@ const parseArgs		= (args) => {
 		printHelp ();
 		process.exit ();
 	}
-	
+
 	console.log ("\n\n==============================");
+
+	// ==============================
+
+	if (options["testnet"] == true) {
+		console.log ("Using local testnet");
+		
+		provider	= new Web3.providers.HttpProvider ("http://127.0.0.1:8545");
+		return ;
+	}
+	
+	// ==============================
 	
 	if (options["infura"] == true) {
 		// Do nothing: using default infura key

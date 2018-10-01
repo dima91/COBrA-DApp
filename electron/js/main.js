@@ -100,6 +100,7 @@ const printHelp		= () => {
 					"Runs COBrA client\n\n" +
 					"Options :\n" +
 					"\t--catalog-address <addr>\t Uses given address for catalog contract address\n" +
+					"\t--testnet               \t Run program to support local test network (e.g. ganache)" +
 					"\t--infura                \t Uses the default Infura node as ethereum provider (API key: " + infuraKey + ")\n" +
 					"\t--infura-key <key>      \t Uses given string as API key for infura Node\n" +
 					"\t--mnemonic <words>      \t Uses given words to identify the Ethereum account\n" +
@@ -118,6 +119,7 @@ const parseArgs		= (args) => {
 	
 	const optionDefinitions = [
 		{ name : 'catalog-address',	type : String },
+		{ name : 'testnet',			type : Boolean},
 		{ name : 'infura',			type : Boolean},
 		{ name : 'infura-key',		type : String },
 		{ name : 'mnemonic',		type : String},
@@ -139,6 +141,15 @@ const parseArgs		= (args) => {
 		contracts.catalog.address	=defaultcatalogAddress;
 
 	console.log ("\n---  Using  " + contracts.catalog.address + "  as catalog address");
+
+	// ==============================
+
+	if (options["testnet"] == true) {
+		console.log ("Using local testnet");
+		
+		provider	= new Web3.providers.HttpProvider ("http://127.0.0.1:8545");
+		return ;
+	}
 
 	// ==============================
 
