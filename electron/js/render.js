@@ -133,7 +133,7 @@ ipcr.on('create-content-reply', ((evt, arg) => {
 
 	if (arg.result == 'success') {
 		htmlText = newContentItem (arg.address, arg.type, arg.title);
-		//$('#published-contents-list').append (htmlText);
+		$('#published-contents-list').append (htmlText);
 	}
 	else {
 		if (arg.cause != undefined && arg.cause != '')
