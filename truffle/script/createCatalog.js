@@ -11,7 +11,7 @@ const catalogPath			= 'build/contracts/CatalogSmartContract.json';
 var catalogInstance;
 var catalogOwner;
 
-var privateKeys				= [];
+var privateKeys				= ["d4f293fe249a5b025361545f253d20e723c61072453e11ccedf92d4253abf167"];
 var mnemonic				= "";
 var infuraKey				= "3c51b50483cd4eec9119a4a7129bd0a4";
 
@@ -46,11 +46,11 @@ const printHelp		= () => {
 	console.log(	"\nUsage :   nodejs createCatalog.js [options]\n"+
 					"Runs COBrA client\n\n" +
 					"Options :\n" +
-					"\t--testnet               \t Write me\n" +
+					"\t--testnet               \t Use the local Ethereum network (e.g. ganache) to deploy the contract\n" +
 					"\t--infura                \t Use the default Infura node as ethereum provider (api key: " + infuraKey + ")\n" +
-					"\t--infura-key <key>      \t write me\n" +
-					"\t--mnemonic <words>      \t write me\n" +
-					"\t--private-key <key>     \t write me\n" +
+					"\t--infura-key <key>      \t Uses given string as API key for infura node\n" +
+					"\t--mnemonic <words>      \t Uses given words to identify the Ethereum account\n" +
+					"\t--private-key <key>     \t Uses given string to identify the Ethereum account (default private key: d4f293fe249a5b025361545f253d20e723c61072453e11ccedf92d4253abf167)\n" +
 					"\t--help                  \t This help message will shown\n" +
 					"\n" +
 					"Example : nodejs createCatalog.js --infura --private-key d4f293fe249a5b025361545f253d20e723c61072453e11ccedf92d4253abf167");
@@ -91,7 +91,7 @@ const getBalance	= (address) => {
 
 
 
-const createCatalog	= () => {
+const createCatalog	= async () => {
 	web3.eth.getAccounts (async (err, res) => {
 		try {
 			let catalogContract	= truffle (JSON.parse (fs.readFileSync (catalogPath)));
@@ -106,6 +106,8 @@ const createCatalog	= () => {
 			catalogInstance		= await catalogContract.new ({ from: catalogOwner, data:catalogContract.bytecode, gas:4000000});
 			console.log ('Catalog created!');
 			console.log ('\tCatalog address is   ' + catalogInstance.address);
+
+			console.log ("\nType CTRL-C to delete catalog and exit");
 			
 		} catch (err) {
 			console.log ("\n\nRaised this error during 'createCatalog' :  " + err.message);
@@ -194,5 +196,8 @@ else {
 }
 web3		= new Web3(provider);
 
+
+
 createCatalog ();
 
+setInterval (() => {/*Do nothing*/}, 100);

@@ -23,10 +23,10 @@ const videoContractPath			= folderPrefix + 'VideoManagementContract.json'
 
 
 // FIXME Insert correct catalog default address
-var defaultcatalogAddress	= "0x9a6e2ea7f61d320fe16b664d65eda48489d0e6ce";
+var defaultcatalogAddress	= "0x49c32605a1aab14ecb6fbb180b4b3aae530a2701";
 var infuraKey				= "3c51b50483cd4eec9119a4a7129bd0a4";
 var mnemonic				= "";
-var privateKeys				= [];
+var privateKeys				= ["d4f293fe249a5b025361545f253d20e723c61072453e11ccedf92d4253abf167"];
 var endpoint;
 var provider;
 var web3;
@@ -99,12 +99,12 @@ const printHelp		= () => {
 	console.log(	"Usage :   npm start [-- options]\n"+
 					"Runs COBrA client\n\n" +
 					"Options :\n" +
-					"\t--catalog-address <addr>\t Uses given address for catalog contract address\n" +
-					"\t--testnet               \t Run program to support local test network (e.g. ganache)" +
-					"\t--infura                \t Uses the default Infura node as ethereum provider (API key: " + infuraKey + ")\n" +
-					"\t--infura-key <key>      \t Uses given string as API key for infura Node\n" +
+					"\t--catalog-address <addr>\t Uses given address as catalog contract address\n" +
+					"\t--testnet               \t Run program to support local test network (e.g. ganache)\n" +
+					"\t--infura                \t Uses the default Infura node as ethereum provider (default API key: " + infuraKey + ")\n" +
+					"\t--infura-key <key>      \t Uses given string as API key for infura node\n" +
 					"\t--mnemonic <words>      \t Uses given words to identify the Ethereum account\n" +
-					"\t--private-key <key>     \t Uses given string to identify the Ethereum account\n" +
+					"\t--private-key <key>     \t Uses given string to identify the Ethereum account (default private key: d4f293fe249a5b025361545f253d20e723c61072453e11ccedf92d4253abf167)\n" +
 					"\t--help                  \t This help message will shown\n" +
 					"\n" +
 					"Example : npm start -- --infura --private-key d4f293fe249a5b025361545f253d20e723c61072453e11ccedf92d4253abf167");
@@ -174,13 +174,13 @@ const parseArgs		= (args) => {
 		provider	= new hdWalletProvider (mnemonic, endpoint);
 	}
 	else if (options["private-key"] != undefined) {
+		privateKeys	= [];
 		privateKeys.push (options["private-key"]);
 		provider	= new privateKeyProvider (privateKeys, endpoint);
 	}
 
 	else {
-		console.log ("[WARNING] No private key or mnemonic words given!");
-		provider	= new hdWalletProvider	("", endpoint);
+		provider	= new privateKeyProvider	(privateKeys, endpoint);
 	}
 }
 
