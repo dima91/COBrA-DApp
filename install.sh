@@ -9,5 +9,6 @@ npm install
 
 cd ../electron
 npm install
+npm run rebuild
 
 echo -e "\n===================\nReady to run!\n"
