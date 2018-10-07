@@ -22,6 +22,7 @@ const photoContractPath			= folderPrefix + 'PhotoManagementContract.json'
 const videoContractPath			= folderPrefix + 'VideoManagementContract.json'
 
 
+// Global variables
 var defaultcatalogAddress	= "0x49c32605a1aab14ecb6fbb180b4b3aae530a2701";
 var infuraKey				= "3c51b50483cd4eec9119a4a7129bd0a4";
 var mnemonic				= "";
@@ -35,7 +36,7 @@ var web3;
 
 var mainWindow;
 
-
+// Variable to store readed contracts from filesystem
 var contracts	= {
 	catalog : {
 		instance	:{},				// Instance of catalog
@@ -50,6 +51,7 @@ var contracts	= {
 
 var availableAddresses	= [];		// List of available addresses
 
+// Variable to store information about logged user
 var user	= {
 	balance				: {},
 	address				: {},
@@ -85,6 +87,7 @@ genreFilters	= [];
 // ===== HELPFUL FUNCTIONS  =====
 
 
+// This function prints an error message on the console and exit from the program
 const errorAndExit	= (err) => {
 	console.log ('\n\n' + '==============================\n[ERROR]   ' + err + '\n');
 	process.exit ();
@@ -93,6 +96,7 @@ const errorAndExit	= (err) => {
 
 
 
+// This functions is used to print out on the console an help message
 const printHelp		= () => {
 	console.log ("\n");
 	console.log(	"Usage :   npm start [-- options]\n"+
@@ -113,7 +117,7 @@ const printHelp		= () => {
 
 
 
-// Function to parse comman line arguments which describe provider and account
+// Function to parse comman line arguments which describe provider and account to use
 const parseArgs		= (args) => {
 	
 	const optionDefinitions = [
@@ -129,11 +133,13 @@ const parseArgs		= (args) => {
 	const options = commandLineArgs (optionDefinitions);
 	console.log ("\n\n==============================");
 
+	// If "--help" argument is present, help message will e shown
 	if (options["help"] == true) {
 		printHelp ();
 		process.exit ();
 	}
 
+	// Loading catalog address information
 	if (options["catalog-address"] != undefined)
 		contracts.catalog.address	= options["catalog-address"];
 	else
@@ -143,6 +149,7 @@ const parseArgs		= (args) => {
 
 	// ==============================
 
+	// Loading local testnet provider
 	if (options["testnet"] == true) {
 		console.log ("Using local testnet");
 		
@@ -152,6 +159,7 @@ const parseArgs		= (args) => {
 
 	// ==============================
 
+	// Using an Infura node as provider
 	if (options["infura"] == true) {
 		// Do nothing: using default infura key
 		endpoint	= "https://ropsten.infura.io/v3/"+ infuraKey;
@@ -168,6 +176,7 @@ const parseArgs		= (args) => {
 
 	// ==============================
 
+	// Loading user address private key or mnemonic words
 	if (options["mnemonic"] != undefined) {
 		mnemonic	= options["mnemonic"];
 		provider	= new hdWalletProvider (mnemonic, endpoint);
@@ -186,6 +195,7 @@ const parseArgs		= (args) => {
 
 
 
+// This function is used by Electron framework to create the program's window
 const createWindow= () => {
 	if (availableAddresses.length == 0) {
 		console.log ("No address available: VERY DANGEROUS!\nEXIT")
@@ -209,6 +219,9 @@ const createWindow= () => {
 
 
 
+/* Function to load available addresses depending on type of loaded Ethereum provider
+	(if --testnet option is specified to use network created by Ganache, multiple accounts are available)
+*/
 const loadAddresses	= () => {
 	web3.eth.getAccounts (async (err, res) => {
 		if (err)
@@ -222,6 +235,7 @@ const loadAddresses	= () => {
 
 
 
+// Function to read content of compiled solidity catalog contract and to link to catalog on the blockchain
 const linkToCatalogInstance	= () => {
 	var jsonContract			= readContract (catalogSmartContractPath);
 	contracts.catalog.contract	= truffle (jsonContract);
@@ -243,6 +257,7 @@ const linkToCatalogInstance	= () => {
 
 
 
+// Function to load content of compiled solidity contracts about deployable contents
 const loadExtendedContents	= () => {
 	contracts.baseContent			= truffle (readContract (baseContentContractPath));
 	contracts.baseContent.setProvider (provider);
@@ -262,70 +277,43 @@ const loadExtendedContents	= () => {
 
 
 
+// Function to setup callbacks when an event is received. Events are loaded from teh latest Ethereum block
 const setupEventsCallbacks = () => {
-	/*
-	event NewUser			(bytes32 username, address userAddress);
-    event ContentPublished	(bytes32 username, bytes32 contentTitle, address contentAddress);
-    event GrantedAccess		(bytes32 username, address userAddress, bytes32 contentTitle, address contentAddress);
-	event GiftedAccess		(bytes32 rcvUsername, address rcvUserAddress, bytes32 sndUsername, bytes32 contentTitle, address contentAddress);
-    event GrantedPremium	(bytes32 username, address userAddress);
-	event GiftedPremium		(bytes32 rcvUsername, address rcvUserAddress, bytes32 sndUsername);
-	event CatalogDied		();
-	*/
 
 	var initBlock	= 'latest';
 	var endBlock	= 'latest';
 
-	// It works, but i don't care about it 
-	contracts.catalog.instance.NewUser ({from:user.address}, {fromBlock: initBlock, toBlock: 'latest'})
-	.watch ((err, res) => {
-		console.log ('Received event about registration of ' + web3.toUtf8(res.args.username));
-	});
-
-	
-
-	// event ContentPublished (bytes32 username, bytes32 contentTitle, address contentAddress);
-	contracts.catalog.instance.ContentPublished ({from:user.address}, {fromBlock: initBlock, toBlock: 'latest'})
+	contracts.catalog.instance.ContentPublished ({from:user.address}, {fromBlock: initBlock, toBlock: endBlock})
 	.watch ((err, res) => {
 		contentPublishedCallback (err, res);
-	})
-
-
-
-	// event GrantedAccess (bytes32 username, address userAddress, bytes32 contentTitle, address contentAddress);
-	contracts.catalog.instance.GrantedAccess ({from:user.address}, {fromBlock: initBlock, toBlock: 'latest'})
+	});
+	
+	
+	contracts.catalog.instance.GrantedAccess ({from:user.address}, {fromBlock: initBlock, toBlock: endBlock})
 	.watch ((err, res) => {
 		grantedAccessCallback (err, res);
-	})
+	});
 
 
-
-	// event GrantedPremium (bytes32 username, address user.address);
-	contracts.catalog.instance.GrantedPremium ({from:user.address}, {fromBlock: initBlock, toBlock: 'latest'})
+	contracts.catalog.instance.GrantedPremium ({from:user.address}, {fromBlock: initBlock, toBlock: endBlock})
 	.watch ((err, res) => {
 		grantedPremiumCallback (err, res);
 	})
 
-
-
-	// event GiftedAccess		(bytes32 rcvUsername, address rcvUserAddress, bytes32 sndUsername, bytes32 contentTitle, address contentAddress);
-	contracts.catalog.instance.GiftedAccess ({from:user.address}, {fromBlock: initBlock, toBlock: 'latest'})
+	
+	contracts.catalog.instance.GiftedAccess ({from:user.address}, {fromBlock: initBlock, toBlock: endBlock})
 	.watch ((err, res) => {
 		giftedAccessCallback (err, res);
 	})
 
 
-
-	// event GiftedPremium		(bytes32 rcvUsername, address rcvUserAddress, bytes32 sndUsername);
-	contracts.catalog.instance.GiftedPremium ({from:user.address}, {fromBlock: initBlock, toBlock: 'latest'})
+	contracts.catalog.instance.GiftedPremium ({from:user.address}, {fromBlock: initBlock, toBlock: endBlock})
 	.watch ((err, res) => {
 		giftedPremiumCallback (err, res);
 	})
 
 
-
-	// event CatalogDied		();
-	contracts.catalog.instance.CatalogDied ({form:user.address}, {fromBlock: initBlock, toBlock: 'latest'})
+	contracts.catalog.instance.CatalogDied ({form:user.address}, {fromBlock: initBlock, toBlock: endBlock})
 	.watch ((err, res) => {
 		catalogDiedCallback (err, res);
 	})
@@ -334,6 +322,7 @@ const setupEventsCallbacks = () => {
 
 
 
+// Function to extract published content list from the reply given by catalog contract
 const buildCompleteContentsList	= (arg) => {
 	var count			= arg['0']
 	var titles			= arg['1'];
@@ -359,6 +348,7 @@ const buildCompleteContentsList	= (arg) => {
 
 
 
+// Function to send user information to catalog and process them
 const getUserInfo	= (getContentList) => {
 	const constructPayload = (conList,isPremium) => {
 		return {
@@ -369,30 +359,23 @@ const getUserInfo	= (getContentList) => {
 		};
 	};
 
-	console.log ('Published contents:');
-	console.log (user.publishedContents);
-
-
 	return new Promise ((resolve, reject) => {
 		web3.eth.getBalance (user.address, (err, res) => {
 			// Recived balance in 'wei' --> converting it into 'ether'
 			user.balance	= web3.fromWei (res);
-			console.log ('Balance is: ' + user.balance);
 	
 			contracts.catalog.instance.isPremium (user.hexName, {from:user.address})
 			.then ((res) => {
 				user.isPremium	= res;
 				
 				if (getContentList) {
-					console.log ('\nQuerying content list for ' + user.hexName);
 					contracts.catalog.instance.getContentsListByAuthor (user.hexName)
 					.then((res) => {
-						// Saving addresses o user.publishedContents
+						// Saving addresses of user.publishedContents
 						res[2].forEach (addr => {
 							user.publishedContents.push (addr);
-						})
+						});
 
-						console.log (res)
 						var conList	= buildCompleteContentsList (res);
 						var payload	= constructPayload (conList, user.isPremium);
 						resolve (payload);
@@ -412,6 +395,7 @@ const getUserInfo	= (getContentList) => {
 
 
 
+// Function to read synchronously a contract placed in the filesystem
 const readContract	= (contractPath) => {
 	content= fs.readFileSync (contractPath);
 	return JSON.parse(content);
@@ -420,6 +404,7 @@ const readContract	= (contractPath) => {
 
 
 
+// Function which return a human readable time
 const currentTime = () => {
 	var currentdate	= new Date(); 
 	return	"Last Sync: " + currentdate.getDate() + "/"
@@ -433,6 +418,7 @@ const currentTime = () => {
 
 
 
+// Function to compute the average from feedbacks array given as argument
 const computeFeedbacksAvg	= (feeds) => {
 	var sum=0, div=0;
 
@@ -452,6 +438,7 @@ const computeFeedbacksAvg	= (feeds) => {
 
 
 
+// Function used to convert a number into a string which represents a type of content
 const type2TypeString	= (intType) => {
 	switch (intType) {
 		case 0:
@@ -474,6 +461,7 @@ const type2TypeString	= (intType) => {
 
 
 
+// Function used to convert a number into an hexadecimal string which represents a genre
 const type2HexGenre	= (intType) => {
 	switch (intType) {
 		case 0:
@@ -510,17 +498,11 @@ const type2HexGenre	= (intType) => {
 // =====================================
 // ===== CATALOG EVENTS CALLBACKS  =====
 
-// event ContentPublished (bytes32 username, bytes32 contentTitle, address contentAddress);
 // Listener for event 'content published'
 const contentPublishedCallback = async (err, evt) => {
 	const suitableFor	= (array, cnt) => {
 		return (array.length == 0 || array.includes (cnt));
 	}
-
-
-	console.log ("Someone published a content!");
-	/*console.log (evt);
-	console.log (err);*/
 		
 	var tmpInstance	= contracts.baseContent.at (evt.args.contentAddress);
 	var type		= await tmpInstance.getType		({from:user.address, gas:upperBoundGas});
@@ -546,14 +528,12 @@ const contentPublishedCallback = async (err, evt) => {
 
 
 
-// event GrantedAccess (bytes32 username, address userAddress, bytes32 contentTitle, address contentAddress);
-// Listener for event 'granted access' --> action already handled
+// Listener for event 'granted access'
 const grantedAccessCallback = (err, evt) => {
 	var rcvUser	= web3.toUtf8 (evt.args.username);
 
 	if (rcvUser == user.stringName) {
-		var stringTitle	=	web3.toUtf8 (evt.args.contentTitle);
-		console.log ("You're granted to access to content  " + web3.toUtf8 (evt.args.contentTitle));
+		var stringTitle	= web3.toUtf8 (evt.args.contentTitle);
 		mainWindow.webContents.send ('granted-access-event', {title:stringTitle});
 		getUserInfo (false)
 		.then ((userInfo) => {
@@ -571,12 +551,11 @@ const grantedAccessCallback = (err, evt) => {
 
 
 
-// event GrantedPremium (bytes32 username, address user.address);
+// Listener for event "grantedPremiumCallback"
 const grantedPremiumCallback = (err, evt) => {
 	var rcvUser	= web3.toUtf8 (evt.args.username);
 
 	if (rcvUser == user.stringName) {
-		console.log ("You bought a premium account. Enjoy yourself!");
 		mainWindow.webContents.send ('granted-premium-event', {});
 		getUserInfo (false)
 		.then ((userInfo) => {
@@ -588,7 +567,7 @@ const grantedPremiumCallback = (err, evt) => {
 
 
 
-// event GiftedAccess (bytes32 rcvUsername, address rcvUserAddress, bytes32 sndUsername, bytes32 contentTitle, address contentAddress);
+// Listener for event "giftedAccessCallback"
 const giftedAccessCallback	= (err, evt) => {
 	var rcvUser	= web3.toUtf8 (evt.args.rcvUsername);
 
@@ -604,15 +583,13 @@ const giftedAccessCallback	= (err, evt) => {
 
 
 
-// event GiftedPremium		(bytes32 rcvUsername, address rcvUserAddress, bytes32 sndUsername);
+// Listener for event "giftedPremiumCallback"
 const giftedPremiumCallback	= (err, evt) => {
 	var rcvUser	= web3.toUtf8 (evt.args.rcvUsername);
 
-	//console.log ('Receiver name is  ' + rcvUser);
-
 	if (rcvUser == user.stringName) {
 		var sender	= web3.toUtf8 (evt.args.sndUsername);
-		console.log ('User  ' + sender + '  gift to you premium account!');
+
 		getUserInfo (false)
 		.then ((userInfo) => {
 			mainWindow.webContents.send('gifted-premium-event', {sender:sender});
@@ -626,11 +603,8 @@ const giftedPremiumCallback	= (err, evt) => {
 
 
 
-// emit FeedbackActivation (_username, _userAddr);
+// Listener for event "feedbackActivation"
 const feedbackActivationCallback	= (err, evt) => {
-	console.log (evt.args);
-	console.log (web3.toUtf8(evt.args.contentTitle));
-	console.log (web3.fromUtf8(web3.toUtf8(evt.args.contentTitle)));
 	if (web3.toUtf8 (evt.args.targetUsername) == user.stringName) 
 		mainWindow.webContents.send('feedback-activation-event', {
 																	title: web3.toUtf8 (evt.args.contentTitle),
@@ -640,6 +614,7 @@ const feedbackActivationCallback	= (err, evt) => {
 
 
 
+// Listener for event "catalogDied". When this event is received, all created contents are destroyed
 const catalogDiedCallback	= (err, evt) => {
 	user.publishedContents.forEach (async el => {
 		console.log (el);
@@ -763,14 +738,16 @@ ipcMain.on ('create-content-request', async (event, data) => {
 			result	: 'failure',
 			cause	: 'Content already exists'
 		});
-		console.log ('Error here!');
-		// TODO Destroy created contract
+		
+		// Destroying created content
+		await contracts.baseContent.at(newInstance.address).killMe({from:user.address, gas:upperBoundGas});
 	}
 })
 
 
 
 
+// Event to retreive list of consumable contents
 ipcMain.on ('contents-list-request', async (evt, arg) => {
 	console.log ('Received a contents list update request');
 
@@ -787,11 +764,11 @@ ipcMain.on ('contents-list-request', async (evt, arg) => {
 
 
 
+// Event to retreive more information about specific content
 ipcMain.on ('more-info-request', async (evt, arg) => {
 	console.log ('Received more-info-request for '+ arg.title);
 	
 	var infoOf	= await (contracts.catalog.instance.getInfoOf (web3.fromUtf8 (arg.title), {from:user.address, gas:upperBoundGas}));
-	console.log (infoOf);
 	var toSend	= {
 		title	: arg.title,
 		rating	: computeFeedbacksAvg (infoOf[0]),
@@ -806,6 +783,9 @@ ipcMain.on ('more-info-request', async (evt, arg) => {
 
 
 
+/* Event to buy a content. If user is premium, it tries to buy as a premium and,
+	if it fails, it retreies to build the content as a simple user
+*/
 ipcMain.on ('buy-content-request', async (evt, arg) => {
 	console.log ('Received request to buy content  ' + arg.title);
 	
@@ -817,12 +797,10 @@ ipcMain.on ('buy-content-request', async (evt, arg) => {
 		tmpPrice	= await (contracts.catalog.instance.getPriceOf (web3.fromUtf8(tmpTitle), {from:user.address, gas:upperBoundGas}));
 
 		if (user.isPremium) {
-			console.log ('buying by premium!');
 			await contracts.catalog.instance.getContentPremium (web3.fromUtf8(tmpTitle), {from:user.address, gas:upperBoundGas});
 			success	= true;
 		}
 		else {
-			console.log ("Buying by a mortal man");
 			await contracts.catalog.instance.getContent (web3.fromUtf8(tmpTitle), {from:user.address, gas:upperBoundGas, value:tmpPrice});
 			success	= true;
 		}
@@ -853,6 +831,9 @@ ipcMain.on ('buy-content-request', async (evt, arg) => {
 
 
 
+/* Event to consume an already buyed content. Before sending the request to catalog,
+	it subscribes itself to content's "FeedcakcACtivation" event.
+*/
 ipcMain.on ('consume-content-request', async (evt, arg) => {
 	console.log ('Received reuest to consume content ' + arg.title);
 
@@ -884,7 +865,7 @@ ipcMain.on ('consume-content-request', async (evt, arg) => {
 
 
 
-// function leaveFeedback (bytes32 _username, uint8 _c, uint8 _v) public isAllowedUser(_username, msg.sender) isCorrectCategory(_c) isCorrectRating(_v) notGivenFeedbackFor(_c-1, _username) notToBeConsumedBy (_username) {
+// Event to leave a feedback about already consumed content
 ipcMain.on ('rating-request', async (evt, arg) => {
 	console.log (arg);
 
@@ -910,6 +891,7 @@ ipcMain.on ('rating-request', async (evt, arg) => {
 
 
 
+// Event to gift a content to a specific user
 ipcMain.on ('gift-content-request', async (evt, arg) => {
 	console.log ('Gifting  ' + arg.title + '  to  ' + arg.user);
 
@@ -920,7 +902,6 @@ ipcMain.on ('gift-content-request', async (evt, arg) => {
 		await contracts.catalog.instance.giftContent (web3.fromUtf8(arg.title), web3.fromUtf8(arg.user), {from:user.address, gas:upperBoundGas, value:tmpPrice})
 		mainWindow.webContents.send('gift-content-reply', {result:'success'});
 	} catch (err) {
-		console.log ('Gift content fails!');
 		mainWindow.webContents.send('gift-content-reply', {result:'failure'});
 	}
 
@@ -931,16 +912,15 @@ ipcMain.on ('gift-content-request', async (evt, arg) => {
 
 
 
+// Event to buy a premium account
 ipcMain.on ('buy-premium-request', async (evt, arg) => {
 	try {
 		await (contracts.catalog.instance.buyPremium ({from:user.address, gas:upperBoundGas, value:premiumCost}));
-		console.log ("Premium account buyed");
 		mainWindow.webContents.send('buy-premium-reply', {result:'success'});
 
 		var userInfo	= await (getUserInfo (false));
 		mainWindow.webContents.send('user-info', JSON.stringify(userInfo));
 	} catch (err) {
-		console.log ('Error during buy premium')
 		console.log (err);
 		mainWindow.webContents.send('gift-content-reply', {result:'failure'});
 	}
@@ -949,12 +929,11 @@ ipcMain.on ('buy-premium-request', async (evt, arg) => {
 
 
 
+// Event to gift premiumaccount to another user
 ipcMain.on ('gift-premium-request', async (evt, arg) => {
-	console.log ('Performing request..');
 
 	try {
 		await (contracts.catalog.instance.giftPremium (web3.fromAscii(arg.user), {from:user.address, gas:upperBoundGas, value:premiumCost}));
-		console.log ("Gifted!!!!");
 		mainWindow.webContents.send('gift-premium-reply', {result:'success'});
 		
 		var userInfo	= await (getUserInfo (false));
@@ -974,6 +953,7 @@ ipcMain.on ('gift-premium-request', async (evt, arg) => {
 
 
 
+// Event fired when user requests the content of views of all available contents
 ipcMain.on ('get-views-count-request', async (evt, arg) => {
 	
 	var stats	= await (contracts.catalog.instance.getStatistics ({from:user.address, gas:upperBoundGas}));
@@ -997,6 +977,7 @@ ipcMain.on ('get-views-count-request', async (evt, arg) => {
 
 
 
+// Event fired when user requests newest available contents
 ipcMain.on ('get-newest-content-list-request', async (evt, arg) => {
 
 	var list	= await (contracts.catalog.instance.getNewContentList  (arg.count, {from:user.address, gas:upperBoundGas}));
@@ -1011,6 +992,7 @@ ipcMain.on ('get-newest-content-list-request', async (evt, arg) => {
 
 
 
+// Event fired when user requests the latest published content by a specific author
 ipcMain.on ('get-latest-content-by-author-request', async (evt, arg) => {
 	try {
 		var cont	= await (contracts.catalog.instance.getLatestByAuthor  (web3.fromUtf8(arg.author), {from:user.address, gas:upperBoundGas}));
@@ -1023,6 +1005,7 @@ ipcMain.on ('get-latest-content-by-author-request', async (evt, arg) => {
 
 
 
+// Event fired when user requests the latest published content of a specific genre
 ipcMain.on ('get-latest-content-by-genre-request', async (evt, arg) => {
 	try {
 		var genre	= type2HexGenre (arg.genre);
@@ -1032,8 +1015,6 @@ ipcMain.on ('get-latest-content-by-genre-request', async (evt, arg) => {
 		mainWindow.webContents.send('get-latest-content-by-genre-reply', {result:'success', data:web3.toUtf8 (cont)});
 	}
 	catch (err) {
-		// TODO Handle errors
-		console.log (err);
 		mainWindow.webContents.send('get-latest-content-by-genre-reply', {result:'failure'});
 	}
 });
@@ -1041,13 +1022,12 @@ ipcMain.on ('get-latest-content-by-genre-request', async (evt, arg) => {
 
 
 
+// Event fired when user requests the most popular content published by a specific author
 ipcMain.on ('get-most-popular-content-by-author-request', async (evt, arg) => {
 	try {
 		var cont	= await contracts.catalog.instance.getMostPopularByAuthor  (web3.fromUtf8(arg.author), {from:user.address, gas:upperBoundGas})
 		mainWindow.webContents.send('get-most-popular-content-by-author-reply', {result:'success', data:web3.toUtf8 (cont)});
 	} catch (err) {
-		// TODO Handle errors
-		console.log (err);
 		mainWindow.webContents.send('get-most-popular-content-by-author-reply', {result:'failure'});
 	}
 });
@@ -1055,6 +1035,7 @@ ipcMain.on ('get-most-popular-content-by-author-request', async (evt, arg) => {
 
 
 
+// Event fired when user requests the most popular content belonging to a specific genre
 ipcMain.on ('get-most-popular-content-by-genre-request', async (evt, arg) => {
 	try {
 		var genre	= type2HexGenre (arg.genre);
@@ -1062,8 +1043,6 @@ ipcMain.on ('get-most-popular-content-by-genre-request', async (evt, arg) => {
 		var cont	= await (contracts.catalog.instance.getMostPopularByGenre  (genre, {from:user.address, gas:upperBoundGas}));
 		mainWindow.webContents.send('get-most-popular-content-by-genre-reply', {result:'success', data:web3.toUtf8 (cont)});
 	} catch (err) {
-		// TODO Handle errors
-		console.log (err);
 		mainWindow.webContents.send('get-most-popular-content-by-genre-reply', {result:'failure'});
 	}
 });
@@ -1071,13 +1050,12 @@ ipcMain.on ('get-most-popular-content-by-genre-request', async (evt, arg) => {
 
 
 
+// Event fired when user requests the most rated content
 ipcMain.on ('get-most-rated-content-request', async (evt, arg) => {
 	try {
 		var cont	= await (contracts.catalog.instance.getMostRated  (arg.category, {from:user.address, gas:upperBoundGas}));
 		mainWindow.webContents.send('get-most-rated-content-reply', {result:'success', data:web3.toUtf8 (cont)});
 	} catch (err) {
-		// TODO Handle errors
-		console.log (err);
 		mainWindow.webContents.send('get-most-rated-content-reply', {result:'failure'});
 	}
 });
@@ -1085,6 +1063,7 @@ ipcMain.on ('get-most-rated-content-request', async (evt, arg) => {
 
 
 
+// Event fired when user requests the most rated content belonging to a specific genre
 ipcMain.on ('get-most-rated-content-by-genre-request', async (evt, arg) => {
 	try {
 		var genre	= type2HexGenre (arg.genre);
@@ -1092,8 +1071,6 @@ ipcMain.on ('get-most-rated-content-by-genre-request', async (evt, arg) => {
 		var cont	= await (contracts.catalog.instance.getMostRatedByGenre  (genre, arg.category, {from:user.address, gas:upperBoundGas}));
 		mainWindow.webContents.send('get-most-rated-content-by-genre-reply', {result:'success', data:web3.toUtf8 (cont)});
 	} catch (err) {
-		// TODO Handle errors
-		console.log (err);
 		mainWindow.webContents.send('get-most-rated-content-by-genre-reply', {result:'failure'});
 	}
 });
@@ -1101,13 +1078,12 @@ ipcMain.on ('get-most-rated-content-by-genre-request', async (evt, arg) => {
 
 
 
+// Event fired when user requests the most rated content published by a specific user
 ipcMain.on ('get-most-rated-content-by-author-request', async (evt, arg) => {
 	try {
 		var cont	= await (contracts.catalog.instance.getMostRatedByAuthor  (arg.author, arg.category, {from:user.address, gas:upperBoundGas}));
 		mainWindow.webContents.send('get-most-rated-content-by-author-reply', {result:'success', data:web3.toUtf8 (cont)});
 	} catch (err) {
-		// TODO Handle errors
-		console.log (err);
 		mainWindow.webContents.send('get-most-rated-content-by-author-reply', {result:'failure'});
 	}
 });
@@ -1115,19 +1091,16 @@ ipcMain.on ('get-most-rated-content-by-author-request', async (evt, arg) => {
 
 
 
+/* Event fired when the user wants to receive events about contentscreation only for some authors or some genres
+*/
 ipcMain.on ('apply-filters', (evt, arg) => {
 	var filterAndDecodeString	= (str) => {
 		str= str.replace(/ /g,'');		// Removing all whitespaces
 		return str.split(',');
 	}
-	console.log ('Authors:  ' + arg.authors);
-	console.log ('Genres:   ' + arg.genres);
 
 	authorFilters	= filterAndDecodeString(arg.authors);
 	genreFilters	= filterAndDecodeString(arg.genres);
-
-	console.log (authorFilters);
-	console.log (genreFilters);
 })
 
 
@@ -1137,6 +1110,10 @@ ipcMain.on ('apply-filters', (evt, arg) => {
 
 
 
+
+/* Entry point of program. If another instance of web3 already exists, it is loaded.
+	Otherwise command lien arguments are loaded.
+*/
 if (typeof web3 !== 'undefined') {
 	provider	= web3.currentProvider;
 }
@@ -1146,8 +1123,7 @@ else {
 }
 
 
-
-
+// When the application will be ready to be shown, this event is fired.
 app.on('ready', () => {
 	loadAddresses ();
 	ipcMain.setMaxListeners (50);

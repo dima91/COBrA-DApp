@@ -7,11 +7,7 @@ const ipcr = ipcRenderer;
 
 var username;
 var userAddress;
-var ADDRESSES			= [];
 var currentRating		= "";
-
-
-const ___TEST___	= false;
 
 
 
@@ -34,11 +30,9 @@ const ___TEST___	= false;
 ipcr.on('addresses', (event, arg) => {
 	jsonP = JSON.parse(arg);
 	var idx = 0;
-	ADDRESSES = jsonP;
 	jsonP.forEach(el => {
 		var tmpid = "dropel" + idx;
 		$("#dropdownElements").append('<li class="item" id="' + tmpid + '" data-val="' + tmpid + '">' + el + '</li>');
-		console.log($("#" + tmpid))
 		idx++;
 	});
 
@@ -57,12 +51,10 @@ ipcr.on('newBalance', (event, arg) => {
 
 
 
+// Event handler for incoming user information
 ipcr.on ('user-info', (evt, arg) => {
 	jsonP = JSON.parse(arg);
 	console.log(jsonP);
-
-	console.log ('Received new user infos..');
-	console.log (arg.balance);
 
 	if (jsonP['result'] == 'error') {
 		var cause	= '';
@@ -80,7 +72,6 @@ ipcr.on ('user-info', (evt, arg) => {
 		if (jsonP.contentsList != undefined) {
 
 				jsonP.contentsList.forEach ((el) => {
-				console.log ('Address: ' + el.address);
 				htmlText	= newContentItem (el.address, Number(el.type), el.title);
 				$('#published-contents-list').append(htmlText);
 			});
@@ -91,7 +82,7 @@ ipcr.on ('user-info', (evt, arg) => {
 
 
 
-// Event handler for incoming user information
+// Event handler for incoming initial user information
 ipcr.on('init-info', (event, arg) => {
 	jsonP = JSON.parse(arg);
 
@@ -113,7 +104,6 @@ ipcr.on('init-info', (event, arg) => {
 
 		
 		jsonP.contentsList.forEach ((el) => {
-			console.log ('Address: ' + el.address);
 			htmlText	= newContentItem (el.address, Number(el.type), el.title);
 			$('#published-contents-list').append(htmlText);
 		});
@@ -127,9 +117,8 @@ ipcr.on('init-info', (event, arg) => {
 
 
 
+// Event handler for a content creation reply
 ipcr.on('create-content-reply', ((evt, arg) => {
-	// FIXME Handle errors!
-	console.log(arg);
 
 	if (arg.result == 'success') {
 		htmlText = newContentItem (arg.address, arg.type, arg.title);
@@ -148,6 +137,7 @@ ipcr.on('create-content-reply', ((evt, arg) => {
 
 
 
+// Event handler for consumable content list reply
 ipcr.on ('contents-list-reply', ((evt, arg) => {
 	i	= 0;
 	$('#last-sync').text (arg.time);
@@ -163,6 +153,7 @@ ipcr.on ('contents-list-reply', ((evt, arg) => {
 
 
 
+// Event handler for more information about specific content reply
 ipcr.on ('more-info-reply', ((evt, arg) => {
 	$('#info-title').text (arg.title);
 	$('#info-author').text (arg.author);
@@ -173,18 +164,19 @@ ipcr.on ('more-info-reply', ((evt, arg) => {
 
 	hideLoader ('loaderDiv');
 	$('#more-info-modal').modal('show');
-	console.log (arg);
 }))
 
 
 
 
+// Event handler for buyed content reply
 ipcr.on ('buy-content-reply', (evt, arg) => {
 	// Disabling previous content's buyed button
 	$('#button-' + arg.hexTitle).addClass ('disabled');
 	$('#button-' + arg.hexTitle).attr("id","newId");
 
 
+	// If an error occurs, it is notified to user. Otherwise the content is inserted in the consumable contents list
 	if (arg.result == 'error') {
 		if (arg.cause != undefined && arg.cause != '')
 			error ('Error buying content: ' + arg.cause);
@@ -208,6 +200,9 @@ ipcr.on ('buy-content-reply', (evt, arg) => {
 
 
 
+/* Event handler for a consume content reply. The green button related to consumable content is modified into
+	a rating button, but it is not activated. It is activated when feedback activation event is received
+*/
 ipcr.on ('consume-content-reply', (evt, arg) => {
 	if (arg.result == 'error') {
 		if (arg.cause != undefined && arg.cause != '')
@@ -223,7 +218,6 @@ ipcr.on ('consume-content-reply', (evt, arg) => {
 
 		
 		$('#button-' + arg.title).click	((ev) => {
-			console.log ('clicked for rate');
 			showModal ('rating-modal');
 			var title		= ev.target.id.substring (7);
 			currentRating	= title;
@@ -237,6 +231,7 @@ ipcr.on ('consume-content-reply', (evt, arg) => {
 
 
 
+// Event handler for a gift content reply. If an error occurs, it will be shown
 ipcr.on ('gift-content-reply', (ev, arg) => {
 	hideLoader ('buy-gift-content-dimmer');
 
@@ -244,17 +239,17 @@ ipcr.on ('gift-content-reply', (ev, arg) => {
 		// Do nothing
 	}
 	else {
-		console.log ("Error gifting a content to someone!\n" + arg.cause);
 		if (arg.cause != undefined && arg.cause != '')
 			error ('Error gifting content: ' + arg.cause);
 		else
-			error ('Error gifting content. Have you enough money?');
+			error ('Error gifting content. Have you enough money or is username correct?');
 	}
 })
 
 
 
 
+// Event handler for a buy content reply.
 ipcr.on ('buy-premium-reply', (evt, arg) => {
 	hideLoader ('buy-gift-premium-dimmer');
 
@@ -274,6 +269,7 @@ ipcr.on ('buy-premium-reply', (evt, arg) => {
 
 
 
+// Event handler for a gift content reply
 ipcr.on ('gift-premium-reply', (evt, arg) => {
 	hideLoader ('buy-gift-premium-dimmer');
 	
@@ -281,7 +277,7 @@ ipcr.on ('gift-premium-reply', (evt, arg) => {
 		if (arg.cause != undefined && arg.cause != '')
 			error ('Error buying content: ' + arg.cause);
 		else
-			error ('Error buying content. Have you enough money?');
+			error ('Error buying content. Have you enough money of is username correct?');
 	}
 })
 
@@ -294,8 +290,12 @@ ipcr.on ('gift-premium-reply', (evt, arg) => {
 
 
 
+/* Following events handler are fired when a reply about some statistics is received.
+	A modal window is shown with the received response 
+*/
+
+
 ipcr.on ('get-views-count-reply', (evt, arg) => {
-	//console.log (arg);
 	hideLoader ('loaderDiv');
 
 	if (arg.result == 'success') {
@@ -309,7 +309,6 @@ ipcr.on ('get-views-count-reply', (evt, arg) => {
 
 		else
 			arg.data.forEach(el => {
-				//console.log (el);
 				$('#query-reply-list').append (newQueryItem (el.title + ' : ' + el.count));
 			});
 
@@ -505,21 +504,11 @@ ipcr.on ('get-most-rated-content-by-author-reply', (evt, arg) => {
 
 
 
-
-
-
-
-
-
-// ===========================
-// =====  CATALOG EVENTS  ====
-// ===========================
-
+// Event handler fired when a new content is published. If publishing user differs from current user a notification is shown
 ipcr.on ('content-published-event', (evt, arg) => {
-	// TODO Type of content is present
 	var id	= arg.hexTitle;
 	$('#available-contents-list').append (newAvailableContent (arg.stringTitle, id));
-	$('#more-info-'+id).click ((evt) => {console.log ('getting more info'); getMoreInfo ($('#'+evt.target.id).prev())});
+	$('#more-info-'+id).click ((evt) => {getMoreInfo ($('#'+evt.target.id).prev())});
 	console.log ();
 	if (arg.author != username)
 		newNotification ({name:'The author  "' +arg.author+ '" published  "'+arg.stringTitle+'"'});
@@ -528,6 +517,7 @@ ipcr.on ('content-published-event', (evt, arg) => {
 
 
 
+// Event handler fired when an access to a content is granted
 ipcr.on ('granted-access-event', (evt, arg) => {
 	newNotification ({name:'You can access to content  "' + arg.title +'"'});
 });
@@ -535,6 +525,7 @@ ipcr.on ('granted-access-event', (evt, arg) => {
 
 
 
+// Event handler fired when a premium account is activated
 ipcr.on ('granted-premium-event', (evt, arg) => {
 	newNotification ({name:'You obtained premium acces'});
 });
@@ -542,15 +533,14 @@ ipcr.on ('granted-premium-event', (evt, arg) => {
 
 
 
+// Event handler fired when another user gifts to current user a content
 ipcr.on ('gifted-content-event', (evt, arg) => {
 	$('#consumable-contents-list').append (newBuyedItem (arg.title, arg.hexTitle));
 	
 	$('#button-'+arg.hexTitle).click ((ev) => {
-		console.log ('Clicked for consume');
 		var title	= ev.target.id.substring (7);
 		ipcr.send ('consume-content-request', {'title':title});
 		showLoader ('consume-rate-content-dimmer');
-		console.log ('Done');
 	});
 
 	var notif	= {name:'User  "' + arg.sender + '"  gifted to you content  "'+ arg.title + '"'};
@@ -560,17 +550,15 @@ ipcr.on ('gifted-content-event', (evt, arg) => {
 
 
 
+// Event handler fired when another user gifts to current user a premium account
 ipcr.on ('gifted-premium-event', (evt, arg) => {
 	newNotification ({name:'User "' + arg.sender +'" gifted you a premium account'});
 });
 
 
 
-
+//Event handler fired when a feedback activation event is received from catalog
 ipcr.on ('feedback-activation-event', (evt, arg) => {
-	console.log ("Received new feedback activation");
-	console.log (arg);
-
 	$('#button-' + arg.hexTitle).removeClass ('disabled');
 	showModal ('rating-question-modal');
 	currentRating	= arg.hexTitle;
@@ -579,6 +567,9 @@ ipcr.on ('feedback-activation-event', (evt, arg) => {
 
 
 
+/* Event handler fired when the catalog contract is killed. A message is shown with the information and after two seconds and
+	half, an event to close the application is fired
+*/
 ipcr.on ('catalog-died-event', (evt, arg) => {
 	error ('Catalo contract is died! Application will be closed', 3000);
 
@@ -608,6 +599,11 @@ ipcr.on ('catalog-died-event', (evt, arg) => {
 // ========================================
 //					QUERIES
 // ========================================
+
+/* Following functions are registered as callback when buttons belonging to "Perform a query" list is clicked.
+	A modal window is shown to collect user arguments (e.g. number of contents or type of contents) and
+	when "Send" buton is clicked, an event to request informationsto catalog is sent to main electron process
+*/
 
 const getViewsCount = (evt) => {
 	ipcr.send ('get-views-count-request', {});
@@ -900,6 +896,8 @@ const prepareGetMostRatedContentByAuthor	= (evt, arg) => {
 // ===============================
 // =====  HELPFUL FUNCTIONS  =====
 
+// Helpful functions to interact with the user interface
+
 const showLoader = (loaderId) => {
 	$('#' + loaderId).addClass('active')
 }
@@ -1153,6 +1151,9 @@ const newQueryItem	= (text) => {
 // ==================================================
 //					LOGIN VIEW
 // ==================================================
+
+// Callbacks related to login form in the user interface
+
 $("#modal_closeButton").click((evt) => {
 	ipcRenderer.send("quitDapp", {});
 });
@@ -1201,11 +1202,7 @@ $('#modal_submitButton').click((evt) => {
 //					PAGE HEADER
 // ==================================================
 
-/*$("#headerCloseButton").click ((evt) => {
-	ipcRenderer.send('quitDapp', {});
-})*/
-
-
+// Callbacks related to page header in the user interface
 
 $("#authorRoleBtn").click ((evt) => {
 	showAuthorView();
@@ -1268,6 +1265,8 @@ $('#interests-cancel-button').click ((evt) => {
 //					AUTHOR VIEW
 // ==================================================
 
+// Callbacks related to author view in the user interface
+
 
 // ==================================
 // ====  Create content segment  ====
@@ -1284,8 +1283,6 @@ $('#create-content-button').click((evt) => {
 		}
 		$('#' + id).removeClass('error');
 	}
-
-	console.log(type + '  ' + title + '  ' + price)
 
 	error = error || checkAndError(type, 'contentDropdown');
 	error = error || checkAndError(title, 'conTitleInpContainer');
@@ -1323,11 +1320,7 @@ $('#create-content-button').click((evt) => {
 //					CUSTOMER VIEW
 // ==================================================
 
-/* Kind of feedback
- * contentAppreciation  : how much the customer enjoyed the content
- * priceFairness        : how fair the requested price is considered compared to the content
- * availabilityTime     : how fair the availability of content is considered compating to the price
- */
+// Callbacks related to customer view in the user interface
 
 $('#refresh-button').click ((evt) => {
 	ipcr.send ('contents-list-request');
@@ -1355,7 +1348,6 @@ $('#buy-content-button').click (evt => {
 
 
 $('#gift-to-content-button').click (evt => {
-	// gift-to-user
 	var title	= $('#buy-gift-title').val();
 	var user	= $('#gift-to-user').val();
 
@@ -1380,7 +1372,6 @@ $('#yes-quest-button').click ((evt) => {
 	hideModal ('rating-question-modal');
 	showModal ('rating-modal');
 
-	// Cleaning values
 	$('.ui.rating').rating();
 })
 
@@ -1402,8 +1393,6 @@ $('#rating-submit-button').click ((evt) => {
 						'3' : $('#rating-3').rating('get rating')
 					}
 	ipcr.send ('rating-request', data);
-	console.log ('sengin..');
-	console.log (data);
 
 	hideModal('rating-modal');
 
@@ -1436,8 +1425,6 @@ $('#gift-premium-button').click ((evt) => {
 		return ;
 	}
 
-	console.log ('Gifting premium')
-
 	showLoader ('buy-gift-premium-dimmer');
 	ipcr.send ('gift-premium-request', {user:user});
 })
@@ -1460,7 +1447,11 @@ $('#gift-premium-button').click ((evt) => {
 $("#body").keyup((evt) => {
 });
 
-// Getting addresses
+
+
+/* Function triggered when the application window is ready to be shown.
+	It sets up some Semantic ui lements.
+*/
 window.onload = () => {
 	
 	ipcr.setMaxListeners (50);
@@ -1469,7 +1460,6 @@ window.onload = () => {
 	$('#loginModal').modal	({closable:false});
 	showModal ('loginModal');
 	$('.ui.dropdown').dropdown();
-	//$('.ui.rating').rating();
 
 	// Adding listener to dropdown notfication about onHide and onShow events
 	$('#notificationsDropdown').dropdown ('setting', 'onShow', () => {
@@ -1486,19 +1476,5 @@ window.onload = () => {
 	$('#more-info-modal').modal('hide');
 
 	ipcr.send('getAddresses', {});
-
-	if (___TEST___) {
-
-		// Timeout to automatically access with first address of array
-		setTimeout(() => {
-			console.log('Helo user: ' + ___TEST___)
-			userAddress = ADDRESSES[9]
-			username = 'luca'
-			payload = { 'user': username, 'addr': userAddress };
-			$('#loginModal').modal('hide')
-			showLoader('loaderDiv')
-			ipcr.send('init-info', payload);
-		}, 100);
-	}
 }
 
