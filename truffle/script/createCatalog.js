@@ -185,6 +185,8 @@ const parseArgs		= (args) => {
 
 
 
+process.chdir (__dirname + "/..");
+
 if (typeof web3 !== 'undefined') {
 	console.log ("Provider already defined!");
 

@@ -22,7 +22,6 @@ const photoContractPath			= folderPrefix + 'PhotoManagementContract.json'
 const videoContractPath			= folderPrefix + 'VideoManagementContract.json'
 
 
-// FIXME Insert correct catalog default address
 var defaultcatalogAddress	= "0x49c32605a1aab14ecb6fbb180b4b3aae530a2701";
 var infuraKey				= "3c51b50483cd4eec9119a4a7129bd0a4";
 var mnemonic				= "";
@@ -99,7 +98,7 @@ const printHelp		= () => {
 	console.log(	"Usage :   npm start [-- options]\n"+
 					"Runs COBrA client\n\n" +
 					"Options :\n" +
-					"\t--catalog-address <addr>\t Uses given address as catalog contract address\n" +
+					"\t--catalog-address <addr>\t Uses given address as catalog contract address (default address: "+ defaultcatalogAddress +")\n" +
 					"\t--testnet               \t Run program to support local test network (e.g. ganache)\n" +
 					"\t--infura                \t Uses the default Infura node as ethereum provider (default API key: " + infuraKey + ")\n" +
 					"\t--infura-key <key>      \t Uses given string as API key for infura node\n" +
