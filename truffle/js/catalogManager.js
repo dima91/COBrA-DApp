@@ -23,22 +23,6 @@ var web3;
 
 
 
-/*const atExit	= async () => {
-	
-			var res	= await catalogInstance.killMe ({from: catalogOwner, gas:4000000});
-			console.log ("Catalog estroyed!");
-		} catch (err) {
-			console.log ("\n\nRaised this error during "killMe"");
-			console.log (err.message);
-		}
-	}
-
-	process.exit ();
-}*/
-
-
-
-
 const printHelp		= () => {
 	console.log(	"\nUsage :   nodejs catalogManager.js --create || --delete <address>  [options]\n"+
 					"Allows you tocreate or destroy a Catalog smart contract\n\n" +
@@ -88,7 +72,7 @@ const performAction	= () => {
 			}
 			else {
 				const address	= commandLineOptions["delete"];
-				console.log ("Destroying catalog at " + address + "from address  " + catalogOwner +
+				console.log ("Destroying catalog at " + address + " from address  " + catalogOwner +
 							 "  which has balance  " + balance +  "...");
 				destroyCatalog (address, catalogContract);
 			}
@@ -152,6 +136,12 @@ const parseArgs		= (args) => {
 	commandLineOptions = commandLineArgs (optionDefinitions);
 
 
+	if (commandLineOptions["help"] == true) {
+		printHelp ();
+		process.exit ();
+	}
+
+	
 	if ((commandLineOptions["delete"] == null && commandLineOptions["create"] == undefined)
 		 || (commandLineOptions["delete"] != null && commandLineOptions["create"] != undefined)) {
 		console.log ("\nERROR : both --delete ad --create are missing or are defined!\n");
@@ -159,10 +149,6 @@ const parseArgs		= (args) => {
 		process.exit ();
 	}
 
-	if (commandLineOptions["help"] == true) {
-		printHelp ();
-		process.exit ();
-	}
 
 	// ==============================
 
