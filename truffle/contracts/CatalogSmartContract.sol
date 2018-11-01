@@ -231,7 +231,6 @@ contract CatalogSmartContract is Ownable {
 
             if (_category == 0) {
                 // Calculating average and compare to temporary most rated
-                // FIXME Add check on feedsCount > 0
                 uint tmpRating  = feedbacksAverage (feeds, feedsCount);
                 if (tmpRating >= mostRateValue) {
                     mostRatedIdx    = i;
@@ -240,7 +239,6 @@ contract CatalogSmartContract is Ownable {
                 }
             }
             else {
-                // FIXME Add check on feedsCount > 0
                 if (feeds[_category-1] >= mostRateValue) {
                     mostRatedIdx    = i;
                     mostRateValue   = feeds[_category-1];
@@ -275,7 +273,6 @@ contract CatalogSmartContract is Ownable {
     // Public functions
     
     // Function which kills current contract. It is callable only from contract's owner
-    // FIXME
     function killMe () public onlyOwner() {
         
         // First of all, it distrubutes payments amog authors
@@ -338,8 +335,6 @@ contract CatalogSmartContract is Ownable {
     
     
     // Function to notify new view from another content manager
-    // FIXME Update payment to author
-    // FIXME Check correspondance between msg.sender and saved contentAddress
     function notifyNewView (bytes32 _contentTitle, bytes32 _username) alreadyPublishedM (_contentTitle) onlyRegisteredContent (_contentTitle, msg.sender)
 	userExistsM (_username) userAllowed (_username, _contentTitle) public {
         BaseContentManagementContract remoteContract	= BaseContentManagementContract (msg.sender);
@@ -547,7 +542,7 @@ contract CatalogSmartContract is Ownable {
     
     
     
-    // FIXME Returns the content with most views of the author x
+    // Returns the content with most views of the author x
     function getMostPopularByAuthor (bytes32 _author) userExistsM (_author) public view returns (bytes32) {
         bytes32 reqStr	= "";
         uint maximum	= 0;

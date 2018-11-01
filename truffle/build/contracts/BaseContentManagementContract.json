@@ -255,7 +255,7 @@
         "id": 2,
         "nodeType": "ImportDirective",
         "scope": 606,
-        "sourceUnit": 2998,
+        "sourceUnit": 2941,
         "src": "26:27:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -277,7 +277,7 @@
         "id": 4,
         "nodeType": "ImportDirective",
         "scope": 606,
-        "sourceUnit": 2959,
+        "sourceUnit": 2902,
         "src": "91:23:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -291,10 +291,10 @@
               "id": 5,
               "name": "Ownable",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 2958,
+              "referencedDeclaration": 2901,
               "src": "159:7:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Ownable_$2958",
+                "typeIdentifier": "t_contract$_Ownable_$2901",
                 "typeString": "contract Ownable"
               }
             },
@@ -304,7 +304,7 @@
           }
         ],
         "contractDependencies": [
-          2958
+          2901
         ],
         "contractKind": "contract",
         "documentation": null,
@@ -312,7 +312,7 @@
         "id": 605,
         "linearizedBaseContracts": [
           605,
-          2958
+          2901
         ],
         "name": "BaseContentManagementContract",
         "nodeType": "ContractDefinition",
@@ -725,7 +725,7 @@
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_enum$_contentType_$2965",
+              "typeIdentifier": "t_enum$_contentType_$2908",
               "typeString": "enum SharedTypes.contentType"
             },
             "typeName": {
@@ -733,10 +733,10 @@
               "id": 40,
               "name": "SharedTypes.contentType",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 2965,
+              "referencedDeclaration": 2908,
               "src": "1450:23:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_enum$_contentType_$2965",
+                "typeIdentifier": "t_enum$_contentType_$2908",
                 "typeString": "enum SharedTypes.contentType"
               }
             },
@@ -865,7 +865,7 @@
                       "referencedDeclaration": 41,
                       "src": "2004:13:0",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_contentType_$2965",
+                        "typeIdentifier": "t_enum$_contentType_$2908",
                         "typeString": "enum SharedTypes.contentType"
                       }
                     },
@@ -880,13 +880,13 @@
                       "referencedDeclaration": 51,
                       "src": "2022:8:0",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_contentType_$2965",
+                        "typeIdentifier": "t_enum$_contentType_$2908",
                         "typeString": "enum SharedTypes.contentType"
                       }
                     },
                     "src": "2004:26:0",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_enum$_contentType_$2965",
+                      "typeIdentifier": "t_enum$_contentType_$2908",
                       "typeString": "enum SharedTypes.contentType"
                     }
                   },
@@ -1559,7 +1559,7 @@
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_enum$_contentType_$2965",
+                    "typeIdentifier": "t_enum$_contentType_$2908",
                     "typeString": "enum SharedTypes.contentType"
                   },
                   "typeName": {
@@ -1567,10 +1567,10 @@
                     "id": 50,
                     "name": "SharedTypes.contentType",
                     "nodeType": "UserDefinedTypeName",
-                    "referencedDeclaration": 2965,
+                    "referencedDeclaration": 2908,
                     "src": "1912:23:0",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_enum$_contentType_$2965",
+                      "typeIdentifier": "t_enum$_contentType_$2908",
                       "typeString": "enum SharedTypes.contentType"
                     }
                   },
@@ -1674,7 +1674,7 @@
                             "name": "msg",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 3012,
+                            "referencedDeclaration": 2955,
                             "src": "2482:3:0",
                             "typeDescriptions": {
                               "typeIdentifier": "t_magic_message",
@@ -1728,10 +1728,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        3015,
-                        3016
+                        2958,
+                        2959
                       ],
-                      "referencedDeclaration": 3015,
+                      "referencedDeclaration": 2958,
                       "src": "2473:7:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -2076,10 +2076,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        3015,
-                        3016
+                        2958,
+                        2959
                       ],
-                      "referencedDeclaration": 3015,
+                      "referencedDeclaration": 2958,
                       "src": "2766:7:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -2303,10 +2303,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        3015,
-                        3016
+                        2958,
+                        2959
                       ],
-                      "referencedDeclaration": 3015,
+                      "referencedDeclaration": 2958,
                       "src": "2888:7:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -2504,10 +2504,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        3015,
-                        3016
+                        2958,
+                        2959
                       ],
-                      "referencedDeclaration": 3015,
+                      "referencedDeclaration": 2958,
                       "src": "3105:7:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -2754,10 +2754,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        3015,
-                        3016
+                        2958,
+                        2959
                       ],
-                      "referencedDeclaration": 3015,
+                      "referencedDeclaration": 2958,
                       "src": "3250:7:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -3004,10 +3004,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        3015,
-                        3016
+                        2958,
+                        2959
                       ],
-                      "referencedDeclaration": 3015,
+                      "referencedDeclaration": 2958,
                       "src": "3366:7:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -3221,10 +3221,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        3015,
-                        3016
+                        2958,
+                        2959
                       ],
-                      "referencedDeclaration": 3015,
+                      "referencedDeclaration": 2958,
                       "src": "3512:7:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -3969,7 +3969,7 @@
                       "name": "msg",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 3012,
+                      "referencedDeclaration": 2955,
                       "src": "3972:3:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_magic_message",
@@ -4106,7 +4106,7 @@
                         "name": "owner",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2937,
+                        "referencedDeclaration": 2880,
                         "src": "4665:5:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -4125,7 +4125,7 @@
                       "name": "selfdestruct",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 3020,
+                      "referencedDeclaration": 2963,
                       "src": "4651:12:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_selfdestruct_nonpayable$_t_address_$returns$__$",
@@ -4167,7 +4167,7 @@
                   "name": "onlyOwner",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 2957,
+                  "referencedDeclaration": 2900,
                   "src": "4629:9:0",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$__$",
@@ -4458,7 +4458,7 @@
                     "referencedDeclaration": 41,
                     "src": "5176:13:0",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_enum$_contentType_$2965",
+                      "typeIdentifier": "t_enum$_contentType_$2908",
                       "typeString": "enum SharedTypes.contentType"
                     }
                   },
@@ -4498,7 +4498,7 @@
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_enum$_contentType_$2965",
+                    "typeIdentifier": "t_enum$_contentType_$2908",
                     "typeString": "enum SharedTypes.contentType"
                   },
                   "typeName": {
@@ -4506,10 +4506,10 @@
                     "id": 335,
                     "name": "SharedTypes.contentType",
                     "nodeType": "UserDefinedTypeName",
-                    "referencedDeclaration": 2965,
+                    "referencedDeclaration": 2908,
                     "src": "5134:23:0",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_enum$_contentType_$2965",
+                      "typeIdentifier": "t_enum$_contentType_$2908",
                       "typeString": "enum SharedTypes.contentType"
                     }
                   },
@@ -6275,7 +6275,7 @@
                       "name": "msg",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 3012,
+                      "referencedDeclaration": 2955,
                       "src": "6713:3:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_magic_message",
@@ -7848,7 +7848,7 @@
         "id": 2,
         "nodeType": "ImportDirective",
         "scope": 606,
-        "sourceUnit": 2998,
+        "sourceUnit": 2941,
         "src": "26:27:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -7870,7 +7870,7 @@
         "id": 4,
         "nodeType": "ImportDirective",
         "scope": 606,
-        "sourceUnit": 2959,
+        "sourceUnit": 2902,
         "src": "91:23:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -7884,10 +7884,10 @@
               "id": 5,
               "name": "Ownable",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 2958,
+              "referencedDeclaration": 2901,
               "src": "159:7:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Ownable_$2958",
+                "typeIdentifier": "t_contract$_Ownable_$2901",
                 "typeString": "contract Ownable"
               }
             },
@@ -7897,7 +7897,7 @@
           }
         ],
         "contractDependencies": [
-          2958
+          2901
         ],
         "contractKind": "contract",
         "documentation": null,
@@ -7905,7 +7905,7 @@
         "id": 605,
         "linearizedBaseContracts": [
           605,
-          2958
+          2901
         ],
         "name": "BaseContentManagementContract",
         "nodeType": "ContractDefinition",
@@ -8318,7 +8318,7 @@
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_enum$_contentType_$2965",
+              "typeIdentifier": "t_enum$_contentType_$2908",
               "typeString": "enum SharedTypes.contentType"
             },
             "typeName": {
@@ -8326,10 +8326,10 @@
               "id": 40,
               "name": "SharedTypes.contentType",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 2965,
+              "referencedDeclaration": 2908,
               "src": "1450:23:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_enum$_contentType_$2965",
+                "typeIdentifier": "t_enum$_contentType_$2908",
                 "typeString": "enum SharedTypes.contentType"
               }
             },
@@ -8458,7 +8458,7 @@
                       "referencedDeclaration": 41,
                       "src": "2004:13:0",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_contentType_$2965",
+                        "typeIdentifier": "t_enum$_contentType_$2908",
                         "typeString": "enum SharedTypes.contentType"
                       }
                     },
@@ -8473,13 +8473,13 @@
                       "referencedDeclaration": 51,
                       "src": "2022:8:0",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_contentType_$2965",
+                        "typeIdentifier": "t_enum$_contentType_$2908",
                         "typeString": "enum SharedTypes.contentType"
                       }
                     },
                     "src": "2004:26:0",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_enum$_contentType_$2965",
+                      "typeIdentifier": "t_enum$_contentType_$2908",
                       "typeString": "enum SharedTypes.contentType"
                     }
                   },
@@ -9152,7 +9152,7 @@
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_enum$_contentType_$2965",
+                    "typeIdentifier": "t_enum$_contentType_$2908",
                     "typeString": "enum SharedTypes.contentType"
                   },
                   "typeName": {
@@ -9160,10 +9160,10 @@
                     "id": 50,
                     "name": "SharedTypes.contentType",
                     "nodeType": "UserDefinedTypeName",
-                    "referencedDeclaration": 2965,
+                    "referencedDeclaration": 2908,
                     "src": "1912:23:0",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_enum$_contentType_$2965",
+                      "typeIdentifier": "t_enum$_contentType_$2908",
                       "typeString": "enum SharedTypes.contentType"
                     }
                   },
@@ -9267,7 +9267,7 @@
                             "name": "msg",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 3012,
+                            "referencedDeclaration": 2955,
                             "src": "2482:3:0",
                             "typeDescriptions": {
                               "typeIdentifier": "t_magic_message",
@@ -9321,10 +9321,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        3015,
-                        3016
+                        2958,
+                        2959
                       ],
-                      "referencedDeclaration": 3015,
+                      "referencedDeclaration": 2958,
                       "src": "2473:7:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -9669,10 +9669,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        3015,
-                        3016
+                        2958,
+                        2959
                       ],
-                      "referencedDeclaration": 3015,
+                      "referencedDeclaration": 2958,
                       "src": "2766:7:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -9896,10 +9896,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        3015,
-                        3016
+                        2958,
+                        2959
                       ],
-                      "referencedDeclaration": 3015,
+                      "referencedDeclaration": 2958,
                       "src": "2888:7:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -10097,10 +10097,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        3015,
-                        3016
+                        2958,
+                        2959
                       ],
-                      "referencedDeclaration": 3015,
+                      "referencedDeclaration": 2958,
                       "src": "3105:7:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -10347,10 +10347,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        3015,
-                        3016
+                        2958,
+                        2959
                       ],
-                      "referencedDeclaration": 3015,
+                      "referencedDeclaration": 2958,
                       "src": "3250:7:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -10597,10 +10597,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        3015,
-                        3016
+                        2958,
+                        2959
                       ],
-                      "referencedDeclaration": 3015,
+                      "referencedDeclaration": 2958,
                       "src": "3366:7:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -10814,10 +10814,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        3015,
-                        3016
+                        2958,
+                        2959
                       ],
-                      "referencedDeclaration": 3015,
+                      "referencedDeclaration": 2958,
                       "src": "3512:7:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -11562,7 +11562,7 @@
                       "name": "msg",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 3012,
+                      "referencedDeclaration": 2955,
                       "src": "3972:3:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_magic_message",
@@ -11699,7 +11699,7 @@
                         "name": "owner",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2937,
+                        "referencedDeclaration": 2880,
                         "src": "4665:5:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -11718,7 +11718,7 @@
                       "name": "selfdestruct",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 3020,
+                      "referencedDeclaration": 2963,
                       "src": "4651:12:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_selfdestruct_nonpayable$_t_address_$returns$__$",
@@ -11760,7 +11760,7 @@
                   "name": "onlyOwner",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 2957,
+                  "referencedDeclaration": 2900,
                   "src": "4629:9:0",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$__$",
@@ -12051,7 +12051,7 @@
                     "referencedDeclaration": 41,
                     "src": "5176:13:0",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_enum$_contentType_$2965",
+                      "typeIdentifier": "t_enum$_contentType_$2908",
                       "typeString": "enum SharedTypes.contentType"
                     }
                   },
@@ -12091,7 +12091,7 @@
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_enum$_contentType_$2965",
+                    "typeIdentifier": "t_enum$_contentType_$2908",
                     "typeString": "enum SharedTypes.contentType"
                   },
                   "typeName": {
@@ -12099,10 +12099,10 @@
                     "id": 335,
                     "name": "SharedTypes.contentType",
                     "nodeType": "UserDefinedTypeName",
-                    "referencedDeclaration": 2965,
+                    "referencedDeclaration": 2908,
                     "src": "5134:23:0",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_enum$_contentType_$2965",
+                      "typeIdentifier": "t_enum$_contentType_$2908",
                       "typeString": "enum SharedTypes.contentType"
                     }
                   },
@@ -13868,7 +13868,7 @@
                       "name": "msg",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 3012,
+                      "referencedDeclaration": 2955,
                       "src": "6713:3:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_magic_message",
@@ -15420,5 +15420,5 @@
   },
   "networks": {},
   "schemaVersion": "2.0.1",
-  "updatedAt": "2018-09-10T19:49:17.805Z"
+  "updatedAt": "2018-11-01T10:53:31.288Z"
 }

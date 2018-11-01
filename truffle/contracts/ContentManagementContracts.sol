@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
 import "./BaseContentManagementContract.sol";
-import "./CatalogSmartContract.sol";        // FIXME Remove me!!!!!
+import "./CatalogSmartContract.sol";
 
 
 

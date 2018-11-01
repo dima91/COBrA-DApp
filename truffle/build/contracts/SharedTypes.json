@@ -3,22 +3,22 @@
   "abi": [],
   "bytecode": "0x604c602c600b82828239805160001a60731460008114601c57601e565bfe5b5030600052607381538281f30073000000000000000000000000000000000000000030146080604052600080fd00a165627a7a723058202539d0575567788cc9d30274a2399c1d88f319df93dd082b606fa9916aff9ca10029",
   "deployedBytecode": "0x73000000000000000000000000000000000000000030146080604052600080fd00a165627a7a723058202539d0575567788cc9d30274a2399c1d88f319df93dd082b606fa9916aff9ca10029",
-  "sourceMap": "67:2072:5:-;;132:2:-1;166:7;155:9;146:7;137:37;252:7;246:14;243:1;238:23;232:4;229:33;270:1;265:20;;;;222:63;;265:20;274:9;222:63;;298:9;295:1;288:20;328:4;319:7;311:22;352:7;343;336:24",
-  "deployedSourceMap": "67:2072:5:-;;;;;;;;",
+  "sourceMap": "67:2072:4:-;;132:2:-1;166:7;155:9;146:7;137:37;252:7;246:14;243:1;238:23;232:4;229:33;270:1;265:20;;;;222:63;;265:20;274:9;222:63;;298:9;295:1;288:20;328:4;319:7;311:22;352:7;343;336:24",
+  "deployedSourceMap": "67:2072:4:-;;;;;;;;",
   "source": "pragma solidity ^0.4.24;\n\n\n// Library Containing types definitions\nlibrary SharedTypes {\n    \n    // Kind of content\n    enum contentType {song, video, photo, document}\n    \n    // Kind of account\n    enum accountType {standard, premium}\n    \n    /* Kind of feedback\n     * contentAppreciation  : how much the customer enjoyed the content\n     * priceFairness        : how fair the requested price is considered compared to the content\n     * suitableForChildren  : how much the content is suitable for guys\n     */\n    enum feedbackType {contentAppreciation, priceFairness, suitableForChildren}\n    \n    // Type for registered users, both authors or customers. This struct is stored in the catalog\n    // Username is the identifier of content\n    struct User {\n        address userAddress;                    // Address of user (key value is the name)\n        bool exists;                            // To check if an user exists in the system\n        accountType accType;                    // Type of current account (default standard)\n        uint expirationTime;                    // Expiration time (calculated in block.size). Valid only for premium account\n        bytes32 latestContent;                  // Title of latest content published by current user\n\t\tuint publishedContentsCount;\t\t\t// Number of contents published by this user\n\t\tuint totalViews;\t\t\t\t\t\t// Number of views reached by its contents (used at catalog destroy)\n    }\n    \n    // Struct to hold reference of BaseContentManagementContracts with its author\n    // Title of content (a bytes32) is the identifier of content\n    struct ExtendedContent {\n        uint contentPrice;                      // Price of conent, defined by the author\n        bool exists;                            // To check if a content exists in the system\n        address contractAddress;                // Contract's address associated to current content\n        bytes32 author;                         // Name of owner of content\n\n        // Others informations, about views and users which are granted to access to current content, are stored in BaseContentManagementContracts\n    }\n}",
   "sourcePath": "/home/luca/Università/Progetti/P2PBC/COBrA-DApp/truffle/contracts/SharedTypes.sol",
   "ast": {
     "absolutePath": "/home/luca/Università/Progetti/P2PBC/COBrA-DApp/truffle/contracts/SharedTypes.sol",
     "exportedSymbols": {
       "SharedTypes": [
-        2997
+        2940
       ]
     },
-    "id": 2998,
+    "id": 2941,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 2960,
+        "id": 2903,
         "literals": [
           "solidity",
           "^",
@@ -26,7 +26,7 @@
           ".24"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:5"
+        "src": "0:24:4"
       },
       {
         "baseContracts": [],
@@ -34,105 +34,105 @@
         "contractKind": "library",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 2997,
+        "id": 2940,
         "linearizedBaseContracts": [
-          2997
+          2940
         ],
         "name": "SharedTypes",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "canonicalName": "SharedTypes.contentType",
-            "id": 2965,
+            "id": 2908,
             "members": [
               {
-                "id": 2961,
+                "id": 2904,
                 "name": "song",
                 "nodeType": "EnumValue",
-                "src": "139:4:5"
+                "src": "139:4:4"
               },
               {
-                "id": 2962,
+                "id": 2905,
                 "name": "video",
                 "nodeType": "EnumValue",
-                "src": "145:5:5"
+                "src": "145:5:4"
               },
               {
-                "id": 2963,
+                "id": 2906,
                 "name": "photo",
                 "nodeType": "EnumValue",
-                "src": "152:5:5"
+                "src": "152:5:4"
               },
               {
-                "id": 2964,
+                "id": 2907,
                 "name": "document",
                 "nodeType": "EnumValue",
-                "src": "159:8:5"
+                "src": "159:8:4"
               }
             ],
             "name": "contentType",
             "nodeType": "EnumDefinition",
-            "src": "121:47:5"
+            "src": "121:47:4"
           },
           {
             "canonicalName": "SharedTypes.accountType",
-            "id": 2968,
+            "id": 2911,
             "members": [
               {
-                "id": 2966,
+                "id": 2909,
                 "name": "standard",
                 "nodeType": "EnumValue",
-                "src": "219:8:5"
+                "src": "219:8:4"
               },
               {
-                "id": 2967,
+                "id": 2910,
                 "name": "premium",
                 "nodeType": "EnumValue",
-                "src": "229:7:5"
+                "src": "229:7:4"
               }
             ],
             "name": "accountType",
             "nodeType": "EnumDefinition",
-            "src": "201:36:5"
+            "src": "201:36:4"
           },
           {
             "canonicalName": "SharedTypes.feedbackType",
-            "id": 2972,
+            "id": 2915,
             "members": [
               {
-                "id": 2969,
+                "id": 2912,
                 "name": "contentAppreciation",
                 "nodeType": "EnumValue",
-                "src": "539:19:5"
+                "src": "539:19:4"
               },
               {
-                "id": 2970,
+                "id": 2913,
                 "name": "priceFairness",
                 "nodeType": "EnumValue",
-                "src": "560:13:5"
+                "src": "560:13:4"
               },
               {
-                "id": 2971,
+                "id": 2914,
                 "name": "suitableForChildren",
                 "nodeType": "EnumValue",
-                "src": "575:19:5"
+                "src": "575:19:4"
               }
             ],
             "name": "feedbackType",
             "nodeType": "EnumDefinition",
-            "src": "520:75:5"
+            "src": "520:75:4"
           },
           {
             "canonicalName": "SharedTypes.User",
-            "id": 2987,
+            "id": 2930,
             "members": [
               {
                 "constant": false,
-                "id": 2974,
+                "id": 2917,
                 "name": "userAddress",
                 "nodeType": "VariableDeclaration",
-                "scope": 2987,
-                "src": "770:19:5",
+                "scope": 2930,
+                "src": "770:19:4",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -140,10 +140,10 @@
                   "typeString": "address"
                 },
                 "typeName": {
-                  "id": 2973,
+                  "id": 2916,
                   "name": "address",
                   "nodeType": "ElementaryTypeName",
-                  "src": "770:7:5",
+                  "src": "770:7:4",
                   "typeDescriptions": {
                     "typeIdentifier": "t_address",
                     "typeString": "address"
@@ -154,11 +154,11 @@
               },
               {
                 "constant": false,
-                "id": 2976,
+                "id": 2919,
                 "name": "exists",
                 "nodeType": "VariableDeclaration",
-                "scope": 2987,
-                "src": "861:11:5",
+                "scope": 2930,
+                "src": "861:11:4",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -166,10 +166,10 @@
                   "typeString": "bool"
                 },
                 "typeName": {
-                  "id": 2975,
+                  "id": 2918,
                   "name": "bool",
                   "nodeType": "ElementaryTypeName",
-                  "src": "861:4:5",
+                  "src": "861:4:4",
                   "typeDescriptions": {
                     "typeIdentifier": "t_bool",
                     "typeString": "bool"
@@ -180,26 +180,26 @@
               },
               {
                 "constant": false,
-                "id": 2978,
+                "id": 2921,
                 "name": "accType",
                 "nodeType": "VariableDeclaration",
-                "scope": 2987,
-                "src": "953:19:5",
+                "scope": 2930,
+                "src": "953:19:4",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_enum$_accountType_$2968",
+                  "typeIdentifier": "t_enum$_accountType_$2911",
                   "typeString": "enum SharedTypes.accountType"
                 },
                 "typeName": {
                   "contractScope": null,
-                  "id": 2977,
+                  "id": 2920,
                   "name": "accountType",
                   "nodeType": "UserDefinedTypeName",
-                  "referencedDeclaration": 2968,
-                  "src": "953:11:5",
+                  "referencedDeclaration": 2911,
+                  "src": "953:11:4",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_enum$_accountType_$2968",
+                    "typeIdentifier": "t_enum$_accountType_$2911",
                     "typeString": "enum SharedTypes.accountType"
                   }
                 },
@@ -208,11 +208,11 @@
               },
               {
                 "constant": false,
-                "id": 2980,
+                "id": 2923,
                 "name": "expirationTime",
                 "nodeType": "VariableDeclaration",
-                "scope": 2987,
-                "src": "1047:19:5",
+                "scope": 2930,
+                "src": "1047:19:4",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -220,10 +220,10 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 2979,
+                  "id": 2922,
                   "name": "uint",
                   "nodeType": "ElementaryTypeName",
-                  "src": "1047:4:5",
+                  "src": "1047:4:4",
                   "typeDescriptions": {
                     "typeIdentifier": "t_uint256",
                     "typeString": "uint256"
@@ -234,11 +234,11 @@
               },
               {
                 "constant": false,
-                "id": 2982,
+                "id": 2925,
                 "name": "latestContent",
                 "nodeType": "VariableDeclaration",
-                "scope": 2987,
-                "src": "1173:21:5",
+                "scope": 2930,
+                "src": "1173:21:4",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -246,10 +246,10 @@
                   "typeString": "bytes32"
                 },
                 "typeName": {
-                  "id": 2981,
+                  "id": 2924,
                   "name": "bytes32",
                   "nodeType": "ElementaryTypeName",
-                  "src": "1173:7:5",
+                  "src": "1173:7:4",
                   "typeDescriptions": {
                     "typeIdentifier": "t_bytes32",
                     "typeString": "bytes32"
@@ -260,11 +260,11 @@
               },
               {
                 "constant": false,
-                "id": 2984,
+                "id": 2927,
                 "name": "publishedContentsCount",
                 "nodeType": "VariableDeclaration",
-                "scope": 2987,
-                "src": "1268:27:5",
+                "scope": 2930,
+                "src": "1268:27:4",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -272,10 +272,10 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 2983,
+                  "id": 2926,
                   "name": "uint",
                   "nodeType": "ElementaryTypeName",
-                  "src": "1268:4:5",
+                  "src": "1268:4:4",
                   "typeDescriptions": {
                     "typeIdentifier": "t_uint256",
                     "typeString": "uint256"
@@ -286,11 +286,11 @@
               },
               {
                 "constant": false,
-                "id": 2986,
+                "id": 2929,
                 "name": "totalViews",
                 "nodeType": "VariableDeclaration",
-                "scope": 2987,
-                "src": "1346:15:5",
+                "scope": 2930,
+                "src": "1346:15:4",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -298,10 +298,10 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 2985,
+                  "id": 2928,
                   "name": "uint",
                   "nodeType": "ElementaryTypeName",
-                  "src": "1346:4:5",
+                  "src": "1346:4:4",
                   "typeDescriptions": {
                     "typeIdentifier": "t_uint256",
                     "typeString": "uint256"
@@ -313,21 +313,21 @@
             ],
             "name": "User",
             "nodeType": "StructDefinition",
-            "scope": 2997,
-            "src": "748:694:5",
+            "scope": 2940,
+            "src": "748:694:4",
             "visibility": "public"
           },
           {
             "canonicalName": "SharedTypes.ExtendedContent",
-            "id": 2996,
+            "id": 2939,
             "members": [
               {
                 "constant": false,
-                "id": 2989,
+                "id": 2932,
                 "name": "contentPrice",
                 "nodeType": "VariableDeclaration",
-                "scope": 2996,
-                "src": "1632:17:5",
+                "scope": 2939,
+                "src": "1632:17:4",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -335,10 +335,10 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 2988,
+                  "id": 2931,
                   "name": "uint",
                   "nodeType": "ElementaryTypeName",
-                  "src": "1632:4:5",
+                  "src": "1632:4:4",
                   "typeDescriptions": {
                     "typeIdentifier": "t_uint256",
                     "typeString": "uint256"
@@ -349,11 +349,11 @@
               },
               {
                 "constant": false,
-                "id": 2991,
+                "id": 2934,
                 "name": "exists",
                 "nodeType": "VariableDeclaration",
-                "scope": 2996,
-                "src": "1722:11:5",
+                "scope": 2939,
+                "src": "1722:11:4",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -361,10 +361,10 @@
                   "typeString": "bool"
                 },
                 "typeName": {
-                  "id": 2990,
+                  "id": 2933,
                   "name": "bool",
                   "nodeType": "ElementaryTypeName",
-                  "src": "1722:4:5",
+                  "src": "1722:4:4",
                   "typeDescriptions": {
                     "typeIdentifier": "t_bool",
                     "typeString": "bool"
@@ -375,11 +375,11 @@
               },
               {
                 "constant": false,
-                "id": 2993,
+                "id": 2936,
                 "name": "contractAddress",
                 "nodeType": "VariableDeclaration",
-                "scope": 2996,
-                "src": "1816:23:5",
+                "scope": 2939,
+                "src": "1816:23:4",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -387,10 +387,10 @@
                   "typeString": "address"
                 },
                 "typeName": {
-                  "id": 2992,
+                  "id": 2935,
                   "name": "address",
                   "nodeType": "ElementaryTypeName",
-                  "src": "1816:7:5",
+                  "src": "1816:7:4",
                   "typeDescriptions": {
                     "typeIdentifier": "t_address",
                     "typeString": "address"
@@ -401,11 +401,11 @@
               },
               {
                 "constant": false,
-                "id": 2995,
+                "id": 2938,
                 "name": "author",
                 "nodeType": "VariableDeclaration",
-                "scope": 2996,
-                "src": "1916:14:5",
+                "scope": 2939,
+                "src": "1916:14:4",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -413,10 +413,10 @@
                   "typeString": "bytes32"
                 },
                 "typeName": {
-                  "id": 2994,
+                  "id": 2937,
                   "name": "bytes32",
                   "nodeType": "ElementaryTypeName",
-                  "src": "1916:7:5",
+                  "src": "1916:7:4",
                   "typeDescriptions": {
                     "typeIdentifier": "t_bytes32",
                     "typeString": "bytes32"
@@ -428,29 +428,29 @@
             ],
             "name": "ExtendedContent",
             "nodeType": "StructDefinition",
-            "scope": 2997,
-            "src": "1599:538:5",
+            "scope": 2940,
+            "src": "1599:538:4",
             "visibility": "public"
           }
         ],
-        "scope": 2998,
-        "src": "67:2072:5"
+        "scope": 2941,
+        "src": "67:2072:4"
       }
     ],
-    "src": "0:2139:5"
+    "src": "0:2139:4"
   },
   "legacyAST": {
     "absolutePath": "/home/luca/Università/Progetti/P2PBC/COBrA-DApp/truffle/contracts/SharedTypes.sol",
     "exportedSymbols": {
       "SharedTypes": [
-        2997
+        2940
       ]
     },
-    "id": 2998,
+    "id": 2941,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 2960,
+        "id": 2903,
         "literals": [
           "solidity",
           "^",
@@ -458,7 +458,7 @@
           ".24"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:5"
+        "src": "0:24:4"
       },
       {
         "baseContracts": [],
@@ -466,105 +466,105 @@
         "contractKind": "library",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 2997,
+        "id": 2940,
         "linearizedBaseContracts": [
-          2997
+          2940
         ],
         "name": "SharedTypes",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "canonicalName": "SharedTypes.contentType",
-            "id": 2965,
+            "id": 2908,
             "members": [
               {
-                "id": 2961,
+                "id": 2904,
                 "name": "song",
                 "nodeType": "EnumValue",
-                "src": "139:4:5"
+                "src": "139:4:4"
               },
               {
-                "id": 2962,
+                "id": 2905,
                 "name": "video",
                 "nodeType": "EnumValue",
-                "src": "145:5:5"
+                "src": "145:5:4"
               },
               {
-                "id": 2963,
+                "id": 2906,
                 "name": "photo",
                 "nodeType": "EnumValue",
-                "src": "152:5:5"
+                "src": "152:5:4"
               },
               {
-                "id": 2964,
+                "id": 2907,
                 "name": "document",
                 "nodeType": "EnumValue",
-                "src": "159:8:5"
+                "src": "159:8:4"
               }
             ],
             "name": "contentType",
             "nodeType": "EnumDefinition",
-            "src": "121:47:5"
+            "src": "121:47:4"
           },
           {
             "canonicalName": "SharedTypes.accountType",
-            "id": 2968,
+            "id": 2911,
             "members": [
               {
-                "id": 2966,
+                "id": 2909,
                 "name": "standard",
                 "nodeType": "EnumValue",
-                "src": "219:8:5"
+                "src": "219:8:4"
               },
               {
-                "id": 2967,
+                "id": 2910,
                 "name": "premium",
                 "nodeType": "EnumValue",
-                "src": "229:7:5"
+                "src": "229:7:4"
               }
             ],
             "name": "accountType",
             "nodeType": "EnumDefinition",
-            "src": "201:36:5"
+            "src": "201:36:4"
           },
           {
             "canonicalName": "SharedTypes.feedbackType",
-            "id": 2972,
+            "id": 2915,
             "members": [
               {
-                "id": 2969,
+                "id": 2912,
                 "name": "contentAppreciation",
                 "nodeType": "EnumValue",
-                "src": "539:19:5"
+                "src": "539:19:4"
               },
               {
-                "id": 2970,
+                "id": 2913,
                 "name": "priceFairness",
                 "nodeType": "EnumValue",
-                "src": "560:13:5"
+                "src": "560:13:4"
               },
               {
-                "id": 2971,
+                "id": 2914,
                 "name": "suitableForChildren",
                 "nodeType": "EnumValue",
-                "src": "575:19:5"
+                "src": "575:19:4"
               }
             ],
             "name": "feedbackType",
             "nodeType": "EnumDefinition",
-            "src": "520:75:5"
+            "src": "520:75:4"
           },
           {
             "canonicalName": "SharedTypes.User",
-            "id": 2987,
+            "id": 2930,
             "members": [
               {
                 "constant": false,
-                "id": 2974,
+                "id": 2917,
                 "name": "userAddress",
                 "nodeType": "VariableDeclaration",
-                "scope": 2987,
-                "src": "770:19:5",
+                "scope": 2930,
+                "src": "770:19:4",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -572,10 +572,10 @@
                   "typeString": "address"
                 },
                 "typeName": {
-                  "id": 2973,
+                  "id": 2916,
                   "name": "address",
                   "nodeType": "ElementaryTypeName",
-                  "src": "770:7:5",
+                  "src": "770:7:4",
                   "typeDescriptions": {
                     "typeIdentifier": "t_address",
                     "typeString": "address"
@@ -586,11 +586,11 @@
               },
               {
                 "constant": false,
-                "id": 2976,
+                "id": 2919,
                 "name": "exists",
                 "nodeType": "VariableDeclaration",
-                "scope": 2987,
-                "src": "861:11:5",
+                "scope": 2930,
+                "src": "861:11:4",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -598,10 +598,10 @@
                   "typeString": "bool"
                 },
                 "typeName": {
-                  "id": 2975,
+                  "id": 2918,
                   "name": "bool",
                   "nodeType": "ElementaryTypeName",
-                  "src": "861:4:5",
+                  "src": "861:4:4",
                   "typeDescriptions": {
                     "typeIdentifier": "t_bool",
                     "typeString": "bool"
@@ -612,26 +612,26 @@
               },
               {
                 "constant": false,
-                "id": 2978,
+                "id": 2921,
                 "name": "accType",
                 "nodeType": "VariableDeclaration",
-                "scope": 2987,
-                "src": "953:19:5",
+                "scope": 2930,
+                "src": "953:19:4",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_enum$_accountType_$2968",
+                  "typeIdentifier": "t_enum$_accountType_$2911",
                   "typeString": "enum SharedTypes.accountType"
                 },
                 "typeName": {
                   "contractScope": null,
-                  "id": 2977,
+                  "id": 2920,
                   "name": "accountType",
                   "nodeType": "UserDefinedTypeName",
-                  "referencedDeclaration": 2968,
-                  "src": "953:11:5",
+                  "referencedDeclaration": 2911,
+                  "src": "953:11:4",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_enum$_accountType_$2968",
+                    "typeIdentifier": "t_enum$_accountType_$2911",
                     "typeString": "enum SharedTypes.accountType"
                   }
                 },
@@ -640,11 +640,11 @@
               },
               {
                 "constant": false,
-                "id": 2980,
+                "id": 2923,
                 "name": "expirationTime",
                 "nodeType": "VariableDeclaration",
-                "scope": 2987,
-                "src": "1047:19:5",
+                "scope": 2930,
+                "src": "1047:19:4",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -652,10 +652,10 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 2979,
+                  "id": 2922,
                   "name": "uint",
                   "nodeType": "ElementaryTypeName",
-                  "src": "1047:4:5",
+                  "src": "1047:4:4",
                   "typeDescriptions": {
                     "typeIdentifier": "t_uint256",
                     "typeString": "uint256"
@@ -666,11 +666,11 @@
               },
               {
                 "constant": false,
-                "id": 2982,
+                "id": 2925,
                 "name": "latestContent",
                 "nodeType": "VariableDeclaration",
-                "scope": 2987,
-                "src": "1173:21:5",
+                "scope": 2930,
+                "src": "1173:21:4",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -678,10 +678,10 @@
                   "typeString": "bytes32"
                 },
                 "typeName": {
-                  "id": 2981,
+                  "id": 2924,
                   "name": "bytes32",
                   "nodeType": "ElementaryTypeName",
-                  "src": "1173:7:5",
+                  "src": "1173:7:4",
                   "typeDescriptions": {
                     "typeIdentifier": "t_bytes32",
                     "typeString": "bytes32"
@@ -692,11 +692,11 @@
               },
               {
                 "constant": false,
-                "id": 2984,
+                "id": 2927,
                 "name": "publishedContentsCount",
                 "nodeType": "VariableDeclaration",
-                "scope": 2987,
-                "src": "1268:27:5",
+                "scope": 2930,
+                "src": "1268:27:4",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -704,10 +704,10 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 2983,
+                  "id": 2926,
                   "name": "uint",
                   "nodeType": "ElementaryTypeName",
-                  "src": "1268:4:5",
+                  "src": "1268:4:4",
                   "typeDescriptions": {
                     "typeIdentifier": "t_uint256",
                     "typeString": "uint256"
@@ -718,11 +718,11 @@
               },
               {
                 "constant": false,
-                "id": 2986,
+                "id": 2929,
                 "name": "totalViews",
                 "nodeType": "VariableDeclaration",
-                "scope": 2987,
-                "src": "1346:15:5",
+                "scope": 2930,
+                "src": "1346:15:4",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -730,10 +730,10 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 2985,
+                  "id": 2928,
                   "name": "uint",
                   "nodeType": "ElementaryTypeName",
-                  "src": "1346:4:5",
+                  "src": "1346:4:4",
                   "typeDescriptions": {
                     "typeIdentifier": "t_uint256",
                     "typeString": "uint256"
@@ -745,21 +745,21 @@
             ],
             "name": "User",
             "nodeType": "StructDefinition",
-            "scope": 2997,
-            "src": "748:694:5",
+            "scope": 2940,
+            "src": "748:694:4",
             "visibility": "public"
           },
           {
             "canonicalName": "SharedTypes.ExtendedContent",
-            "id": 2996,
+            "id": 2939,
             "members": [
               {
                 "constant": false,
-                "id": 2989,
+                "id": 2932,
                 "name": "contentPrice",
                 "nodeType": "VariableDeclaration",
-                "scope": 2996,
-                "src": "1632:17:5",
+                "scope": 2939,
+                "src": "1632:17:4",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -767,10 +767,10 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 2988,
+                  "id": 2931,
                   "name": "uint",
                   "nodeType": "ElementaryTypeName",
-                  "src": "1632:4:5",
+                  "src": "1632:4:4",
                   "typeDescriptions": {
                     "typeIdentifier": "t_uint256",
                     "typeString": "uint256"
@@ -781,11 +781,11 @@
               },
               {
                 "constant": false,
-                "id": 2991,
+                "id": 2934,
                 "name": "exists",
                 "nodeType": "VariableDeclaration",
-                "scope": 2996,
-                "src": "1722:11:5",
+                "scope": 2939,
+                "src": "1722:11:4",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -793,10 +793,10 @@
                   "typeString": "bool"
                 },
                 "typeName": {
-                  "id": 2990,
+                  "id": 2933,
                   "name": "bool",
                   "nodeType": "ElementaryTypeName",
-                  "src": "1722:4:5",
+                  "src": "1722:4:4",
                   "typeDescriptions": {
                     "typeIdentifier": "t_bool",
                     "typeString": "bool"
@@ -807,11 +807,11 @@
               },
               {
                 "constant": false,
-                "id": 2993,
+                "id": 2936,
                 "name": "contractAddress",
                 "nodeType": "VariableDeclaration",
-                "scope": 2996,
-                "src": "1816:23:5",
+                "scope": 2939,
+                "src": "1816:23:4",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -819,10 +819,10 @@
                   "typeString": "address"
                 },
                 "typeName": {
-                  "id": 2992,
+                  "id": 2935,
                   "name": "address",
                   "nodeType": "ElementaryTypeName",
-                  "src": "1816:7:5",
+                  "src": "1816:7:4",
                   "typeDescriptions": {
                     "typeIdentifier": "t_address",
                     "typeString": "address"
@@ -833,11 +833,11 @@
               },
               {
                 "constant": false,
-                "id": 2995,
+                "id": 2938,
                 "name": "author",
                 "nodeType": "VariableDeclaration",
-                "scope": 2996,
-                "src": "1916:14:5",
+                "scope": 2939,
+                "src": "1916:14:4",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -845,10 +845,10 @@
                   "typeString": "bytes32"
                 },
                 "typeName": {
-                  "id": 2994,
+                  "id": 2937,
                   "name": "bytes32",
                   "nodeType": "ElementaryTypeName",
-                  "src": "1916:7:5",
+                  "src": "1916:7:4",
                   "typeDescriptions": {
                     "typeIdentifier": "t_bytes32",
                     "typeString": "bytes32"
@@ -860,16 +860,16 @@
             ],
             "name": "ExtendedContent",
             "nodeType": "StructDefinition",
-            "scope": 2997,
-            "src": "1599:538:5",
+            "scope": 2940,
+            "src": "1599:538:4",
             "visibility": "public"
           }
         ],
-        "scope": 2998,
-        "src": "67:2072:5"
+        "scope": 2941,
+        "src": "67:2072:4"
       }
     ],
-    "src": "0:2139:5"
+    "src": "0:2139:4"
   },
   "compiler": {
     "name": "solc",
@@ -877,5 +877,5 @@
   },
   "networks": {},
   "schemaVersion": "2.0.1",
-  "updatedAt": "2018-09-10T19:49:17.823Z"
+  "updatedAt": "2018-11-01T10:53:31.252Z"
 }
