@@ -511,11 +511,11 @@ const contentPublishedCallback = async (err, evt) => {
 
 	type		= Number (type);
 	var strType	= type2TypeString(type);
-	console.log (type);
+	//console.log (type);
 
 	if (!suitableFor(genreFilters, strType) && !suitableFor(authorFilters,author)) {
-		console.log ("genreFilters doesn't contain   " + strType);
-		console.log ("genreFilters doesn't contain   " + author);
+		//console.log ("genreFilters doesn't contain   " + strType);
+		//console.log ("genreFilters doesn't contain   " + author);
 		return ;
 	}
 	
