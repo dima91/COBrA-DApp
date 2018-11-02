@@ -23,7 +23,7 @@ const videoContractPath			= folderPrefix + 'VideoManagementContract.json'
 
 
 // Global variables
-var defaultcatalogAddress	= "0x49c32605a1aab14ecb6fbb180b4b3aae530a2701";
+var defaultcatalogAddress	= "0x36851d5acabff5356f126615d246e7f35b36f462";
 var infuraKey				= "3c51b50483cd4eec9119a4a7129bd0a4";
 var mnemonic				= "";
 var privateKeys				= ["d4f293fe249a5b025361545f253d20e723c61072453e11ccedf92d4253abf167"];
